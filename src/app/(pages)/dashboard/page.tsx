@@ -92,7 +92,7 @@ function page() {
 <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-blue-700">
+        <h1 className="text-2xl font-bold text-blue-00">
           Inventory Management KPIs
         </h1>
         <span className="text-sm text-gray-700">
