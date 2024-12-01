@@ -1,39 +1,49 @@
-import React from "react";
+'use client'
+import React, { useState } from "react";
 import Navbar from "@/app/components/navbar";
 import Header from "@/app/components/header";
 import DepartmentCard from "@/app/components/departmentCard";
+import AddDepartmentPopup from "@/app/components/addDepartmentPopup";
 
 function Page() {
+  const [openPopup, setOpenPopup] = useState(false);
+
+  const handleSave = (data: { departmentName: string; headOfDepartment: string }) => {
+    console.log("Saved Data:", data);
+    // Add logic to save data to an API or update state
+  };
+
   return (
-    <div className="flex w-full h-screen bg-gray-100">
-      {/* Sidebar Section */}
-      <div className="w-[20%] bg-white shadow-md">
+    <div className="flex w-full h-screen">
+      <div className="w-[20%]">
         <Navbar />
       </div>
-
-      {/* Main Content Section */}
-      <div className="w-[80%] p-6">
+      <div className="w-[80%]">
         <Header />
-        <div className="w-full mt-6">
-          {/* Header Section */}
-          <div className="flex justify-center items-center space-x-4 mb-6">
-            <h1 className="text-2xl font-bold text-blue-800 text-center w-[80%]">Departments</h1>
-            <button className="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+        <div className="w-full h-screen">
+          <div className="flex justify-center w-full space-x-2 mt-[3%]">
+            <div className="text-2xl w-[80%] text-center font-bold text-blue-800">
+              Department
+            </div>
+            <button
+              className="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm"
+              onClick={() => setOpenPopup(true)} // Open the popup
+            >
               Add New
             </button>
           </div>
-
-          {/* Cards Section */}
-          <div className="flex justify-between flex-wrap gap-4 p-4">
+          <div className="flex w-full justify-between p-4 rounded-xl">
             <DepartmentCard />
             <DepartmentCard />
             <DepartmentCard />
-            <DepartmentCard />
-            <DepartmentCard />
-            <DepartmentCard />
-
           </div>
         </div>
+        {openPopup && (
+          <AddDepartmentPopup
+            btnStatus={setOpenPopup}
+            onSave={handleSave}
+          />
+        )}
       </div>
     </div>
   );
