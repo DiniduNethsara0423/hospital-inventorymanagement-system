@@ -1,8 +1,10 @@
-'use client'
+'use client';
 import React, { useState } from "react";
+import SaveSuccessPopup from "@/app/components/SaveSuccessPopup";
 
-const page: React.FC = () => {
+const Page: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
+  const [isPopupVisible, setPopupVisible] = useState(false); // State for popup visibility
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -12,12 +14,19 @@ const page: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
     console.log("Form submitted!");
+
+    // Show the success popup
+    setPopupVisible(true);
+
+    // Auto-close popup after 3 seconds
+    setTimeout(() => {
+      setPopupVisible(false);
+    }, 3000);
   };
 
   return (
-    <div className="flex justify-center  items-center min-h-screen bg-white">
+    <div className="flex justify-center items-center min-h-screen bg-white">
       <form
         onSubmit={handleSubmit}
         className="bg-white rounded-lg p-6 w-full max-w-4xl"
@@ -168,6 +177,7 @@ const page: React.FC = () => {
               />
             </div>
           </div>
+
         </div>
 
         <div className="flex justify-center mt-6">
@@ -179,8 +189,15 @@ const page: React.FC = () => {
           </button>
         </div>
       </form>
+
+      {/* Render the SaveSuccessPopup if visible */}
+      {isPopupVisible && (
+        <SaveSuccessPopup
+          onClose={() => setPopupVisible(false)} // Close popup on user action
+        />
+      )}
     </div>
   );
 };
 
-export default page;
+export default Page;

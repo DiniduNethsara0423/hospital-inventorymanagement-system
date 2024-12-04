@@ -1,7 +1,5 @@
-'use client'
+'use client';
 import React, { useState } from "react";
-import Link from "next/link";
-
 
 interface InventoryItem {
   name: string;
@@ -14,6 +12,7 @@ interface InventoryItem {
 const page: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState(50);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   // Sample inventory data
   const inventoryData: InventoryItem[] = Array(500)
@@ -43,15 +42,43 @@ const page: React.FC = () => {
     setCurrentPage(page);
   };
 
+  const handleCheckboxChange = (itemCode: string) => {
+    setSelectedItems((prevSelected) =>
+      prevSelected.includes(itemCode)
+        ? prevSelected.filter((code) => code !== itemCode)
+        : [...prevSelected, itemCode]
+    );
+  };
+
+  const handleDeleteSelected = () => {
+    alert(`Delete the selected items: ${selectedItems.join(", ")}`);
+    // Add logic to delete selected items
+    setSelectedItems([]); // Clear selection after deletion
+  };
+
+  const handleEdit = (itemCode: string) => {
+    alert(`Edit item with code: ${itemCode}`);
+    // Add logic for editing the item
+  };
+
   return (
-    
     <div className="p-4 w-full">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div className="text-2xl font-bold">Inventory All Items</div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
-          + New
-        </button>
+        <div className="flex items-center space-x-4">
+          {selectedItems.length > 0 && (
+            <button
+              onClick={handleDeleteSelected}
+              className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm"
+            >
+              Delete Selected
+            </button>
+          )}
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+            + New
+          </button>
+        </div>
       </div>
 
       {/* Table */}
@@ -59,16 +86,41 @@ const page: React.FC = () => {
         <table className="table-auto w-full border-collapse border border-gray-200">
           <thead className="bg-gray-100 text-left">
             <tr>
+              <th className="border border-gray-200 px-4 py-2">
+                <input
+                  type="checkbox"
+                  onChange={(e) =>
+                    setSelectedItems(
+                      e.target.checked
+                        ? paginatedItems.map((item) => item.itemCode)
+                        : []
+                    )
+                  }
+                  checked={
+                    paginatedItems.every((item) =>
+                      selectedItems.includes(item.itemCode)
+                    ) && paginatedItems.length > 0
+                  }
+                />
+              </th>
               <th className="border border-gray-200 px-4 py-2">Name</th>
               <th className="border border-gray-200 px-4 py-2">Item Code</th>
               <th className="border border-gray-200 px-4 py-2">Type</th>
               <th className="border border-gray-200 px-4 py-2">Description</th>
               <th className="border border-gray-200 px-4 py-2">Rate (LKR)</th>
+              <th className="border border-gray-200 px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedItems.map((item, index) => (
-              <tr key={index} className="hover:bg-gray-100">
+            {paginatedItems.map((item) => (
+              <tr key={item.itemCode} className="hover:bg-gray-100">
+                <td className="border border-gray-200 px-4 py-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.includes(item.itemCode)}
+                    onChange={() => handleCheckboxChange(item.itemCode)}
+                  />
+                </td>
                 <td className="border border-gray-200 px-4 py-2">{item.name}</td>
                 <td className="border border-gray-200 px-4 py-2">
                   {item.itemCode}
@@ -78,6 +130,14 @@ const page: React.FC = () => {
                   {item.description}
                 </td>
                 <td className="border border-gray-200 px-4 py-2">{item.rate}</td>
+                <td className="border border-gray-200 px-4 py-2">
+                  <button
+                    onClick={() => handleEdit(item.itemCode)}
+                    className="bg-green-600 text-white px-2 py-1 rounded-md text-sm"
+                  >
+                    Edit
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -90,7 +150,9 @@ const page: React.FC = () => {
         <div className="flex items-center">
           <button
             className={`px-3 py-1 rounded-md ${
-              currentPage === 1 ? "bg-gray-200 cursor-not-allowed" : "bg-blue-500 text-white"
+              currentPage === 1
+                ? "bg-gray-200 cursor-not-allowed"
+                : "bg-blue-500 text-white"
             }`}
             onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
@@ -112,7 +174,9 @@ const page: React.FC = () => {
           ))}
           <button
             className={`px-3 py-1 rounded-md ${
-              currentPage === totalPages ? "bg-gray-200 cursor-not-allowed" : "bg-blue-500 text-white"
+              currentPage === totalPages
+                ? "bg-gray-200 cursor-not-allowed"
+                : "bg-blue-500 text-white"
             }`}
             onClick={() =>
               currentPage < totalPages && handlePageChange(currentPage + 1)
@@ -140,8 +204,6 @@ const page: React.FC = () => {
         </div>
       </div>
     </div>
-  
-
   );
 };
 
