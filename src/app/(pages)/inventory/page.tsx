@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter
 
 interface InventoryItem {
   name: string;
@@ -10,6 +11,8 @@ interface InventoryItem {
 }
 
 const page: React.FC = () => {
+  const router = useRouter(); // Initialize useRouter
+
   const [itemsPerPage, setItemsPerPage] = useState(50);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -75,7 +78,10 @@ const page: React.FC = () => {
               Delete Selected
             </button>
           )}
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+          <button
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
+            onClick={() => router.push("/add-Inventory")} // Navigate to the add inventory page
+          >
             + New
           </button>
         </div>
