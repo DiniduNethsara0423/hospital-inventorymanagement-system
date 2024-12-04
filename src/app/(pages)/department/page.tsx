@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Navbar from "@/app/components/navbar";
 import Header from "@/app/components/header";
 import DepartmentCard from "@/app/components/departmentCard";
-import AddDepartmentPopup from "@/app/components/addDepartmentPopup";
+// import AddDepartmentPopup from "@/app/components/addDepartmentPopup";
 
 function Page() {
   const [openPopup, setOpenPopup] = useState(false);
@@ -14,12 +14,7 @@ function Page() {
   };
 
   return (
-    <div className="flex w-full h-screen">
-      <div className="w-[20%]">
-        <Navbar />
-      </div>
-      <div className="w-[80%]">
-        <Header />
+  
         <div className="w-full h-screen">
           <div className="flex justify-center w-full space-x-2 mt-[3%]">
             <div className="text-2xl w-[80%] text-center font-bold text-blue-800">
@@ -38,14 +33,8 @@ function Page() {
             <DepartmentCard />
           </div>
         </div>
-        {openPopup && (
-          <AddDepartmentPopup
-            btnStatus={setOpenPopup}
-            onSave={handleSave}
-          />
-        )}
-      </div>
-    </div>
+       
+      
   );
 }
 

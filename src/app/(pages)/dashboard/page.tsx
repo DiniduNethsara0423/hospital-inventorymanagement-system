@@ -35,60 +35,7 @@ function page() {
         ],
       };
   return (
-    <div className="flex w-full h-screen">
-      <div className="w-[20%]">
-        <Navbar />
-      </div>
-      <div className="w-[80%]">
-        <Header />
-        {/* <div className="w-full h-screen  p-5">
-          <div className="flex w-full">
-            <div className="w-[80%] border border-red-800">
-              <h1 className="text-xl font-bold text-blue-800">
-                Inventory Management KPIs
-              </h1>
-
-              <div className="w-full p-2 mt-[3%] space-y-5">
-                <div className="flex w-full space-x-16 ml-[6%] ">
-                  <div className="w-[25%] border border-red-800 space-y-4 p-2 flex flex-col ">
-                    <div className="ml-[20%] space-y-7 p-2">
-                    <h2 className="font-bold text-sm ml-[2%]">Average Inventory</h2>
-                    <div className="flex space-x-1 ml-[5%]  ">
-                        <h1 className="text-blue-700">LKR</h1>
-                        <h1 className="text-blue-700">25000</h1>
-                    </div>
-                    </div>
-                  </div>
-                  <div className="w-[25%] border border-red-800">
-                    <h2>Inventory Turnover Ratio</h2>
-                    <h1>LKR 250000</h1>
-                  </div>
-                  <div className="w-[25%] border border-red-800">
-                    <h2>Returns</h2>
-                    <h1>LKR 250000</h1>
-                  </div>
-                </div>
-                <div className="flex w-full space-x-16 ml-[6%] ">
-                  <div className="w-[25%] border border-red-800">
-                    <h2>To Be Ship</h2>
-                    <h1>LKR 250000</h1>
-                  </div>
-                  <div className="w-[25%] border border-red-800">
-                    <h2>Perfect Order Ratio</h2>
-                    <h1>LKR 250000</h1>
-                  </div>
-                  <div className="w-[25%] border border-red-800">
-                    <h2>To Be Invoiced</h2>
-                    <h1>LKR 250000</h1>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="w-[20%]">22</div>
-          </div>
-          <div>body</div>
-        </div> */}
-
+ 
 <div className="p-6 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -137,9 +84,9 @@ function page() {
       </div>
 
       {/* Charts Section */}
-      <div className="mt-10 grid grid-cols-2 gap-8">
+      <div className="mt-10  grid grid-cols-2 gap-8">
         {/* Purchases Chart */}
-        <div className="bg-white shadow-md p-6 rounded-md">
+        <div className="bg-white shadow-md p-6 rounded-md ">
           <h3 className="text-lg font-bold text-gray-800 mb-4">Purchases</h3>
           <Doughnut data={purchasesData} />
         </div>
@@ -153,8 +100,7 @@ function page() {
     </div>
 
 
-      </div>
-    </div>
+    
   );
 }
 

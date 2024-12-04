@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from "react";
-import Navbar from "@/app/components/navbar";
-import Header from "@/app/components/header";
+import Link from "next/link";
+
 
 interface InventoryItem {
   name: string;
@@ -44,12 +44,7 @@ const page: React.FC = () => {
   };
 
   return (
-    <div className="flex w-full h-screen">
-    <div className="w-[20%]">
-      <Navbar />
-    </div>
-    <div className="w-[80%]">
-      <Header />
+    
     <div className="p-4 w-full">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -145,8 +140,7 @@ const page: React.FC = () => {
         </div>
       </div>
     </div>
-    </div>
-    </div>
+  
 
   );
 };
