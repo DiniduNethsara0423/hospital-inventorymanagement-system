@@ -1,150 +1,239 @@
-'use client';
-import React, { useState } from "react";
+'use client'
+import { useState } from "react";
 
-interface Vendor {
-  name: string;
+type Supplier = {
+  id: number;
+  vendorName: string;
   email?: string;
   shopName: string;
   shopAddress?: string;
   telephoneNumber?: string;
-}
+};
 
-const VendorForm: React.FC = () => {
-  const [vendor, setVendor] = useState<Vendor>({
-    name: "",
-    email: "",
-    shopName: "",
-    shopAddress: "",
-    telephoneNumber: "",
-  });
+export default function SuppliersPage() {
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form, setForm] = useState<Partial<Supplier>>({});
+  const [editingId, setEditingId] = useState<number | null>(null);
 
-  const [error, setError] = useState<string>("");
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setVendor((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+  const openModal = (supplier?: Supplier) => {
+    if (supplier) {
+      setForm(supplier);
+      setEditingId(supplier.id);
+    } else {
+      setForm({});
+      setEditingId(null);
+    }
+    setIsModalOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Basic validation
-    if (!vendor.name || !vendor.shopName) {
-      setError("Name and Shop Name are required.");
-      return;
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setForm({});
+    setEditingId(null);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = () => {
+    if (editingId !== null) {
+      setSuppliers((prev) =>
+        prev.map((supplier) =>
+          supplier.id === editingId ? { ...supplier, ...form } : supplier
+        )
+      );
+    } else {
+      const newSupplier: Supplier = {
+        id: Date.now(),
+        vendorName: form.vendorName || "",
+        email: form.email,
+        shopName: form.shopName || "",
+        shopAddress: form.shopAddress,
+        telephoneNumber: form.telephoneNumber,
+      };
+      setSuppliers([...suppliers, newSupplier]);
     }
-    setError("");
-    // Process form submission logic here (e.g., save to server or update state)
-    console.log("Vendor submitted:", vendor);
+    closeModal();
+  };
+
+  const handleDelete = (id: number) => {
+    setSuppliers(suppliers.filter((supplier) => supplier.id !== id));
   };
 
   return (
-    <div className="p-4 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4 text-center">Vendor Registration</h1>
-
-      <div className="max-w-md mx-auto bg-white p-6 rounded-md shadow-md">
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="name" className="block text-sm font-semibold text-gray-700">
-              Vendor Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={vendor.name}
-              onChange={handleInputChange}
-              className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
-              Email (Optional)
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={vendor.email || ""}
-              onChange={handleInputChange}
-              className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="shopName" className="block text-sm font-semibold text-gray-700">
-              Shop Name
-            </label>
-            <input
-              type="text"
-              id="shopName"
-              name="shopName"
-              value={vendor.shopName}
-              onChange={handleInputChange}
-              className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="shopAddress" className="block text-sm font-semibold text-gray-700">
-              Shop Address (Optional)
-            </label>
-            <input
-              type="text"
-              id="shopAddress"
-              name="shopAddress"
-              value={vendor.shopAddress || ""}
-              onChange={handleInputChange}
-              className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="telephoneNumber" className="block text-sm font-semibold text-gray-700">
-              Telephone Number (Optional)
-            </label>
-            <input
-              type="text"
-              id="telephoneNumber"
-              name="telephoneNumber"
-              value={vendor.telephoneNumber || ""}
-              onChange={handleInputChange}
-              className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-          </div>
-
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-
-          <div className="flex justify-end gap-2">
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-            >
-              Submit
-            </button>
-            <button
-              type="reset"
-              onClick={() => setVendor({
-                name: "",
-                email: "",
-                shopName: "",
-                shopAddress: "",
-                telephoneNumber: "",
-              })}
-              className="bg-gray-400 text-white px-6 py-2 rounded-md hover:bg-gray-500"
-            >
-              Reset
-            </button>
-          </div>
-        </form>
+    <div className="min-h-screen bg-gray-100 py-8 px-4">
+      <div className="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-700">Supplier Management</h1>
+          <button
+            onClick={() => openModal()}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md"
+          >
+            + Add Supplier
+          </button>
+        </div>
+        <table className="w-full table-auto border-collapse border border-gray-300">
+          <thead className="bg-gray-200">
+            <tr>
+              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                Vendor Name
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                Email
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                Shop Name
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                Shop Address
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-600">
+                Telephone
+              </th>
+              <th className="border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-600">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {suppliers.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="text-center py-4 text-gray-500 text-sm"
+                >
+                  No suppliers added yet.
+                </td>
+              </tr>
+            ) : (
+              suppliers.map((supplier) => (
+                <tr key={supplier.id} className="bg-white">
+                  <td className="border border-gray-300 px-4 py-2">
+                    {supplier.vendorName}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {supplier.email || "-"}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {supplier.shopName}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {supplier.shopAddress || "-"}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {supplier.telephoneNumber || "-"}
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 flex justify-center space-x-2">
+                    <button
+                      onClick={() => openModal(supplier)}
+                      className="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(supplier.id)}
+                      className="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
+
+      {/* Modal for Add/Edit Supplier */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+            <h2 className="text-xl font-bold mb-4">
+              {editingId ? "Edit Supplier" : "Add Supplier"}
+            </h2>
+            <div className="grid gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-600">
+                  Vendor Name
+                </label>
+                <input
+                  type="text"
+                  name="vendorName"
+                  value={form.vendorName || ""}
+                  onChange={handleChange}
+                  className="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600">
+                  Email (Optional)
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={form.email || ""}
+                  onChange={handleChange}
+                  className="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600">
+                  Shop Name
+                </label>
+                <input
+                  type="text"
+                  name="shopName"
+                  value={form.shopName || ""}
+                  onChange={handleChange}
+                  className="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600">
+                  Shop Address (Optional)
+                </label>
+                <input
+                  type="text"
+                  name="shopAddress"
+                  value={form.shopAddress || ""}
+                  onChange={handleChange}
+                  className="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-600">
+                  Telephone Number (Optional)
+                </label>
+                <input
+                  type="text"
+                  name="telephoneNumber"
+                  value={form.telephoneNumber || ""}
+                  onChange={handleChange}
+                  className="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end space-x-4">
+              <button
+                onClick={closeModal}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
+              >
+                {editingId ? "Update" : "Add"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-};
-
-export default VendorForm;
+}
