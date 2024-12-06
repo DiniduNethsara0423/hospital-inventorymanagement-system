@@ -75,6 +75,26 @@ function Navbar() {
             <span>Reports</span>
           </a>
           <a
+            href="/Purchase"
+            className="flex items-center space-x-3 text-gray-700 dark:text-gray-300 hover:text-blue-600"
+          >
+            <svg
+              className="w-6 h-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M17 16v1m0-4V7m2-4H7a2 2 0 00-2 2v14h10l6-6V7a2 2 0 00-2-2z"
+              />
+            </svg>
+            <span>Purchase requests</span>
+          </a>
+          <a
             href="/suppliers"
             className="flex items-center space-x-3 text-gray-700 dark:text-gray-300 hover:text-blue-600"
           >
