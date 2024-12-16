@@ -1,5 +1,5 @@
 import React from "react";
-import { FaEdit } from "react-icons/fa"; // Importing the edit icon from react-icons
+import { FaEdit } from "react-icons/fa";
 
 interface DepartmentCardProps {
   department: {
