@@ -3,41 +3,51 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DepartmentCard from "@/app/components/departmentCard";
-import { postDepartment } from "@/app/apis/add-department/api";
-import { getDepartments } from "@/app/apis/get-all-department/api";
+import { postDepartment, getDepartments, updateDepartment, deleteDepartment } from "@/app/apis/department/api";
 
-// Define Department Interface
 interface Department {
   id: number;
   name: string;
+  head?: string; // Optional field for department head
 }
 
 function DepartmentsPage() {
-  const router = useRouter();
-
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
   const [openPopup, setOpenPopup] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
 
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [totalItems, setTotalItems] = useState(0);
 
-  // Fetch Departments
   const fetchDepartments = async () => {
+    setLoading(true);
     try {
       const response = await getDepartments(currentPage, pageSize);
-      if (response && response.data) {
-        setDepartments(response.data); // Set departments data
-        setTotalItems(response.total); // Set total items
+      if (response) {
+        console.log(response);
+        setDepartments(response); // Assuming the API returns `data` for the current page
+        setTotalItems(response); // Assuming the API returns `totalCount` for all items
       } else {
         console.error("Invalid API response:", response);
       }
     } catch (error) {
       console.error("Error fetching departments:", error);
+    } finally {
+      setLoading(false);
     }
   };
+  
+  // Handle Page Change
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+  
 
   useEffect(() => {
     fetchDepartments();
@@ -45,25 +55,44 @@ function DepartmentsPage() {
 
   const totalPages = Math.ceil(totalItems / pageSize);
 
-  // Add New Department
-  const handleAddDepartment = async (data: { name: string }) => {
+  const handleAddOrUpdateDepartment = async (data: { id?: number; name: string }) => {
     setLoading(true);
     try {
-      const newDepartment = await postDepartment(data);
-      setDepartments((prev) => [...prev, newDepartment]);
+      if (data.id) {
+        await updateDepartment(data); // Update if ID exists
+      } else {
+        await postDepartment(data); // Add new department
+      }
       setOpenPopup(false);
+      setEditingDepartment(null);
       fetchDepartments(); // Refresh the list
     } catch (error) {
-      console.error("Failed to add department:", error);
-      alert("Error adding department. Please try again.");
+      console.error("Failed to save department:", error);
+      alert("Error saving department. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  const handleDeleteDepartment = async (id: number) => {
+    if (confirm("Are you sure you want to delete this department?")) {
+      setLoading(true);
+      try {
+        await deleteDepartment(id);
+        fetchDepartments(); // Refresh the list after deletion
+      } catch (error) {
+        console.error("Failed to delete department:", error);
+        alert("Error deleting department. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    }
   };
+  
+
+  // const handlePageChange = (page: number) => {
+  //   if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  // };
 
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
@@ -74,12 +103,13 @@ function DepartmentsPage() {
     <div className="w-full h-screen">
       {/* Page Header */}
       <div className="flex justify-center w-full space-x-2 mt-[3%]">
-        <div className="text-2xl w-[80%] text-center font-bold text-blue-800">
-          Departments
-        </div>
+        <div className="text-2xl w-[80%] text-center font-bold text-blue-800">Departments</div>
         <button
           className="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm"
-          onClick={() => setOpenPopup(true)}
+          onClick={() => {
+            setEditingDepartment(null);
+            setOpenPopup(true);
+          }}
         >
           Add New
         </button>
@@ -100,52 +130,74 @@ function DepartmentsPage() {
       </div>
 
       {/* Department Cards */}
-      <div className="flex flex-wrap">
+      <div className="flex flex-wrap ">
         {departments?.map((department) => (
           <DepartmentCard
             key={department.id}
             department={department}
-            onClick={() => router.push(`/department-view?id=${department.id}`)}
+            onEdit={() => {
+              setEditingDepartment(department);
+              setOpenPopup(true);
+            }}
+            onDelete={() => handleDeleteDepartment(department.id)} // Pass the delete handler
+            onClick={() => setSelectedDepartment(department)}
           />
         ))}
       </div>
 
       {/* Pagination Controls */}
       <div className="flex justify-center items-center space-x-4 mt-4">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          className={`px-3 py-2 bg-gray-300 rounded-lg ${
-            currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        <span>
-          Page {currentPage} of {totalPages || 1}
-        </span>
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          className={`px-3 py-2 bg-gray-300 rounded-lg ${
-            currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-      </div>
+  <button
+    onClick={() => handlePageChange(currentPage - 1)}
+    className={`px-3 py-2 bg-gray-300 rounded-lg ${
+      currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+    }`}
+    disabled={currentPage === 1}
+  >
+    Previous
+  </button>
+  <span className="font-medium">
+    Page {currentPage}
+  </span>
+  <button
+    onClick={() => handlePageChange(currentPage + 1)}
+    className={`px-3 py-2 bg-gray-300 rounded-lg ${
+      departments.length < pageSize ? "opacity-50 cursor-not-allowed" : ""
+    }`}
+    disabled={departments.length < pageSize}
+  >
+    Next
+  </button>
+</div>
 
-      {/* Add Department Popup */}
+
+      {/* Department Details Section */}
+      {selectedDepartment && (
+        <div className="mt-8 p-6 bg-gray-100 rounded-lg shadow-md">
+          <h2 className="text-xl font-bold mb-4">Department Details</h2>
+          <p><strong>ID:</strong> {selectedDepartment.id}</p>
+          <p><strong>Name:</strong> {selectedDepartment.name}</p>
+          <p><strong>Head:</strong> {selectedDepartment.head || "N/A"}</p>
+        </div>
+      )}
+
+      {/* Add/Edit Department Popup */}
       {openPopup && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg p-6 w-1/3">
-            <h2 className="text-lg font-bold mb-4">Add Department</h2>
+            <h2 className="text-lg font-bold mb-4">
+              {editingDepartment ? "Edit Department" : "Add Department"}
+            </h2>
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
                 const formData = new FormData(e.target as HTMLFormElement);
                 const departmentName = formData.get("name") as string;
-                await handleAddDepartment({ name: departmentName });
+                await handleAddOrUpdateDepartment(
+                  editingDepartment
+                    ? { id: editingDepartment.id, name: departmentName }
+                    : { name: departmentName }
+                );
               }}
             >
               <div className="mb-4">
@@ -153,6 +205,7 @@ function DepartmentsPage() {
                 <input
                   name="name"
                   className="border border-gray-300 rounded-md w-full px-3 py-2"
+                  defaultValue={editingDepartment?.name || ""}
                   required
                 />
               </div>
@@ -171,7 +224,7 @@ function DepartmentsPage() {
                   }`}
                   disabled={loading}
                 >
-                  {loading ? "Adding..." : "Add Department"}
+                  {loading ? "Saving..." : "Save"}
                 </button>
               </div>
             </form>
