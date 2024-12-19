@@ -1,72 +1,79 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import DepartmentCard from '@/app/components/departmentCard';
-import { getAllDepartments } from '@/app/apis/get-all-department/api'; // API to fetch departments
-import { postDepartment } from '@/app/apis/add-department/api'; // API to add department
+"use client";
 
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import DepartmentCard from "@/app/components/departmentCard";
+import { postDepartment } from "@/app/apis/add-department/api";
+import { getDepartments } from "@/app/apis/get-all-department/api";
+
+// Define Department Interface
 interface Department {
   id: number;
   name: string;
-  head?: string;
 }
 
-function Page() {
+function DepartmentsPage() {
   const router = useRouter();
+
   const [departments, setDepartments] = useState<Department[]>([]);
   const [openPopup, setOpenPopup] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  // State for pagination
-  const [page, setPage] = useState(1);
-  const [pageSize] = useState(5); // Fixed page size
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [totalItems, setTotalItems] = useState(0);
 
-  useEffect(() => {
-    fetchDepartments();
-  }, [page]);
-
-  // Function to fetch departments
+  // Fetch Departments
   const fetchDepartments = async () => {
-    setLoading(true);
     try {
-      const data = await getAllDepartments(page, pageSize);
-      console.log("API Response:", data);
-      
-      if (Array.isArray(data)) {
-        setDepartments(data);
+      const response = await getDepartments(currentPage, pageSize);
+      if (response && response.data) {
+        setDepartments(response.data); // Set departments data
+        setTotalItems(response.total); // Set total items
       } else {
-        console.error("API did not return an array:", data);
-        setDepartments([]); // Default to empty array
+        console.error("Invalid API response:", response);
       }
     } catch (error) {
       console.error("Error fetching departments:", error);
-      setDepartments([]);
-    } finally {
-      setLoading(false);
     }
   };
-  
-  
-  // Function to handle adding a department
+
+  useEffect(() => {
+    fetchDepartments();
+  }, [currentPage, pageSize]);
+
+  const totalPages = Math.ceil(totalItems / pageSize);
+
+  // Add New Department
   const handleAddDepartment = async (data: { name: string }) => {
     setLoading(true);
     try {
       const newDepartment = await postDepartment(data);
       setDepartments((prev) => [...prev, newDepartment]);
       setOpenPopup(false);
+      fetchDepartments(); // Refresh the list
     } catch (error) {
-      console.error('Failed to add department:', error);
-      alert('Error adding department. Please try again.');
+      console.error("Failed to add department:", error);
+      alert("Error adding department. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1); // Reset to the first page
+  };
+
   return (
-    <div className="w-full h-screen p-6">
-      {/* Header and Add New Button */}
-      <div className="flex justify-center w-full space-x-2 mb-6">
+    <div className="w-full h-screen">
+      {/* Page Header */}
+      <div className="flex justify-center w-full space-x-2 mt-[3%]">
         <div className="text-2xl w-[80%] text-center font-bold text-blue-800">
           Departments
         </div>
@@ -78,43 +85,51 @@ function Page() {
         </button>
       </div>
 
-      {/* Department Cards */}
-      {loading ? (
-        <p className="text-center">Loading...</p>
-      ) : error ? (
-        <p className="text-center text-red-600">{error}</p>
-      ) : (
-        <div className="flex flex-wrap gap-4">
-  {Array.isArray(departments) && departments.length > 0 ? (
-    departments.map((department) => (
-      <DepartmentCard
-        key={department.id}
-        department={department}
-        onClick={() => router.push(`/department-view?id=${department.id}`)}
-      />
-    ))
-  ) : (
-    <p>No departments available.</p>
-  )}
-</div>
+      {/* Page Size Selector */}
+      <div className="flex justify-end p-4 space-x-2">
+        <label className="font-medium">Page Size:</label>
+        <select
+          className="border border-gray-300 rounded-md px-2 py-1"
+          value={pageSize}
+          onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={15}>15</option>
+        </select>
+      </div>
 
-      )}
+      {/* Department Cards */}
+      <div className="flex flex-wrap">
+        {departments?.map((department) => (
+          <DepartmentCard
+            key={department.id}
+            department={department}
+            onClick={() => router.push(`/department-view?id=${department.id}`)}
+          />
+        ))}
+      </div>
 
       {/* Pagination Controls */}
-      <div className="flex justify-center mt-6 space-x-4">
+      <div className="flex justify-center items-center space-x-4 mt-4">
         <button
-          className={`px-4 py-2 bg-blue-600 text-white rounded ${
-            page === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'
+          onClick={() => handlePageChange(currentPage - 1)}
+          className={`px-3 py-2 bg-gray-300 rounded-lg ${
+            currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
           }`}
-          onClick={() => setPage(page - 1)}
-          disabled={page === 1}
+          disabled={currentPage === 1}
         >
           Previous
         </button>
-        <span className="self-center">Page {page}</span>
+        <span>
+          Page {currentPage} of {totalPages || 1}
+        </span>
         <button
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          onClick={() => setPage(page + 1)}
+          onClick={() => handlePageChange(currentPage + 1)}
+          className={`px-3 py-2 bg-gray-300 rounded-lg ${
+            currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={currentPage === totalPages}
         >
           Next
         </button>
@@ -129,7 +144,7 @@ function Page() {
               onSubmit={async (e) => {
                 e.preventDefault();
                 const formData = new FormData(e.target as HTMLFormElement);
-                const departmentName = formData.get('name') as string;
+                const departmentName = formData.get("name") as string;
                 await handleAddDepartment({ name: departmentName });
               }}
             >
@@ -152,11 +167,11 @@ function Page() {
                 <button
                   type="submit"
                   className={`bg-blue-600 text-white px-4 py-2 rounded-lg ${
-                    loading ? 'opacity-50 cursor-not-allowed' : ''
+                    loading ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                   disabled={loading}
                 >
-                  {loading ? 'Adding...' : 'Add Department'}
+                  {loading ? "Adding..." : "Add Department"}
                 </button>
               </div>
             </form>
@@ -167,4 +182,4 @@ function Page() {
   );
 }
 
-export default Page;
+export default DepartmentsPage;

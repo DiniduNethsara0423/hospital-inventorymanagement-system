@@ -6,7 +6,7 @@ interface DepartmentRequest {
 
 export const postDepartment = async (data: DepartmentRequest) => {
   const url = process.env.NEXT_PUBLIC_ADD_DEPARTMENT || "http://localhost:3100/departments/add-department";
-
+  console.log(url);
   try {
     const response = await api.post(url, data);
     console.log("Department added:", response.data);
