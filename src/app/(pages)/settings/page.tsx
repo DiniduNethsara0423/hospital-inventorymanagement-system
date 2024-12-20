@@ -1,104 +1,133 @@
 "use client"; // Enable client-side rendering
 import { useState, useEffect } from "react";
-import axios from "axios";
-import { postCategory } from "@/app/apis/add-category/api";
+import { FiEdit, FiTrash } from "react-icons/fi"; // Importing icons
+import { getCategory, postCategory } from "@/app/apis/add-category/api";
 
 interface Category {
   id: number;
-  name: string;
+  category_name: string;
 }
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [page, setPage] = useState<number>(1);
+  const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(5);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [newCategory, setNewCategory] = useState({ name: "" });
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
   const [totalCategories, setTotalCategories] = useState<number>(0);
+  const [newCategory, setNewCategory] = useState({ category_name: "" });
 
-  // Fetch categories from API
-  const fetchCategories = async (page: number, pageSize: number, search: string) => {
+  // Fetch categories from the backend
+  const fetchCategories = async () => {
     try {
-      const response = await axios.get(
-        `/category/findAll?page=${page}&pageSize=${pageSize}&search=${search}`
-      );
-      setCategories(response.data.categories || []);
-      setTotalCategories(response.data.total || 0);
+      const response = await getCategory(currentPage, pageSize);
+      if (response) {
+        setCategories(response.data || []);
+        setFilteredCategories(response.data || []);
+        setTotalCategories(response.totalCount || 0); // Adjust based on API response
+      } else {
+        console.error("Invalid API response:", response);
+      }
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
   };
 
   useEffect(() => {
-    fetchCategories(page, pageSize, searchQuery);
-  }, [page, pageSize, searchQuery]);
+    fetchCategories();
+  }, [currentPage, pageSize]);
 
-  // Add a new category
+  useEffect(() => {
+    if (searchQuery) {
+      const filtered = categories.filter((category) =>
+        category.category_name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredCategories(filtered);
+    } else {
+      setFilteredCategories(categories);
+    }
+  }, [searchQuery, categories]);
+
   const handleAddCategory = async () => {
+    if (!newCategory.category_name.trim()) {
+      alert("Category name cannot be empty.");
+      return;
+    }
     try {
-      await postCategory(newCategory); // Use the API function
-      setNewCategory({ name: "" }); // Reset the input field
-      fetchCategories(page, pageSize, searchQuery); // Refresh the category list
-    } catch (error) {
+      await postCategory(newCategory);
+      setNewCategory({ category_name: "" });
+      fetchCategories();
+    } catch (error: any) {
       console.error("Error adding category:", error.message);
     }
   };
 
-  // Update a category
   const handleUpdateCategory = async () => {
     if (selectedCategory) {
       try {
-        await axios.patch(`/category/update/${selectedCategory.id}`, {
-          name: selectedCategory.name,
-        });
+        const response = await fetch(
+          `/category/update/${selectedCategory.id}`,
+          {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              category_name: selectedCategory.category_name,
+            }),
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to update category.");
+        }
         setSelectedCategory(null);
-        fetchCategories(page, pageSize, searchQuery);
+        fetchCategories();
       } catch (error) {
         console.error("Error updating category:", error);
       }
     }
   };
 
-  // Delete a category
   const handleDeleteCategory = async (id: number) => {
     try {
-      await axios.delete(`/category/remove/${id}`);
-      fetchCategories(page, pageSize, searchQuery);
+      const response = await fetch(`/category/remove/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete category.");
+      }
+      fetchCategories();
     } catch (error) {
       console.error("Error deleting category:", error);
     }
-  };
-
-  // Search input handler
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    setPage(1); // Reset to first page when searching
   };
 
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Category Management</h1>
 
-      {/* Search */}
+      {/* Search Bar */}
       <div className="mb-6">
         <input
           type="text"
           placeholder="Search Categories"
           value={searchQuery}
-          onChange={handleSearchChange}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="border p-2 mr-2 w-full md:w-1/3"
         />
       </div>
 
-      {/* Add Category */}
+      {/* Add New Category */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold">Add New Category</h2>
         <input
           type="text"
-          placeholder="Name"
-          value={newCategory.name}
-          onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+          placeholder="Category Name"
+          value={newCategory.category_name}
+          onChange={(e) =>
+            setNewCategory({ ...newCategory, category_name: e.target.value })
+          }
           className="border p-2 mr-2"
         />
         <button
@@ -109,7 +138,7 @@ const CategoriesPage = () => {
         </button>
       </div>
 
-      {/* Category List */}
+      {/* Categories Table */}
       <div>
         <h2 className="text-xl font-semibold mb-2">Categories</h2>
         <table className="table-auto w-full mb-4">
@@ -121,70 +150,91 @@ const CategoriesPage = () => {
             </tr>
           </thead>
           <tbody>
-            {categories.map((category) => (
+            {filteredCategories.map((category) => (
               <tr key={category.id}>
                 <td className="border px-4 py-2">{category.id}</td>
                 <td className="border px-4 py-2">
                   {selectedCategory?.id === category.id ? (
                     <input
                       type="text"
-                      value={selectedCategory.name}
+                      value={selectedCategory.category_name}
                       onChange={(e) =>
-                        setSelectedCategory({ ...selectedCategory, name: e.target.value })
+                        setSelectedCategory({
+                          ...selectedCategory,
+                          category_name: e.target.value,
+                        })
                       }
                       className="border p-1"
                     />
                   ) : (
-                    category.name
+                    category.category_name
                   )}
                 </td>
-                <td className="border px-4 py-2">
+                <td className="border px-4 py-2 flex items-center space-x-2">
                   {selectedCategory?.id === category.id ? (
                     <button
                       onClick={handleUpdateCategory}
-                      className="bg-green-500 text-white p-1 rounded mr-2"
+                      className="bg-green-500 text-white p-1 rounded"
                     >
                       Save
                     </button>
                   ) : (
-                    <button
+                    <FiEdit
                       onClick={() => setSelectedCategory(category)}
-                      className="bg-yellow-500 text-white p-1 rounded mr-2"
-                    >
-                      Edit
-                    </button>
+                      className="text-yellow-500 cursor-pointer"
+                    />
                   )}
-                  <button
+                  <FiTrash
                     onClick={() => handleDeleteCategory(category.id)}
-                    className="bg-red-500 text-white p-1 rounded"
-                  >
-                    Delete
-                  </button>
+                    className="text-red-500 cursor-pointer"
+                  />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        {/* Pagination */}
-        <div className="flex justify-between">
-          <button
-            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-            disabled={page === 1}
-            className="bg-gray-300 p-2 rounded"
-          >
-            Previous
-          </button>
-          <span>
-            Page {page} of {Math.ceil(totalCategories / pageSize)}
-          </span>
-          <button
-            onClick={() => setPage((prev) => prev + 1)}
-            disabled={categories.length < pageSize}
-            className="bg-gray-300 p-2 rounded"
-          >
-            Next
-          </button>
+        {/* Pagination Controls */}
+        <div className="flex justify-between items-center space-x-4 mt-4">
+          <div className="flex space-x-2">
+            <label className="font-medium">Page Size:</label>
+            <select
+              className="border border-gray-300 rounded-md px-2 py-1"
+              value={pageSize}
+              onChange={(e) => setPageSize(Number(e.target.value))}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={15}>15</option>
+            </select>
+          </div>
+          <div className="flex justify-center items-center space-x-4">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className={`px-3 py-2 bg-gray-300 rounded-lg ${
+                currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <span className="font-medium">Page {currentPage}</span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) =>
+                  filteredCategories.length < pageSize ? prev : prev + 1
+                )
+              }
+              className={`px-3 py-2 bg-gray-300 rounded-lg ${
+                filteredCategories.length < pageSize
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }`}
+              disabled={filteredCategories.length < pageSize}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>
