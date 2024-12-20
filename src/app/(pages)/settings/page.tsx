@@ -25,8 +25,8 @@ const CategoriesPage = () => {
     try {
       const response = await getCategory(currentPage, pageSize);
       if (response) {
-        setCategories(response.data || []);
-        setFilteredCategories(response.data || []);
+        setCategories(response || []);
+        setFilteredCategories(response|| []);
         setTotalCategories(response.totalCount || 0); // Adjust based on API response
       } else {
         console.error("Invalid API response:", response);
