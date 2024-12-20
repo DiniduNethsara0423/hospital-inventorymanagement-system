@@ -1,7 +1,7 @@
-"use client"; // Enable client-side rendering
+"use client";
 import { useState, useEffect } from "react";
-import { FiEdit, FiTrash } from "react-icons/fi"; // Importing icons
-import { getCategory, postCategory } from "@/app/apis/add-category/api";
+import { FiEdit, FiTrash } from "react-icons/fi";
+import { getCategory, postCategory, updateCategory } from "@/app/apis/add-category/api";
 
 interface Category {
   id: number;
@@ -14,20 +14,17 @@ const CategoriesPage = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(5);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null
-  );
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [totalCategories, setTotalCategories] = useState<number>(0);
   const [newCategory, setNewCategory] = useState({ category_name: "" });
 
-  // Fetch categories from the backend
   const fetchCategories = async () => {
     try {
       const response = await getCategory(currentPage, pageSize);
       if (response) {
-        setCategories(response || []);
-        setFilteredCategories(response|| []);
-        setTotalCategories(response.totalCount || 0); // Adjust based on API response
+        setCategories(response|| []);
+        setFilteredCategories(response || []);
+        setTotalCategories(response|| 0);
       } else {
         console.error("Invalid API response:", response);
       }
@@ -68,35 +65,21 @@ const CategoriesPage = () => {
   const handleUpdateCategory = async () => {
     if (selectedCategory) {
       try {
-        const response = await fetch(
-          `/category/update/${selectedCategory.id}`,
-          {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              category_name: selectedCategory.category_name,
-            }),
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Failed to update category.");
-        }
+        await updateCategory({
+          id: selectedCategory.id,
+          category_name: selectedCategory.category_name,
+        });
         setSelectedCategory(null);
         fetchCategories();
-      } catch (error) {
-        console.error("Error updating category:", error);
+      } catch (error: any) {
+        console.error("Error updating category:", error.message);
       }
     }
   };
 
   const handleDeleteCategory = async (id: number) => {
     try {
-      const response = await fetch(`/category/remove/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to delete category.");
-      }
+      await deleteCategory(id);
       fetchCategories();
     } catch (error) {
       console.error("Error deleting category:", error);
@@ -107,7 +90,6 @@ const CategoriesPage = () => {
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Category Management</h1>
 
-      {/* Search Bar */}
       <div className="mb-6">
         <input
           type="text"
@@ -118,7 +100,6 @@ const CategoriesPage = () => {
         />
       </div>
 
-      {/* Add New Category */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold">Add New Category</h2>
         <input
@@ -138,7 +119,6 @@ const CategoriesPage = () => {
         </button>
       </div>
 
-      {/* Categories Table */}
       <div>
         <h2 className="text-xl font-semibold mb-2">Categories</h2>
         <table className="table-auto w-full mb-4">
@@ -194,7 +174,6 @@ const CategoriesPage = () => {
           </tbody>
         </table>
 
-        {/* Pagination Controls */}
         <div className="flex justify-between items-center space-x-4 mt-4">
           <div className="flex space-x-2">
             <label className="font-medium">Page Size:</label>
