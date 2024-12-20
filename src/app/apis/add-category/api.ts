@@ -41,3 +41,14 @@ export const updateCategory = async (data: { id: number; category_name: string }
     throw new Error(error.response?.data?.message || "Failed to update category.");
   }
 };
+
+
+export const deleteCategory = async (id: number) => {
+  try {
+    const response = await api.delete(`/category/remove/${id}`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error deleting category:", error.response?.data || error.message);
+    throw new Error("Failed to delete category.");
+  }
+};

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { FiEdit, FiTrash } from "react-icons/fi";
-import { getCategory, postCategory, updateCategory } from "@/app/apis/add-category/api";
+import { getCategory, postCategory, updateCategory, deleteCategory } from "@/app/apis/add-category/api";
 
 interface Category {
   id: number;
@@ -22,9 +22,9 @@ const CategoriesPage = () => {
     try {
       const response = await getCategory(currentPage, pageSize);
       if (response) {
-        setCategories(response|| []);
+        setCategories(response || []);
         setFilteredCategories(response || []);
-        setTotalCategories(response|| 0);
+        setTotalCategories(response || 0);
       } else {
         console.error("Invalid API response:", response);
       }
@@ -76,15 +76,17 @@ const CategoriesPage = () => {
       }
     }
   };
-
   const handleDeleteCategory = async (id: number) => {
     try {
+      console.log(`Attempting to delete category with ID: ${id}`); // Add logging
       await deleteCategory(id);
+      console.log("Category deleted successfully");
       fetchCategories();
-    } catch (error) {
-      console.error("Error deleting category:", error);
+    } catch (error: any) {
+      console.error("Error deleting category:", error.response?.data || error.message);
     }
   };
+  
 
   return (
     <div className="container mx-auto p-6">
