@@ -8,12 +8,10 @@ import { postDepartment, getDepartments, updateDepartment, deleteDepartment } fr
 interface Department {
   id: number;
   name: string;
-  head?: string; // Optional field for department head
 }
 
 function DepartmentsPage() {
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
   const [openPopup, setOpenPopup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
@@ -23,14 +21,14 @@ function DepartmentsPage() {
   const [pageSize, setPageSize] = useState(5);
   const [totalItems, setTotalItems] = useState(0);
 
-  const router = useRouter(); // Router for navigation
+  const router = useRouter();
 
   const fetchDepartments = async () => {
     setLoading(true);
     try {
       const response = await getDepartments(currentPage, pageSize);
       if (response) {
-        setDepartments(response); // Assuming API returns data for the current page
+        setDepartments(response || []); // Assuming API returns data array
         setTotalItems(response.totalCount || 0); // Assuming API returns totalCount
       } else {
         console.error("Invalid API response:", response);
@@ -52,16 +50,18 @@ function DepartmentsPage() {
 
   const totalPages = Math.ceil(totalItems / pageSize);
 
-  const handleAddOrUpdateDepartment = async (data: { id?: number; name: string }) => {
+  const handleAddOrUpdateDepartment = async (name: string) => {
     setLoading(true);
     try {
-      if (data.id) {
-        await updateDepartment(data); // Update if ID exists
+      if (editingDepartment?.id) {
+        // Edit existing department
+        await updateDepartment({ id: editingDepartment.id, name });
       } else {
-        await postDepartment(data); // Add new department
+        // Add new department
+        await postDepartment({ name });
       }
       setOpenPopup(false);
-      setEditingDepartment(null);
+      setEditingDepartment(null); // Reset editing state after saving
       fetchDepartments(); // Refresh the list
     } catch (error) {
       console.error("Failed to save department:", error);
@@ -70,6 +70,7 @@ function DepartmentsPage() {
       setLoading(false);
     }
   };
+  
 
   const handleDeleteDepartment = async (id: number) => {
     if (confirm("Are you sure you want to delete this department?")) {
@@ -159,6 +160,56 @@ function DepartmentsPage() {
           Next
         </button>
       </div>
+
+      {/* Popup for Adding/Editing Departments */}
+      {openPopup && (
+  <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+      <h2 className="text-xl font-bold mb-4">
+        {editingDepartment ? "Edit Department" : "Add Department"}
+      </h2>
+      <input
+        type="text"
+        placeholder="Department Name"
+        value={editingDepartment?.name || ""}
+        className="w-full border border-gray-300 rounded-md px-3 py-2 mb-4"
+        onChange={(e) => {
+          const updatedName = e.target.value;
+          if (editingDepartment) {
+            setEditingDepartment({ ...editingDepartment, name: updatedName });
+          } else {
+            setEditingDepartment({ id: 0, name: updatedName }); // Temporary state for new department
+          }
+        }}
+      />
+      <div className="flex justify-end space-x-4">
+        <button
+          className="bg-gray-500 text-white px-4 py-2 rounded-md"
+          onClick={() => {
+            setOpenPopup(false);
+            setEditingDepartment(null); // Reset state on cancel
+          }}
+        >
+          Cancel
+        </button>
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-md"
+          onClick={() => {
+            const departmentName = editingDepartment?.name || "";
+            if (!departmentName.trim()) {
+              alert("Department name is required.");
+              return;
+            }
+            handleAddOrUpdateDepartment(departmentName);
+          }}
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
