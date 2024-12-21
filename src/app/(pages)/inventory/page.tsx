@@ -63,7 +63,7 @@ const page: React.FC = () => {
     alert(`Edit item with code: ${itemCode}`);
     // Add logic for editing the item
   };
-
+ 
   return (
     <div className="p-4 w-full">
       {/* Header */}
