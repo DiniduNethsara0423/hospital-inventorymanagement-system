@@ -1,5 +1,7 @@
-'use client'
-import { useState } from "react";
+'use client';
+
+import { useState, useEffect } from "react";
+import { postSupplier } from "@/app/apis/supplier/api";
 
 type Supplier = {
   id: number;
@@ -15,6 +17,10 @@ export default function SuppliersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form, setForm] = useState<Partial<Supplier>>({});
   const [editingId, setEditingId] = useState<number | null>(null);
+
+  useEffect(() => {
+    // Fetch suppliers from server if required (not implemented here)
+  }, []);
 
   const openModal = (supplier?: Supplier) => {
     if (supplier) {
@@ -37,26 +43,36 @@ export default function SuppliersPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
-    if (editingId !== null) {
-      setSuppliers((prev) =>
-        prev.map((supplier) =>
-          supplier.id === editingId ? { ...supplier, ...form } : supplier
-        )
-      );
-    } else {
-      const newSupplier: Supplier = {
-        id: Date.now(),
+  const handleSubmit = async () => {
+    try {
+      const newSupplier = {
+        vendor_id: editingId !== null ? String(editingId) : String(Date.now()), // Ensure vendor_id is a string
         vendorName: form.vendorName || "",
-        email: form.email,
+        email: form.email || "",
         shopName: form.shopName || "",
-        shopAddress: form.shopAddress,
-        telephoneNumber: form.telephoneNumber,
+        shopAddress: form.shopAddress || "",
+        telephoneNumber: form.telephoneNumber || "",
       };
-      setSuppliers([...suppliers, newSupplier]);
+  
+      const response = await postSupplier(newSupplier);
+  
+      if (editingId !== null) {
+        setSuppliers((prev) =>
+          prev.map((supplier) =>
+            supplier.id === editingId ? { ...supplier, ...newSupplier } : supplier
+          )
+        );
+      } else {
+        setSuppliers([...suppliers, { id: response.id, ...response }]);
+      }
+  
+      closeModal();
+    } catch (error) {
+      console.error("Error adding supplier:", error);
+      alert(error.message || "Failed to add supplier.");
     }
-    closeModal();
   };
+  
 
   const handleDelete = (id: number) => {
     setSuppliers(suppliers.filter((supplier) => supplier.id !== id));
@@ -145,7 +161,6 @@ export default function SuppliersPage() {
           </tbody>
         </table>
       </div>
-
       {/* Modal for Add/Edit Supplier */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
