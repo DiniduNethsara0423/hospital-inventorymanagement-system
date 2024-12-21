@@ -8,12 +8,10 @@ import { postDepartment, getDepartments, updateDepartment, deleteDepartment } fr
 interface Department {
   id: number;
   name: string;
-  head?: string; // Optional field for department head
 }
 
 function DepartmentsPage() {
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
   const [openPopup, setOpenPopup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
@@ -23,14 +21,15 @@ function DepartmentsPage() {
   const [pageSize, setPageSize] = useState(5);
   const [totalItems, setTotalItems] = useState(0);
 
+  const router = useRouter();
+
   const fetchDepartments = async () => {
     setLoading(true);
     try {
       const response = await getDepartments(currentPage, pageSize);
       if (response) {
-        console.log(response);
-        setDepartments(response); // Assuming the API returns `data` for the current page
-        setTotalItems(response); // Assuming the API returns `totalCount` for all items
+        setDepartments(response || []); // Assuming API returns data array
+        setTotalItems(response.totalCount || 0); // Assuming API returns totalCount
       } else {
         console.error("Invalid API response:", response);
       }
@@ -40,14 +39,10 @@ function DepartmentsPage() {
       setLoading(false);
     }
   };
-  
-  // Handle Page Change
+
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
-  
 
   useEffect(() => {
     fetchDepartments();
@@ -55,16 +50,18 @@ function DepartmentsPage() {
 
   const totalPages = Math.ceil(totalItems / pageSize);
 
-  const handleAddOrUpdateDepartment = async (data: { id?: number; name: string }) => {
+  const handleAddOrUpdateDepartment = async (name: string) => {
     setLoading(true);
     try {
-      if (data.id) {
-        await updateDepartment(data); // Update if ID exists
+      if (editingDepartment?.id) {
+        // Edit existing department
+        await updateDepartment({ id: editingDepartment.id, name });
       } else {
-        await postDepartment(data); // Add new department
+        // Add new department
+        await postDepartment({ name });
       }
       setOpenPopup(false);
-      setEditingDepartment(null);
+      setEditingDepartment(null); // Reset editing state after saving
       fetchDepartments(); // Refresh the list
     } catch (error) {
       console.error("Failed to save department:", error);
@@ -73,6 +70,7 @@ function DepartmentsPage() {
       setLoading(false);
     }
   };
+  
 
   const handleDeleteDepartment = async (id: number) => {
     if (confirm("Are you sure you want to delete this department?")) {
@@ -88,11 +86,6 @@ function DepartmentsPage() {
       }
     }
   };
-  
-
-  // const handlePageChange = (page: number) => {
-  //   if (page >= 1 && page <= totalPages) setCurrentPage(page);
-  // };
 
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
@@ -100,12 +93,12 @@ function DepartmentsPage() {
   };
 
   return (
-    <div className="w-full h-screen">
+    <div className="w-full h-screen p-6">
       {/* Page Header */}
-      <div className="flex justify-center w-full space-x-2 mt-[3%]">
-        <div className="text-2xl w-[80%] text-center font-bold text-blue-800">Departments</div>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-blue-800">Departments</h1>
         <button
-          className="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm"
+          className="bg-blue-700 text-white px-4 py-2 rounded-lg"
           onClick={() => {
             setEditingDepartment(null);
             setOpenPopup(true);
@@ -116,10 +109,10 @@ function DepartmentsPage() {
       </div>
 
       {/* Page Size Selector */}
-      <div className="flex justify-end p-4 space-x-2">
+      <div className="flex justify-end items-center mb-4 space-x-4">
         <label className="font-medium">Page Size:</label>
         <select
-          className="border border-gray-300 rounded-md px-2 py-1"
+          className="border border-gray-300 rounded-md px-3 py-2"
           value={pageSize}
           onChange={(e) => handlePageSizeChange(Number(e.target.value))}
         >
@@ -130,8 +123,8 @@ function DepartmentsPage() {
       </div>
 
       {/* Department Cards */}
-      <div className="flex flex-wrap ">
-        {departments?.map((department) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {departments.map((department) => (
           <DepartmentCard
             key={department.id}
             department={department}
@@ -139,98 +132,84 @@ function DepartmentsPage() {
               setEditingDepartment(department);
               setOpenPopup(true);
             }}
-            onDelete={() => handleDeleteDepartment(department.id)} // Pass the delete handler
-            onClick={() => setSelectedDepartment(department)}
+            onDelete={() => handleDeleteDepartment(department.id)}
+            onClick={() => router.push(`/department/${department.id}`)} // Navigate to department page
           />
         ))}
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex justify-center items-center space-x-4 mt-4">
-  <button
-    onClick={() => handlePageChange(currentPage - 1)}
-    className={`px-3 py-2 bg-gray-300 rounded-lg ${
-      currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-    }`}
-    disabled={currentPage === 1}
-  >
-    Previous
-  </button>
-  <span className="font-medium">
-    Page {currentPage}
-  </span>
-  <button
-    onClick={() => handlePageChange(currentPage + 1)}
-    className={`px-3 py-2 bg-gray-300 rounded-lg ${
-      departments.length < pageSize ? "opacity-50 cursor-not-allowed" : ""
-    }`}
-    disabled={departments.length < pageSize}
-  >
-    Next
-  </button>
-</div>
+      <div className="flex justify-center items-center space-x-4 mt-6">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          className={`px-3 py-2 bg-gray-300 rounded-lg ${
+            currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span className="font-medium">Page {currentPage}</span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          className={`px-3 py-2 bg-gray-300 rounded-lg ${
+            departments.length < pageSize ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={departments.length < pageSize}
+        >
+          Next
+        </button>
+      </div>
 
-
-      {/* Department Details Section */}
-      {selectedDepartment && (
-        <div className="mt-8 p-6 bg-gray-100 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold mb-4">Department Details</h2>
-          <p><strong>ID:</strong> {selectedDepartment.id}</p>
-          <p><strong>Name:</strong> {selectedDepartment.name}</p>
-          <p><strong>Head:</strong> {selectedDepartment.head || "N/A"}</p>
-        </div>
-      )}
-
-      {/* Add/Edit Department Popup */}
+      {/* Popup for Adding/Editing Departments */}
       {openPopup && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 w-1/3">
-            <h2 className="text-lg font-bold mb-4">
-              {editingDepartment ? "Edit Department" : "Add Department"}
-            </h2>
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target as HTMLFormElement);
-                const departmentName = formData.get("name") as string;
-                await handleAddOrUpdateDepartment(
-                  editingDepartment
-                    ? { id: editingDepartment.id, name: departmentName }
-                    : { name: departmentName }
-                );
-              }}
-            >
-              <div className="mb-4">
-                <label className="block font-medium mb-2">Department Name</label>
-                <input
-                  name="name"
-                  className="border border-gray-300 rounded-md w-full px-3 py-2"
-                  defaultValue={editingDepartment?.name || ""}
-                  required
-                />
-              </div>
-              <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg"
-                  onClick={() => setOpenPopup(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className={`bg-blue-600 text-white px-4 py-2 rounded-lg ${
-                    loading ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                  disabled={loading}
-                >
-                  {loading ? "Saving..." : "Save"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+  <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
+      <h2 className="text-xl font-bold mb-4">
+        {editingDepartment ? "Edit Department" : "Add Department"}
+      </h2>
+      <input
+        type="text"
+        placeholder="Department Name"
+        value={editingDepartment?.name || ""}
+        className="w-full border border-gray-300 rounded-md px-3 py-2 mb-4"
+        onChange={(e) => {
+          const updatedName = e.target.value;
+          if (editingDepartment) {
+            setEditingDepartment({ ...editingDepartment, name: updatedName });
+          } else {
+            setEditingDepartment({ id: 0, name: updatedName }); // Temporary state for new department
+          }
+        }}
+      />
+      <div className="flex justify-end space-x-4">
+        <button
+          className="bg-gray-500 text-white px-4 py-2 rounded-md"
+          onClick={() => {
+            setOpenPopup(false);
+            setEditingDepartment(null); // Reset state on cancel
+          }}
+        >
+          Cancel
+        </button>
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-md"
+          onClick={() => {
+            const departmentName = editingDepartment?.name || "";
+            if (!departmentName.trim()) {
+              alert("Department name is required.");
+              return;
+            }
+            handleAddOrUpdateDepartment(departmentName);
+          }}
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
