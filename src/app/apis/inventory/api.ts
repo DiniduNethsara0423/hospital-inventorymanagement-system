@@ -62,3 +62,6 @@ export const createNewItem = async (data: Record<string, any>) => {
     throw error;
   }
 };
+
+
+export const deleteItem = async ()=>{}

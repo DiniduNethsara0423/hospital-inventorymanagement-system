@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAllItems, deleteItem } from "@/app/apis/inventory/api"; // Update the path as needed
@@ -27,8 +27,9 @@ const ItemsPage: React.FC = () => {
       setIsLoading(true);
       try {
         const data = await getAllItems(currentPage, itemsPerPage);
-        setItems(data.items); // Ensure your API response has an `items` key
-        setTotalItems(data.Count || 0); // If API provides a total count
+        setItems(data.items || []); // Ensure your API response has an `items` key
+        const count = data.count && data.count[0] && data.count[0]["COUNT(*)"];
+        setTotalItems(parseInt(count, 10) || 0); // Parse the total count
       } catch (error) {
         console.error("Failed to fetch items:", error);
       } finally {
@@ -57,7 +58,7 @@ const ItemsPage: React.FC = () => {
   const handleDelete = async (barcode: string) => {
     if (confirm("Are you sure you want to delete this item?")) {
       try {
-        await deleteItem(barcode); // Call the delete API
+        await deleteItem(barcode); 
         setItems((prevItems) => prevItems.filter((item) => item.barcode !== barcode));
       } catch (error) {
         console.error("Failed to delete item:", error);
@@ -66,54 +67,69 @@ const ItemsPage: React.FC = () => {
   };
 
   return (
-    <div className="p-4 w-full">
+    <div className=" w-full  min-h-screen">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Inventory All Items</h1>
+        <h1 className="text-3xl font-extrabold text-blue-700">Hospital Inventory</h1>
         <button
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-sm shadow-md"
           onClick={() => router.push("/add-Inventory")}
         >
-          + New
+          Add New Item
         </button>
       </div>
 
+      <div className="flex justify-end items-center mb-4">
+        <label className="mr-2 text-gray-700 font-medium">Items Per Page:</label>
+        <select
+          value={itemsPerPage}
+          onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+          className="border border-gray-300 rounded-md px-3 py-1 text-gray-700 shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
+        >
+          {[5, 10, 25, 50].map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {isLoading ? (
-        <p>Loading items...</p>
+        <p className="text-center text-gray-700 font-medium">Loading items...</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg shadow-md">
-          <table className="table-auto w-full border-collapse border border-gray-200">
-            <thead className="bg-gray-100 text-left">
+        <div className="overflow-x-auto bg-white">
+          <table className="table-auto w-full ">
+            <thead className="bg-[#c0e3fa] text-left">
               <tr>
-                <th className="border border-gray-200 px-4 py-2">Barcode</th>
-                <th className="border border-gray-200 px-4 py-2">Name</th>
-                <th className="border border-gray-200 px-4 py-2">Available Qty</th>
-                <th className="border border-gray-200 px-4 py-2">Total Qty</th>
-                <th className="border border-gray-200 px-4 py-2">Lower Quantity</th>
-                <th className="border border-gray-200 px-4 py-2">Category ID</th>
-                <th className="border border-gray-200 px-4 py-2">Department ID</th>
-                <th className="border border-gray-200 px-4 py-2">Actions</th>
+                <th className=" px-4 py-2 rounded-tl-lg">Barcode</th>
+                <th className="border px-4 py-2">Name</th>
+                <th className="border px-4 py-2">Available Qty</th>
+                <th className="border px-4 py-2">Total Qty</th>
+                <th className="border px-4 py-2">Lower Quantity</th>
+                <th className="border px-4 py-2">Category ID</th>
+                <th className="border px-4 py-2">Department ID</th>
+                <th className=" px-4 py-2 rounded-tr-lg">Actions</th>
               </tr>
             </thead>
             <tbody>
               {items.length > 0 ? (
                 items.map((item) => (
-                  <tr key={item.barcode} className="hover:bg-gray-100">
-                    <td className="border border-gray-200 px-4 py-2">{item.barcode}</td>
-                    <td className="border border-gray-200 px-4 py-2">{item.name}</td>
-                    <td className="border border-gray-200 px-4 py-2">{item.available_qty ?? "N/A"}</td>
-                    <td className="border border-gray-200 px-4 py-2">{item.total_qty}</td>
-                    <td className="border border-gray-200 px-4 py-2">{item.lower_quantity}</td>
-                    <td className="border border-gray-200 px-4 py-2">{item.category_id}</td>
-                    <td className="border border-gray-200 px-4 py-2">{item.department_id ?? "N/A"}</td>
-                    <td className="border border-gray-200 px-4 py-2 text-center">
+                  <tr key={item.barcode} className="hover:bg-blue-50">
+                    <td className="border  px-4 py-2">{item.barcode}</td>
+                    <td className="border  px-4 py-2">{item.name}</td>
+                    <td className="border  px-4 py-2">{item.available_qty ?? "N/A"}</td>
+                    <td className="border  px-4 py-2">{item.total_qty}</td>
+                    <td className="border  px-4 py-2">{item.lower_quantity}</td>
+                    <td className="border  px-4 py-2">{item.category_id}</td>
+                    <td className="border  px-4 py-2">{item.department_id ?? "N/A"}</td>
+                    <td className="border  px-4 py-2 text-center">
                       <button
-                        className="text-blue-600 mr-2"
+                        className="text-blue-600 mr-3 hover:text-blue-800"
                         onClick={() => handleEdit(item.barcode)}
                       >
                         <FaEdit />
                       </button>
                       <button
-                        className="text-red-600"
+                        className="text-red-600 hover:text-red-800"
                         onClick={() => handleDelete(item.barcode)}
                       >
                         <FaTrash />
@@ -123,7 +139,7 @@ const ItemsPage: React.FC = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="text-center py-4">
+                  <td colSpan={8} className="text-center py-4 text-gray-700">
                     No items found.
                   </td>
                 </tr>
@@ -134,51 +150,34 @@ const ItemsPage: React.FC = () => {
       )}
 
       {/* Pagination */}
-      <div className="flex justify-between items-center mt-4">
-        <div className="flex items-center">
-          <button
-            className={`px-3 py-1 rounded-md ${
-              currentPage === 1 ? "bg-gray-200 cursor-not-allowed" : "bg-blue-500 text-white"
-            }`}
-            onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-          >
-            &lt;
-          </button>
-          {Array.from({ length: totalPages }).map((_, index) => (
-            <button
-              key={index}
-              className={`px-3 py-1 mx-1 rounded-md ${
-                currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
-              }`}
-              onClick={() => handlePageChange(index + 1)}
-            >
-              {index + 1}
-            </button>
-          ))}
-          <button
-            className={`px-3 py-1 rounded-md ${
-              currentPage === totalPages ? "bg-gray-200 cursor-not-allowed" : "bg-blue-500 text-white"
-            }`}
-            onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-          >
-            &gt;
-          </button>
+      <div className="flex justify-between items-center mt-6">
+        <button
+          className={`px-4 py-2 rounded-md shadow-md text-white font-medium ${
+            currentPage === 1
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
+          onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+
+        <div className="text-gray-700 font-medium">
+          Page {currentPage} of {totalPages}
         </div>
 
-        <div className="flex items-center">
-          <label className="mr-2">Items Per Page:</label>
-          <select
-            value={itemsPerPage}
-            onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-            className="border border-gray-300 rounded-md px-2 py-1"
-          >
-            {[5, 10, 25, 50].map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
+        <button
+          className={`px-4 py-2 rounded-md shadow-md text-white font-medium ${
+            currentPage === totalPages
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
+          onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
       </div>
     </div>
   );

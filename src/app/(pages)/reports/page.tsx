@@ -18,21 +18,21 @@ const page: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Reports</h1>
+      <div className="flex justify-between items-center mb-10">
+        <h1 className="text-4xl font-extrabold text-blue-700">Hospital Reports</h1>
         <div className="flex items-center space-x-4">
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm shadow hover:bg-blue-700"
+            className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm shadow-lg hover:bg-blue-700 transition-all duration-300"
             onClick={handleCreateReport}
           >
             + Create New Report
           </button>
-          <button className="bg-gray-200 p-2 rounded-lg shadow">
+          <button className="bg-gray-200 p-3 rounded-lg shadow-lg hover:bg-gray-300 transition-all duration-300">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-gray-600"
+              className="h-6 w-6 text-gray-600"
               viewBox="0 0 20 20"
               fill="currentColor"
             >
@@ -43,33 +43,36 @@ const page: React.FC = () => {
       </div>
 
       {/* Search Bar */}
-      <div className="mb-6">
+      <div className="mb-8">
         <input
           type="text"
           placeholder="Search Reports"
-          className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
+          className="w-full max-w-md px-5 py-3 border border-gray-300 rounded-lg shadow-md focus:ring focus:ring-blue-200 focus:outline-none"
         />
       </div>
 
       {/* Categories */}
-      <div className="grid grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {['Inventory', 'Payables', 'Payments', 'Purchases'].map((category, index) => (
-          <div key={index}>
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="text-red-600 text-2xl">
+          <div key={index} className="bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105">
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="text-blue-600 text-3xl">
                 {/* Category Icons */}
                 {category === 'Inventory' && <span>📦</span>}
                 {category === 'Payables' && <span>📄</span>}
                 {category === 'Payments' && <span>📟</span>}
                 {category === 'Purchases' && <span>🛒</span>}
               </div>
-              <h2 className="text-xl font-semibold text-red-600">{category}</h2>
+              <h2 className="text-2xl font-semibold text-blue-700">{category}</h2>
             </div>
-            <ul className="space-y-2">
+            <ul className="space-y-4">
               {[...Array(5)].map((_, i) => (
-                <li key={i} className="text-gray-700 flex items-center space-x-2">
+                <li
+                  key={i}
+                  className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-all duration-300"
+                >
                   <span>⭐</span>
-                  <span>{category} Summary</span>
+                  <span>{category} Summary {i + 1}</span>
                 </li>
               ))}
             </ul>

@@ -1,3 +1,4 @@
+
 'use client';
 import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
@@ -32,8 +33,8 @@ function InventoryPage() {
     <div className="p-8 bg-gray-50 min-h-screen font-sans">
       {/* Header Section */}
       <header className="flex justify-between items-center mb-8">
-      <h1 className="text-3xl font-semibold text-[#002788]">Inventory Management KPIs</h1>
-      <div className="text-gray-700">
+        <h1 className="text-3xl font-semibold text-[#002788]">Inventory Management KPIs</h1>
+        <div className="text-gray-700">
           <span className="font-medium">Period:</span>{' '}
           <span className="text-green-600 font-bold cursor-pointer hover:underline">This Week</span>
         </div>
@@ -54,9 +55,9 @@ function InventoryPage() {
             ].map((item, index) => (
               <div
                 key={index}
-                className="bg-gray-200 shadow-md border border-gray-300 rounded-lg p-8 flex flex-col justify-between"
+                className="bg-white shadow-lg border border-gray-200 rounded-lg p-6 flex flex-col justify-between hover:shadow-xl transition-shadow duration-200 ease-in-out"
               >
-                <p className="text-sm font-medium text-gray-700">{item.label}</p>
+                <p className="text-sm font-medium text-gray-500">{item.label}</p>
                 <p className="text-2xl font-bold text-blue-600 mt-2">{item.value}</p>
               </div>
             ))}
@@ -65,7 +66,7 @@ function InventoryPage() {
 
         {/* Top Items */}
         <div className="w-[25%]">
-          <div className="bg-gray-200 shadow-md border border-gray-300 rounded-lg p-5">
+          <div className="bg-white shadow-lg border border-gray-200 rounded-lg p-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4">Top Items</h3>
             <ul className="space-y-3">
               {['Surgical Gowns', 'Band-Aids', 'Syringes'].map((item, index) => (
@@ -90,7 +91,7 @@ function InventoryPage() {
           { title: 'Purchases', data: purchasesData },
           { title: 'Inventory', data: inventoryData },
         ].map((chart, index) => (
-          <div key={index} className="bg-white shadow rounded-lg p-6">
+          <div key={index} className="bg-white shadow-lg rounded-lg p-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4">{chart.title}</h3>
             <Doughnut data={chart.data} />
           </div>

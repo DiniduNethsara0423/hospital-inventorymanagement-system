@@ -5,7 +5,7 @@ import { getAllCategories, getSuggestions, addNewItem } from "@/app/apis/invento
 
 const AddItemForm = () => {
   const [categories, setCategories] = useState([]);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData]:any = useState({
     category_id: "",
     name: "",
     barcode: "",

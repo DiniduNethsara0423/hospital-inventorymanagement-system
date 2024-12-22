@@ -93,7 +93,7 @@ function DepartmentsPage() {
   };
 
   return (
-    <div className="w-full h-screen p-6">
+    <div className="w-full h-screen">
       {/* Page Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-blue-800">Departments</h1>
@@ -139,24 +139,31 @@ function DepartmentsPage() {
       </div>
 
       {/* Pagination Controls */}
-      {/* Pagination Controls */}
-      <div className="flex justify-center items-center space-x-4 mt-6">
+      <div className="flex justify-between items-center m-6">
         <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          className={`px-3 py-2 bg-gray-300 rounded-lg ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+          className={`px-4 py-2 rounded-md shadow-md text-white font-medium ${
+            currentPage === 1
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
+          onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
           Previous
         </button>
-        <span className="font-medium">
+
+        <div className="text-gray-700 font-medium">
           Page {currentPage} of {totalPages}
-        </span>
+        </div>
+
         <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          className={`px-3 py-2 bg-gray-300 rounded-lg ${currentPage >= totalPages ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          disabled={currentPage >= totalPages}
+          className={`px-4 py-2 rounded-md shadow-md text-white font-medium ${
+            currentPage === totalPages
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
+          onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
         >
           Next
         </button>
