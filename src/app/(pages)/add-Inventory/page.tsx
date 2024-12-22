@@ -1,203 +1,216 @@
-'use client';
-import React, { useState } from "react";
-import SaveSuccessPopup from "@/app/components/SaveSuccessPopup";
+"use client";
 
-const Page: React.FC = () => {
-  const [image, setImage] = useState<File | null>(null);
-  const [isPopupVisible, setPopupVisible] = useState(false); // State for popup visibility
+import React, { useState, useEffect } from "react";
+import { getAllCategories, getSuggestions, addNewItem } from "@/app/apis/inventory/api";
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
+const AddItemForm = () => {
+  const [categories, setCategories] = useState([]);
+  const [formData, setFormData] = useState({
+    category_id: "",
+    name: "",
+    barcode: "",
+    total_qty: "",
+    lower_quantity: "",
+    price: "",
+    invoice_id: "",
+    created_by: 160000
+  });
+  const [suggestions, setSuggestions] = useState([]);
+  const [isExistingItem, setIsExistingItem] = useState(false);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesData = await getAllCategories();
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+  };
+
+  const handleNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value;
+    setFormData({ ...formData, name });
+
+    if (name.length >= 2 && formData.category_id) {
+      try {
+        const suggestionsData = await getSuggestions(name, Number(formData.category_id));
+        setSuggestions(suggestionsData || []);
+        setIsExistingItem(suggestionsData.length > 0);
+      } catch (error) {
+        console.error("Failed to fetch suggestions:", error);
+      }
+    } else {
+      setSuggestions([]);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSuggestionSelect = (suggestion: any) => {
+    setFormData({
+      ...formData,
+      name: suggestion.name,
+      barcode: suggestion.barcode,
+      total_qty: suggestion.total_qty || "",
+      lower_quantity: suggestion.lower_quantity || "",
+    });
+    setSuggestions([]);
+    setIsExistingItem(true);
+  };
+
+  const handleGenerateBarcode = () => {
+    const generatedBarcode = `BC${Date.now()}`;
+    setFormData({ ...formData, barcode: generatedBarcode });
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted!");
 
-    // Show the success popup
-    setPopupVisible(true);
+    const { category_id, name, barcode, total_qty, lower_quantity, price, invoice_id } = formData;
 
-    // Auto-close popup after 3 seconds
-    setTimeout(() => {
-      setPopupVisible(false);
-    }, 3000);
+    if (!category_id || !name || !barcode || !total_qty || !lower_quantity || !price || !invoice_id) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    try {
+      await addNewItem({
+        ...formData,
+        category_id: Number(category_id),
+        total_qty: Number(total_qty),
+        lower_quantity: Number(lower_quantity),
+        price: parseFloat(price),
+      });
+      alert("Item added successfully!");
+      setFormData({
+        category_id: "",
+        name: "",
+        barcode: "",
+        total_qty: "",
+        lower_quantity: "",
+        price: "",
+        invoice_id: "",
+      });
+      setSuggestions([]);
+      setIsExistingItem(false);
+    } catch (error) {
+      alert("Failed to add item. Please try again.");
+      console.error("Error submitting form:", error);
+    }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-white">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white rounded-lg p-6 w-full max-w-4xl"
-      >
-        <h1 className="text-xl font-bold mb-4">New Item</h1>
-        <div className="grid grid-cols-2 gap-4">
-          {/* Left Form Inputs */}
-          <div>
-            <div className="mb-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
-                placeholder="Item Name"
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Item Code
-              </label>
-              <input
-                type="text"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
-                placeholder="Item Code"
-              />
-            </div>
-            <div className="mb-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Type
-              </label>
-              <input
-                type="text"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
-                placeholder="Type"
-              />
-            </div>
-            <div className="mb-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Description
-              </label>
-              <textarea
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
-                placeholder="Description"
-                rows={3}
-              />
-            </div>
-            <div className="mb-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Rate (LKR)
-              </label>
-              <input
-                type="number"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
-                placeholder="Rate"
-              />
-            </div>
-            <div className="mb-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Minimum Count
-              </label>
-              <input
-                type="number"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
-                placeholder="Minimum Count"
-              />
-            </div>
-            <div className="mb-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Quantity
-              </label>
-              <input
-                type="number"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
-                placeholder="Quantity"
-              />
-            </div>
-          </div>
-
-          {/* Right Image Upload */}
-          <div className="flex flex-col items-center">
-            <div className="w-full h-48 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
-              {!image ? (
-                <label className="text-center">
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                  />
-                  <p className="text-gray-500 cursor-pointer">
-                    Drag image(s) here or <span className="text-blue-500">Browse images</span>
-                  </p>
-                </label>
-              ) : (
-                <img
-                  src={URL.createObjectURL(image)}
-                  alt="Uploaded"
-                  className="w-full h-full object-cover rounded-md"
-                />
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mt-4">
-          {/* Additional Form Inputs */}
-          <div>
-            <div className="mb-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Brand
-              </label>
-              <input
-                type="text"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
-                placeholder="Brand"
-              />
-            </div>
-            <div className="mb-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Supplier
-              </label>
-              <input
-                type="text"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
-                placeholder="Supplier"
-              />
-            </div>
-            <div className="mb-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Date
-              </label>
-              <input
-                type="date"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
-              />
-            </div>
-            <div className="mb-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Barcode
-              </label>
-              <input
-                type="text"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
-                placeholder="Barcode"
-              />
-            </div>
-          </div>
-
-        </div>
-
-        <div className="flex justify-center mt-6">
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded-md shadow hover:bg-blue-600"
+    <div className="max-w-2xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Add New Item</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Category */}
+        <div>
+          <label htmlFor="category_id" className="block text-sm font-medium">
+            Category
+          </label>
+          <select
+            id="category_id"
+            value={formData.category_id}
+            onChange={handleInputChange}
+            className="block w-full border-gray-300 rounded-md shadow-sm"
           >
-            Save
-          </button>
+            <option value="" disabled>
+              Select a category
+            </option>
+            {categories.map((category: any) => (
+              <option key={category.id} value={category.id}>
+                {category.category_name}
+              </option>
+            ))}
+          </select>
         </div>
-      </form>
 
-      {/* Render the SaveSuccessPopup if visible */}
-      {isPopupVisible && (
-        <SaveSuccessPopup
-          onClose={() => setPopupVisible(false)} // Close popup on user action
-        />
-      )}
+        {/* Name */}
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium">
+            Item Name
+          </label>
+          <input
+            id="name"
+            type="text"
+            value={formData.name}
+            onChange={handleNameChange}
+            placeholder="Enter item name"
+            className="block w-full border-gray-300 rounded-md shadow-sm"
+          />
+          {suggestions.length > 0 && (
+            <ul className="bg-white border border-gray-300 rounded-md mt-2 max-h-40 overflow-y-auto">
+              {suggestions.map((suggestion, index) => (
+                <li
+                  key={index}
+                  onClick={() => handleSuggestionSelect(suggestion)}
+                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                >
+                  {suggestion.name} - {suggestion.barcode}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Barcode */}
+        <div>
+          <label htmlFor="barcode" className="block text-sm font-medium">
+            Barcode
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="barcode"
+              type="text"
+              value={formData.barcode}
+              onChange={handleInputChange}
+              className="block w-full border-gray-300 rounded-md shadow-sm"
+              disabled={isExistingItem}
+            />
+            <button
+              type="button"
+              onClick={handleGenerateBarcode}
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              disabled={isExistingItem}
+            >
+              Generate
+            </button>
+          </div>
+        </div>
+
+        {/* Other Fields */}
+        {["total_qty", "lower_quantity", "price", "invoice_id"].map((field) => (
+          <div key={field}>
+            <label htmlFor={field} className="block text-sm font-medium capitalize">
+              {field.replace("_", " ")}
+            </label>
+            <input
+              id={field}
+              type={field === "price" ? "number" : "text"}
+              value={formData[field]}
+              onChange={handleInputChange}
+              className="block w-full border-gray-300 rounded-md shadow-sm"
+            />
+          </div>
+        ))}
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          className="w-full py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+        >
+          Add Item
+        </button>
+      </form>
     </div>
   );
 };
 
-export default Page;
+export default AddItemForm;

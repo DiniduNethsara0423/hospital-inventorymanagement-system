@@ -22,9 +22,9 @@ const CategoriesPage = () => {
     try {
       const response = await getCategory(currentPage, pageSize);
       if (response) {
-        setCategories(response || []);
-        setFilteredCategories(response || []);
-        setTotalCategories(response || 0);
+        setCategories(response.data || []);
+        setFilteredCategories(response.data || []);
+        setTotalCategories(response.total || 0);
       } else {
         console.error("Invalid API response:", response);
       }
