@@ -58,11 +58,9 @@ const AddItemForm = () => {
       ...formData,
       name: suggestion.name,
       barcode: suggestion.barcode,
-      total_qty: suggestion.total_qty || "",
-      lower_quantity: suggestion.lower_quantity || "",
     });
-    setSuggestions([]);
-    setIsExistingItem(true);
+    setSuggestions([]); // Clear suggestions after selection
+    setIsExistingItem(true); // Mark as existing item
   };
 
   const handleGenerateBarcode = () => {
@@ -147,13 +145,14 @@ const AddItemForm = () => {
           />
           {suggestions.length > 0 && (
             <ul className="bg-white border border-gray-300 rounded-md mt-2 max-h-40 overflow-y-auto">
-              {suggestions.map((suggestion, index) => (
+              {suggestions.map((suggestion: any, index: number) => (
                 <li
                   key={index}
                   onClick={() => handleSuggestionSelect(suggestion)}
-                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                  className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between"
                 >
-                  {suggestion.name} - {suggestion.barcode}
+                  <span>{suggestion.name}</span>
+                  <span className="text-gray-500">{suggestion.barcode}</span>
                 </li>
               ))}
             </ul>
