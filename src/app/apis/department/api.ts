@@ -4,12 +4,11 @@ export const getDepartments = async (page = 1, pageSize = 5) => {
   const url = `${process.env.NEXT_PUBLIC_GET_ALL_DEPARTMENT}?page=${page}&pageSize=${pageSize}`;
   try {
     const response = await api.get(url);
-    console.log(response.data)
     return response.data;
   } catch (error: any) {
     console.error("Error fetching departments:", error);
     throw new Error(error.response?.data?.message || "Failed to fetch departments.");
-  }
+  } 
 };
 
 export const getDepartmentById = async (id: number) => {
