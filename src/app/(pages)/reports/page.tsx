@@ -1,5 +1,6 @@
-'use client';
-import React, { useState } from 'react';
+"use client";
+import React, { useState } from "react";
+import { Eye, Trash2, FileText, PlusCircle } from "lucide-react";
 
 const page: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -14,70 +15,90 @@ const page: React.FC = () => {
 
   // Handle click on "Create New Report" button
   const handleCreateReport = () => {
-    document.getElementById('fileInput')?.click();
+    document.getElementById("fileInput")?.click();
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br">
+    <div className="min-h-screen  p-6">
       {/* Header */}
-      <div className="flex justify-between items-center mb-10">
+      <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-extrabold text-blue-700">Hospital Reports</h1>
-        <div className="flex items-center space-x-4">
-          <button
-            className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm shadow-lg hover:bg-blue-700 transition-all duration-300"
-            onClick={handleCreateReport}
-          >
-            + Create New Report
-          </button>
-          <button className="bg-gray-200 p-3 rounded-lg shadow-lg hover:bg-gray-300 transition-all duration-300">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-gray-600"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path d="M2.293 9.293a1 1 0 011.414 0L10 15.586l6.293-6.293a1 1 0 011.414 1.414l-7 7a1 1 0 01-1.414 0l-7-7a1 1 0 010-1.414z" />
-            </svg>
-          </button>
-        </div>
+        <button
+          className="flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg text-lg shadow-lg hover:bg-blue-700 transition-all duration-300"
+          onClick={handleCreateReport}
+        >
+          <PlusCircle className="w-5 h-5 mr-2" /> Create New Report
+        </button>
       </div>
 
-      {/* Search Bar */}
-      <div className="mb-8">
+      {/* Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {[
+          { title: "Total Inventory Items", count: 256, icon: <FileText className="text-blue-600 w-8 h-8" />, color:"#cdddff" },
+          { title: "Pending Orders", count: 78, icon: <FileText className="text-yellow-500 w-8 h-8" />, color:"#f9ffcd" },
+          { title: "Completed Reports", count: 182, icon: <FileText className="text-green-600 w-8 h-8" />, color:"#cdffd0" },
+        ].map((stat, index) => (
+          <div
+            key={index}
+            className={`flex items-center p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow bg-[${stat.color}]`}
+          >
+            <div className="mr-4">{stat.icon}</div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-700">{stat.title}</h2>
+              <p className="text-2xl font-bold text-gray-900">{stat.count}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Search and Filter */}
+      <div className="flex items-center space-x-4 mb-8">
         <input
           type="text"
           placeholder="Search Reports"
-          className="w-full max-w-md px-5 py-3 border border-gray-300 rounded-lg shadow-md focus:ring focus:ring-blue-200 focus:outline-none"
+          className="w-full max-w-lg px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
         />
+        <select
+          className="px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-200 focus:outline-none"
+        >
+          <option>All Categories</option>
+          <option>Inventory</option>
+          <option>Payables</option>
+          <option>Payments</option>
+          <option>Purchases</option>
+        </select>
       </div>
 
-      {/* Categories */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {['Inventory', 'Payables', 'Payments', 'Purchases'].map((category, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-lg p-6 transition-transform transform hover:scale-105">
-            <div className="flex items-center space-x-4 mb-6">
-              <div className="text-blue-600 text-3xl">
-                {/* Category Icons */}
-                {category === 'Inventory' && <span>📦</span>}
-                {category === 'Payables' && <span>📄</span>}
-                {category === 'Payments' && <span>📟</span>}
-                {category === 'Purchases' && <span>🛒</span>}
-              </div>
-              <h2 className="text-2xl font-semibold text-blue-700">{category}</h2>
-            </div>
-            <ul className="space-y-4">
-              {[...Array(5)].map((_, i) => (
-                <li
-                  key={i}
-                  className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-all duration-300"
-                >
-                  <span>⭐</span>
-                  <span>{category} Summary {i + 1}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+      {/* Recent Reports Table */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Reports</h2>
+        <table className="w-full text-left">
+          <thead>
+            <tr className="text-gray-700 border-b">
+              <th className="py-3 px-4">Report Name</th>
+              <th className="py-3 px-4">Category</th>
+              <th className="py-3 px-4">Date Created</th>
+              <th className="py-3 px-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[...Array(5)].map((_, index) => (
+              <tr key={index} className="hover:bg-gray-50">
+                <td className="py-3 px-4">Report {index + 1}</td>
+                <td className="py-3 px-4">Inventory</td>
+                <td className="py-3 px-4">2024-12-23</td>
+                <td className="py-3 px-4 flex space-x-2">
+                  <button className="text-blue-600 hover:text-blue-800">
+                    <Eye className="w-5 h-5" />
+                  </button>
+                  <button className="text-red-600 hover:text-red-800">
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* File Input (Hidden) */}
