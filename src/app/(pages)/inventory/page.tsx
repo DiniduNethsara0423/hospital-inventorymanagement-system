@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAllItems, deleteItem } from "@/app/apis/inventory/api"; // Update the path as needed
-import { FaEdit, FaTrash } from "react-icons/fa"; // Icons for edit and delete
+import { Edit, Trash2 } from "lucide-react"; // Updated icons from Lucide React
 
 interface InventoryItem {
   barcode: string;
@@ -17,7 +17,7 @@ interface InventoryItem {
 const ItemsPage: React.FC = () => {
   const router = useRouter();
   const [items, setItems] = useState<InventoryItem[]>([]);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +58,7 @@ const ItemsPage: React.FC = () => {
   const handleDelete = async (barcode: string) => {
     if (confirm("Are you sure you want to delete this item?")) {
       try {
-        await deleteItem(barcode); 
+        await deleteItem(); 
         setItems((prevItems) => prevItems.filter((item) => item.barcode !== barcode));
       } catch (error) {
         console.error("Failed to delete item:", error);
@@ -67,25 +67,25 @@ const ItemsPage: React.FC = () => {
   };
 
   return (
-    <div className=" w-full  min-h-screen">
+    <div className="p-8 w-full min-h-screen bg-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-extrabold text-blue-700">Hospital Inventory</h1>
+        <h1 className="text-4xl font-extrabold text-blue-700">Hospital Inventory</h1>
         <button
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-sm shadow-md"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-base shadow-lg font-semibold"
           onClick={() => router.push("/add-Inventory")}
         >
-          Add New Item
+        Add New Item
         </button>
       </div>
 
       <div className="flex justify-end items-center mb-4">
-        <label className="mr-2 text-gray-700 font-medium">Items Per Page:</label>
+        <label className="mr-3 text-gray-800 font-medium">Items Per Page:</label>
         <select
           value={itemsPerPage}
           onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-          className="border border-gray-300 rounded-md px-3 py-1 text-gray-700 shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
+          className="border border-gray-300 rounded-md px-4 py-2 text-gray-800 shadow-sm focus:outline-none focus:ring focus:ring-blue-300 hover:shadow-lg"
         >
-          {[5, 10, 25, 50].map((option) => (
+          {[10, 25, 50].map((option) => (
             <option key={option} value={option}>
               {option}
             </option>
@@ -96,50 +96,50 @@ const ItemsPage: React.FC = () => {
       {isLoading ? (
         <p className="text-center text-gray-700 font-medium">Loading items...</p>
       ) : (
-        <div className="overflow-x-auto bg-white">
-          <table className="table-auto w-full ">
-            <thead className="bg-[#c0e3fa] text-left">
+        <div className="overflow-x-auto bg-white rounded-lg">
+          <table className="table-auto w-full border-collapse">
+            <thead className="bg-blue-200 text-left">
               <tr>
-                <th className=" px-4 py-2 rounded-tl-lg">Barcode</th>
-                <th className="border px-4 py-2">Name</th>
-                <th className="border px-4 py-2">Available Qty</th>
-                <th className="border px-4 py-2">Total Qty</th>
-                <th className="border px-4 py-2">Lower Quantity</th>
-                <th className="border px-4 py-2">Category ID</th>
-                <th className="border px-4 py-2">Department ID</th>
-                <th className=" px-4 py-2 rounded-tr-lg">Actions</th>
+                <th className="px-4 py-3 rounded-tl-lg text-gray-800">Barcode</th>
+                <th className="border px-4 py-3 text-gray-800">Name</th>
+                <th className="border px-4 py-3 text-gray-800">Available Qty</th>
+                <th className="border px-4 py-3 text-gray-800">Total Qty</th>
+                <th className="border px-4 py-3 text-gray-800">Lower Quantity</th>
+                <th className="border px-4 py-3 text-gray-800">Category ID</th>
+                <th className="border px-4 py-3 text-gray-800">Department ID</th>
+                <th className="px-4 py-3 rounded-tr-lg text-gray-800 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {items.length > 0 ? (
                 items.map((item) => (
                   <tr key={item.barcode} className="hover:bg-blue-50">
-                    <td className="border  px-4 py-2">{item.barcode}</td>
-                    <td className="border  px-4 py-2">{item.name}</td>
-                    <td className="border  px-4 py-2">{item.available_qty ?? "N/A"}</td>
-                    <td className="border  px-4 py-2">{item.total_qty}</td>
-                    <td className="border  px-4 py-2">{item.lower_quantity}</td>
-                    <td className="border  px-4 py-2">{item.category_id}</td>
-                    <td className="border  px-4 py-2">{item.department_id ?? "N/A"}</td>
-                    <td className="border  px-4 py-2 text-center">
+                    <td className="border px-4 py-3 text-gray-700">{item.barcode}</td>
+                    <td className="border px-4 py-3 text-gray-700">{item.name}</td>
+                    <td className="border px-4 py-3 text-gray-700">{item.available_qty ?? "N/A"}</td>
+                    <td className="border px-4 py-3 text-gray-700">{item.total_qty}</td>
+                    <td className="border px-4 py-3 text-gray-700">{item.lower_quantity}</td>
+                    <td className="border px-4 py-3 text-gray-700">{item.category_id}</td>
+                    <td className="border px-4 py-3 text-gray-700">{item.department_id ?? "N/A"}</td>
+                    <td className="border px-4 py-3 text-center">
                       <button
-                        className="text-blue-600 mr-3 hover:text-blue-800"
+                        className="text-blue-600 mr-4 hover:text-blue-800"
                         onClick={() => handleEdit(item.barcode)}
                       >
-                        <FaEdit />
+                        <Edit size={20} />
                       </button>
                       <button
                         className="text-red-600 hover:text-red-800"
                         onClick={() => handleDelete(item.barcode)}
                       >
-                        <FaTrash />
+                        <Trash2 size={20} />
                       </button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="text-center py-4 text-gray-700">
+                  <td colSpan={8} className="text-center py-6 text-gray-700">
                     No items found.
                   </td>
                 </tr>
@@ -150,9 +150,9 @@ const ItemsPage: React.FC = () => {
       )}
 
       {/* Pagination */}
-      <div className="flex justify-between items-center mt-6">
+      <div className="flex justify-between items-center mt-8">
         <button
-          className={`px-4 py-2 rounded-md shadow-md text-white font-medium ${
+          className={`px-6 py-2 rounded-md shadow-md text-white font-medium transition-colors ${
             currentPage === 1
               ? "bg-gray-300 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700"
@@ -163,12 +163,12 @@ const ItemsPage: React.FC = () => {
           Previous
         </button>
 
-        <div className="text-gray-700 font-medium">
+        <div className="text-gray-800 font-medium">
           Page {currentPage} of {totalPages}
         </div>
 
         <button
-          className={`px-4 py-2 rounded-md shadow-md text-white font-medium ${
+          className={`px-6 py-2 rounded-md shadow-md text-white font-medium transition-colors ${
             currentPage === totalPages
               ? "bg-gray-300 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700"

@@ -1,5 +1,4 @@
 import Navbar from "../components/navbar";
-import Header from "../components/header";
 
 export default function RootLayout({
   children,
@@ -9,15 +8,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased font-sans">
-        <div className="flex w-full h-screen">
-          {/* Sidebar with Navbar */}
-          <div className="w-[20%] bg-gray-800 text-white">
+        <div className="flex h-screen">
+          {/* Sidebar/Navbar */}
+          <div className="w-[16%] text-white">
             <Navbar />
           </div>
-          {/* Main Content Area */}
-          <div className="w-[80%]">
-            <Header />
-            <main className="p-4 mt-14">{children}</main>
+
+          {/* Main Content */}
+          <div className="flex-1 mt-12 overflow-y-auto">
+            {children}
           </div>
         </div>
       </body>

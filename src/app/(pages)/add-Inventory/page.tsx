@@ -5,7 +5,7 @@ import { getAllCategories, getSuggestions, addNewItem } from "@/app/apis/invento
 
 const AddItemForm = () => {
   const [categories, setCategories] = useState([]);
-  const [formData, setFormData]:any = useState({
+  const [formData, setFormData]: any = useState({
     category_id: "",
     name: "",
     barcode: "",
@@ -13,7 +13,7 @@ const AddItemForm = () => {
     lower_quantity: "",
     price: "",
     invoice_id: "",
-    created_by: 160000
+    created_by: 160000,
   });
   const [suggestions, setSuggestions] = useState([]);
   const [isExistingItem, setIsExistingItem] = useState(false);
@@ -105,19 +105,19 @@ const AddItemForm = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Add New Item</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className=" p-6 bg-white rounded-md shadow-md">
+      <h1 className="text-3xl font-semibold text-blue-600 mb-6 text-center">Add New Item</h1>
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Category */}
-        <div>
-          <label htmlFor="category_id" className="block text-sm font-medium">
+        <div className="flex flex-col">
+          <label htmlFor="category_id" className="text-md font-medium text-gray-700 mb-1">
             Category
           </label>
           <select
             id="category_id"
             value={formData.category_id}
             onChange={handleInputChange}
-            className="block w-full border-gray-300 rounded-md shadow-sm"
+            className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
           >
             <option value="" disabled>
               Select a category
@@ -131,8 +131,8 @@ const AddItemForm = () => {
         </div>
 
         {/* Name */}
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium">
+        <div className="flex flex-col">
+          <label htmlFor="name" className="text-md font-medium text-gray-700 mb-1">
             Item Name
           </label>
           <input
@@ -141,15 +141,15 @@ const AddItemForm = () => {
             value={formData.name}
             onChange={handleNameChange}
             placeholder="Enter item name"
-            className="block w-full border-gray-300 rounded-md shadow-sm"
+            className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
           />
           {suggestions.length > 0 && (
-            <ul className="bg-white border border-gray-300 rounded-md mt-2 max-h-40 overflow-y-auto">
+            <ul className="bg-white border border-gray-300 rounded-lg mt-2 max-h-40 overflow-y-auto shadow-md">
               {suggestions.map((suggestion: any, index: number) => (
                 <li
                   key={index}
                   onClick={() => handleSuggestionSelect(suggestion)}
-                  className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between"
+                  className="p-2 hover:bg-blue-50 cursor-pointer flex justify-between"
                 >
                   <span>{suggestion.name}</span>
                   <span className="text-gray-500">{suggestion.barcode}</span>
@@ -160,8 +160,8 @@ const AddItemForm = () => {
         </div>
 
         {/* Barcode */}
-        <div>
-          <label htmlFor="barcode" className="block text-sm font-medium">
+        <div className="flex flex-col">
+          <label htmlFor="barcode" className="text-md font-medium text-gray-700 mb-1">
             Barcode
           </label>
           <div className="flex gap-2">
@@ -170,13 +170,13 @@ const AddItemForm = () => {
               type="text"
               value={formData.barcode}
               onChange={handleInputChange}
-              className="block w-full border-gray-300 rounded-md shadow-sm"
+              className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
               disabled={isExistingItem}
             />
             <button
               type="button"
               onClick={handleGenerateBarcode}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none"
               disabled={isExistingItem}
             >
               Generate
@@ -185,17 +185,22 @@ const AddItemForm = () => {
         </div>
 
         {/* Other Fields */}
-        {["total_qty", "lower_quantity", "price", "invoice_id"].map((field) => (
-          <div key={field}>
-            <label htmlFor={field} className="block text-sm font-medium capitalize">
-              {field.replace("_", " ")}
+        {[
+          { id: "total_qty", label: "Total Quantity" },
+          { id: "lower_quantity", label: "Lower Quantity" },
+          { id: "price", label: "Price" },
+          { id: "invoice_id", label: "Invoice ID" },
+        ].map((field) => (
+          <div key={field.id} className="flex flex-col">
+            <label htmlFor={field.id} className="text-md font-medium text-gray-700 mb-1">
+              {field.label}
             </label>
             <input
-              id={field}
-              type={field === "price" ? "number" : "text"}
-              value={formData[field]}
+              id={field.id}
+              type="text"
+              value={formData[field.id]}
               onChange={handleInputChange}
-              className="block w-full border-gray-300 rounded-md shadow-sm"
+              className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
             />
           </div>
         ))}
@@ -203,7 +208,7 @@ const AddItemForm = () => {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+          className="w-full py-3 bg-green-500 text-white text-lg rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300"
         >
           Add Item
         </button>

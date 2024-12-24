@@ -25,7 +25,6 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({ department, onClick }) 
       {/* Content Section */}
       <div className="p-6 text-center">
         <h3 className="text-2xl font-bold text-gray-800 mb-2">{department.name}</h3>
-        <p className="text-sm text-gray-500">Department ID: {department.id}</p>
       </div>
     </div>
   );

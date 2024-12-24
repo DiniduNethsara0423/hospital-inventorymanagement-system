@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DepartmentCard from "@/app/components/departmentCard";
 import { postDepartment, getDepartments, updateDepartment, deleteDepartment } from "@/app/apis/department/api";
+import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Department {
   id: number;
@@ -93,38 +94,39 @@ function DepartmentsPage() {
   };
 
   return (
-    <div className="w-full h-screen">
+    <div className="w-full h-screen mt-12 px-3">
       {/* Page Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-blue-800">Departments</h1>
         <button
-          className="bg-blue-700 text-white px-4 py-2 rounded-lg"
-          onClick={() => {
-            setEditingDepartment(null);
-            setOpenPopup(true);
-          }}
-        >
-          Add New
-        </button>
+      className="bg-blue-700 flex items-center text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition"
+      onClick={() => {
+        setEditingDepartment(null);
+        setOpenPopup(true);
+      }}
+    >
+      <Plus className="mr-2" />
+      Add New
+    </button>
       </div>
 
       {/* Page Size Selector */}
-      <div className="flex justify-end items-center mb-4 space-x-4">
-        <label className="font-medium">Page Size:</label>
-        <select
-          className="border border-gray-300 rounded-md px-3 py-2"
-          value={pageSize}
-          onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-        >
-          <option value={5}>5</option>
-          <option value={10}>10</option>
-          <option value={15}>15</option>
-        </select>
-      </div>
+      <div className="flex justify-end items-center mb-6 space-x-4">
+    <label className="font-medium text-gray-700">Page Size:</label>
+    <select
+      className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:ring focus:ring-blue-300 focus:outline-none"
+      value={pageSize}
+      onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+    >
+      <option value={5}>5</option>
+      <option value={10}>10</option>
+      <option value={15}>15</option>
+    </select>
+  </div>
 
       {/* Department Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {departments?.map((department) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+      {departments?.map((department) => (
           <DepartmentCard
             key={department.id}
             department={department}
@@ -139,35 +141,33 @@ function DepartmentsPage() {
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex justify-between items-center m-6">
-        <button
-          className={`px-4 py-2 rounded-md shadow-md text-white font-medium ${
-            currentPage === 1
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
-          onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-
-        <div className="text-gray-700 font-medium">
-          Page {currentPage} of {totalPages}
-        </div>
-
-        <button
-          className={`px-4 py-2 rounded-md shadow-md text-white font-medium ${
-            currentPage === totalPages
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
-          onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-      </div>
+      <div className="flex justify-center items-center mt-8 space-x-6">
+    <button
+      className={`flex items-center px-4 py-2 rounded-lg font-medium ${
+        currentPage === 1
+          ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+          : "bg-blue-600 text-white hover:bg-blue-700"
+      }`}
+      onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+      disabled={currentPage === 1}
+    >
+      Previous
+    </button>
+    <div className="text-gray-700 font-medium">
+      Page {currentPage} of {totalPages}
+    </div>
+    <button
+      className={`flex items-center px-4 py-2 rounded-lg font-medium ${
+        currentPage === totalPages
+          ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+          : "bg-blue-600 text-white hover:bg-blue-700"
+      }`}
+      onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+      disabled={currentPage === totalPages}
+    >
+      Next
+    </button>
+  </div>
 
 
       {/* Popup for Adding/Editing Departments */}
