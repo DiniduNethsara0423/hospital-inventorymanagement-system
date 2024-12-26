@@ -33,12 +33,12 @@ const SidebarNavbar = () => {
             <SidebarItem href="/dashboard" Icon={LucideHome} label="Dashboard" />
             <SidebarItem href="/inventory" Icon={LucideBox} label="Inventory" />
             <SidebarItem href="/reports" Icon={LucideClipboardList} label="Reports" />
-            <SidebarItem href="/purchase" Icon={LucideShoppingCart} label="Purchase Requests" />
+            <SidebarItem href="/purchase" Icon={LucideShoppingCart} label="Quatations" />
             <SidebarItem href="/suppliers" Icon={LucideTruck} label="Suppliers" />
-            <SidebarItem href="/orders" Icon={LucideClipboardList} label="Orders" />
+            <SidebarItem href="/orders" Icon={LucideClipboardList} label="Invoice" />
             <SidebarItem href="/department" Icon={LucideBuilding} label="Department" />
             <SidebarItem href="/user-management" Icon={LucideUsers} label="User Management" />
-            <SidebarItem href="/add-items" Icon={LucidePlus} label="Add Items to Department" />
+            <SidebarItem href="/add-to-department" Icon={LucidePlus} label="Add Items to Department" />
           </ul>
 
           {/* Bottom Section */}

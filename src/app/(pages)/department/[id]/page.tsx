@@ -86,7 +86,6 @@ const DepartmentDetailPage = ({ params }: { params: { id: string } }) => {
           </div>
         ) : (
           <div>
-            <p className="text-lg font-medium text-gray-700 mb-2">Department ID: {params.id}</p>
             <p className="text-lg font-medium text-gray-700">Department Name: {name}</p>
           </div>
         )}
