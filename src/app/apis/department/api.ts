@@ -61,3 +61,18 @@ export const deleteDepartment = async (id: number) => {
     throw new Error(error.response?.data?.message || "Failed to delete department.");
   }
 };
+
+export const addItemToDepartment = async (itemDetailId: number, departmentId: number, qty: number) => {
+  const url:any = process.env.NEXT_PUBLIC_ADD_ITEMS_TO_DEPARMENTS
+  try {
+    const response = await api.post(`${url}`, {
+      item_detail_id: itemDetailId,
+      department_id: departmentId,
+      qty,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error adding item to department:', error);
+    throw error;
+  }
+};

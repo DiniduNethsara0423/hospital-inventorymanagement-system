@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { getAllCategories, getSuggestions, addNewItem } from "@/app/apis/inventory/api";
+import Barcode from "react-barcode";
 
 const AddItemForm = () => {
   const [categories, setCategories] = useState([]);
@@ -71,11 +72,10 @@ const AddItemForm = () => {
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
-  
+
     const generatedBarcode = `${year}${month}${day}${hours}${minutes}${seconds}`;
     setFormData({ ...formData, barcode: generatedBarcode });
   };
-  
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -114,7 +114,7 @@ const AddItemForm = () => {
   };
 
   return (
-    <div className=" p-6 bg-white rounded-md shadow-md">
+    <div className="p-6 bg-white rounded-md shadow-md">
       <h1 className="text-3xl font-semibold text-blue-600 mb-6 text-center">Add New Item</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Category */}
@@ -191,6 +191,11 @@ const AddItemForm = () => {
               Generate
             </button>
           </div>
+          {formData.barcode && (
+            <div className="mt-4">
+              <Barcode value={formData.barcode} />
+            </div>
+          )}
         </div>
 
         {/* Other Fields */}

@@ -67,7 +67,7 @@ export const createNewItem = async (data: Record<string, any>) => {
 export const deleteItem = async (id:any)=>{
 
   try {
-    const response = await apiClient.delete(`/items/delete/${id}`);
+    const response = await apiClient.post(`/items/delete/${id}`);
     return response.data;
   } catch (error) {
     console.error("Error deleteing item:", error);
