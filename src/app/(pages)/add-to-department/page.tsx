@@ -1,190 +1,188 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
-import { getAllItems } from "@/app/apis/inventory/api"; // Update the path as needed
+import { addItemToDepartment } from "@/app/apis/department/api";
+import { getDepartments } from "@/app/apis/department/api";
 
-interface InventoryItem {
-  barcode: string;
-  name: string;
-  available_qty: number | null;
-  total_qty: number;
-  lower_quantity: number;
-  category_id: number;
-  department_id: number | null;
-}
+const AddItemToDepartment = () => {
+  const generateBarcode = () => {
+    const now = new Date();
+    return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(
+      now.getDate()
+    ).padStart(2, "0")}${String(now.getHours()).padStart(2, "0")}${String(
+      now.getMinutes()
+    ).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}`;
+  };
 
-const AddItemsToDepartmentPage: React.FC = () => {
-  const [items, setItems] = useState<InventoryItem[]>([]);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
-  const [quantities, setQuantities] = useState<{ [barcode: string]: number }>({});
+  const [formData, setFormData] = useState({
+    barcode: generateBarcode(),
+    itemDetailId: 1, // Mock ID, replace with dropdown later
+    departmentId: 1, // Mock ID, replace with dropdown later
+    qty: 0,
+  });
+
+  const [departments, setDepartments] = useState([]);
+
+  const fetchAllDepartments = async () => {
+    try {
+      let page = 1;
+      const pageSize = 10;
+      let allDepartments = [];
+      let response;
+
+      do {
+        response = await getDepartments(page, pageSize);
+        allDepartments = [...allDepartments, ...response.data];
+        page++;
+      } while (response.data.length === pageSize);
+
+      setDepartments(allDepartments);
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+      alert("Failed to fetch departments.");
+    }
+  };
 
   useEffect(() => {
-    const fetchItems = async () => {
-      setIsLoading(true);
-      try {
-        const data = await getAllItems(currentPage, itemsPerPage);
-        setItems(data.items || []);
-        const count = data.count && data.count[0] && data.count[0]["COUNT(*)"];
-        setTotalItems(parseInt(count, 10) || 0);
-      } catch (error) {
-        console.error("Failed to fetch items:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    fetchAllDepartments();
+  }, []);
 
-    fetchItems();
-  }, [currentPage, itemsPerPage]);
-
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleItemsPerPageChange = (value: number) => {
-    setItemsPerPage(value);
-    setCurrentPage(1); // Reset to the first page
+  const handleGenerateBarcode = () => {
+    setFormData({ ...formData, barcode: generateBarcode() });
   };
 
-  const handleCheckboxChange = (barcode: string, isChecked: boolean) => {
-    setSelectedItems((prevSelected) => {
-      const updatedSet = new Set(prevSelected);
-      isChecked ? updatedSet.add(barcode) : updatedSet.delete(barcode);
-      return updatedSet;
-    });
-  };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  const handleQuantityChange = (barcode: string, quantity: number) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [barcode]: quantity,
-    }));
-  };
-
-  const handleAddToDepartment = () => {
-    const selectedData = Array.from(selectedItems).map((barcode) => ({
-      barcode,
-      quantity: quantities[barcode] || 0,
-    }));
-    console.log("Selected items to add to department:", selectedData);
-    // Handle backend logic for adding items to department
+    try {
+      await addItemToDepartment(
+        formData.barcode,
+        Number(formData.itemDetailId),
+        Number(formData.departmentId),
+        Number(formData.qty)
+      );
+      alert("Item successfully added to department!");
+      setFormData({
+        barcode: generateBarcode(),
+        itemDetailId: 1,
+        departmentId: 1,
+        qty: 0,
+      });
+    } catch (error) {
+      alert("Failed to add item to department. Please try again.");
+    }
   };
 
   return (
-    <div className="p-8 w-full min-h-screen bg-white">
-      <h1 className="text-4xl font-extrabold text-blue-700 mb-6">Add Items to Department</h1>
-
-      <div className="flex justify-end items-center mb-4">
-        <label className="mr-3 text-gray-800 font-medium">Items Per Page:</label>
-        <select
-          value={itemsPerPage}
-          onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-          className="border border-gray-300 rounded-md px-4 py-2 text-gray-800 shadow-sm focus:outline-none focus:ring focus:ring-blue-300 hover:shadow-lg"
-        >
-          {[10, 25, 50].map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
+    <div className="min-h-screen flex flex-col bg-gray-100">
+      {/* Page Title */}
+      <div className="py-6">
+        <h1 className="text-center text-3xl font-bold text-gray-700">
+          Add Items to Department
+        </h1>
+        <p className="text-center text-gray-500 mt-2">
+          Use this form to assign items to specific departments in the inventory system.
+        </p>
       </div>
 
-      {isLoading ? (
-        <p className="text-center text-gray-700 font-medium">Loading items...</p>
-      ) : (
-        <div className="overflow-x-auto bg-white rounded-lg">
-          <table className="table-auto w-full border-collapse">
-            <thead className="bg-blue-200 text-left">
-              <tr>
-                <th className="px-4 py-3 rounded-tl-lg text-gray-800">Select</th>
-                <th className="border px-4 py-3 text-gray-800">Barcode</th>
-                <th className="border px-4 py-3 text-gray-800">Name</th>
-                <th className="border px-4 py-3 text-gray-800">Available Qty</th>
-                <th className="border px-4 py-3 text-gray-800">Total Qty</th>
-                <th className="border px-4 py-3 text-gray-800">Lower Quantity</th>
-                <th className="rounded-tr-lg px-4 py-3 text-gray-800">Add Qty</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.length > 0 ? (
-                items.map((item) => (
-                  <tr key={item.barcode} className="hover:bg-blue-50">
-                    <td className="border px-4 py-3 text-center">
-                      <input
-                        type="checkbox"
-                        onChange={(e) =>
-                          handleCheckboxChange(item.barcode, e.target.checked)
-                        }
-                      />
-                    </td>
-                    <td className="border px-4 py-3 text-gray-700">{item.barcode}</td>
-                    <td className="border px-4 py-3 text-gray-700">{item.name}</td>
-                    <td className="border px-4 py-3 text-gray-700">{item.available_qty ?? "N/A"}</td>
-                    <td className="border px-4 py-3 text-gray-700">{item.total_qty}</td>
-                    <td className="border px-4 py-3 text-gray-700">{item.lower_quantity}</td>
-                    <td className="border px-4 py-3">
-                      <input
-                        type="number"
-                        min="0"
-                        value={quantities[item.barcode] || ""}
-                        onChange={(e) =>
-                          handleQuantityChange(item.barcode, Number(e.target.value))
-                        }
-                        className="border rounded-md px-2 py-1 w-full"
-                      />
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={7} className="text-center py-6 text-gray-700">
-                    No items found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      {/* Form Section */}
+      <main className="flex-1 flex items-center justify-center">
+        <div className="max-w-4xl w-full p-8 bg-white rounded-lg shadow-md">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Barcode */}
+            <div>
+              <label htmlFor="barcode" className="block text-sm font-medium text-gray-700">
+                Barcode
+              </label>
+              <div className="flex gap-2 mt-1">
+                <input
+                  id="barcode"
+                  name="barcode"
+                  type="text"
+                  value={formData.barcode}
+                  readOnly
+                  className="flex-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
+                />
+                <button
+                  type="button"
+                  onClick={handleGenerateBarcode}
+                  className="px-4 py-2 bg-gray-800 text-white rounded-md shadow hover:bg-gray-900 focus:outline-none"
+                >
+                  Generate
+                </button>
+              </div>
+            </div>
+
+            {/* Item Detail ID */}
+            <div>
+              <label htmlFor="itemDetailId" className="block text-sm font-medium text-gray-700">
+                Item Detail ID
+              </label>
+              <select
+                id="itemDetailId"
+                name="itemDetailId"
+                value={formData.itemDetailId}
+                onChange={handleInputChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
+              >
+                <option value={1}>Mock Item 1</option>
+                <option value={2}>Mock Item 2</option>
+              </select>
+            </div>
+
+            {/* Department ID */}
+            <div>
+              <label htmlFor="departmentId" className="block text-sm font-medium text-gray-700">
+                Department
+              </label>
+              <select
+                id="departmentId"
+                name="departmentId"
+                value={formData.departmentId}
+                onChange={handleInputChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
+              >
+                {departments.map((dept) => (
+                  <option key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Quantity */}
+            <div>
+              <label htmlFor="qty" className="block text-sm font-medium text-gray-700">
+                Quantity
+              </label>
+              <input
+                id="qty"
+                name="qty"
+                type="number"
+                value={formData.qty}
+                onChange={handleInputChange}
+                placeholder="Enter quantity"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
+              />
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full px-4 py-2 bg-gray-800 text-white text-lg font-medium rounded-md shadow hover:bg-gray-900 focus:outline-none"
+            >
+              Add Item
+            </button>
+          </form>
         </div>
-      )}
-
-      <div className="flex justify-between items-center mt-8">
-        <button
-          className={`px-6 py-2 rounded-md shadow-md text-white font-medium transition-colors ${
-            currentPage === 1
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
-          onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-
-        <button
-          className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg text-base shadow-lg font-semibold"
-          onClick={handleAddToDepartment}
-        >
-          Add to Department
-        </button>
-
-        <button
-          className={`px-6 py-2 rounded-md shadow-md text-white font-medium transition-colors ${
-            currentPage === totalPages
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
-          onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-      </div>
+      </main>
     </div>
   );
 };
 
-export default AddItemsToDepartmentPage;
+export default AddItemToDepartment;

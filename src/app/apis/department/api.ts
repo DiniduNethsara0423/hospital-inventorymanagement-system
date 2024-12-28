@@ -62,12 +62,13 @@ export const deleteDepartment = async (id: number) => {
   }
 };
 
-export const addItemToDepartment = async (itemDetailId: number, departmentId: number, qty: number) => {
+export const addItemToDepartment = async (barcode:String, itemDetailId: number, departmentId: number, qty: number) => {
   const url:any = process.env.NEXT_PUBLIC_ADD_ITEMS_TO_DEPARMENTS
   try {
     const response = await api.post(`${url}`, {
-      item_detail_id: itemDetailId,
-      department_id: departmentId,
+      barcode: barcode,
+      itemDetailId: 3,
+      departmentId: departmentId,
       qty,
     });
     return response.data;

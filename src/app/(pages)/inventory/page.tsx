@@ -5,13 +5,12 @@ import { getAllItems, deleteItem } from "@/app/apis/inventory/api"; // Update th
 import { Edit, Trash2 } from "lucide-react"; // Updated icons from Lucide React
 
 interface InventoryItem {
-  barcode: string;
-  name: string;
+  item_barcode: string;
+  item_name: string;
   avalible_qty: number | null;
   currently_using_qty: number | null;
   total_qty: number;
-  lower_quantity: number;
-  category_id: number;
+  category_name: number;
 }
 
 const ItemsPage: React.FC = () => {
@@ -60,7 +59,7 @@ const ItemsPage: React.FC = () => {
     if (confirm("Are you sure you want to delete this item?")) {
       try {
         await deleteItem(barcode);
-        setItems((prevItems) => prevItems.filter((item) => item.barcode !== barcode));
+        setItems((prevItems) => prevItems.filter((item) => item.item_barcode !== barcode));
       } catch (error) {
         console.error("Failed to delete item:", error);
       }
@@ -103,10 +102,9 @@ const ItemsPage: React.FC = () => {
               <tr>
                 <th className="px-4 py-3 rounded-tl-lg text-gray-800">Barcode</th>
                 <th className="border px-4 py-3 text-gray-800">Name</th>
-                <th className="border px-4 py-3 text-gray-800">Category ID</th>
+                <th className="border px-4 py-3 text-gray-800">Category</th>
                 <th className="border px-4 py-3 text-gray-800">Available Qty</th>
                 <th className="border px-4 py-3 text-gray-800">Currently Using Qty</th>
-                <th className="border px-4 py-3 text-gray-800">Lower Quantity</th>
                 <th className="border px-4 py-3 text-gray-800">Total Qty</th>
                 <th className="px-4 py-3 rounded-tr-lg text-gray-800 text-center">Actions</th>
               </tr>
@@ -114,24 +112,23 @@ const ItemsPage: React.FC = () => {
             <tbody>
               {items.length > 0 ? (
                 items.map((item) => (
-                  <tr key={item.barcode} className="hover:bg-blue-50">
-                    <td className="border px-4 py-3 text-gray-700">{item.barcode}</td>
-                    <td className="border px-4 py-3 text-gray-700">{item.name}</td>
-                    <td className="border px-4 py-3 text-gray-700">{item.category_id}</td>
+                  <tr key={item.item_barcode} className="hover:bg-blue-50">
+                    <td className="border px-4 py-3 text-gray-700">{item.item_barcode}</td>
+                    <td className="border px-4 py-3 text-gray-700">{item.item_name}</td>
+                    <td className="border px-4 py-3 text-gray-700">{item.category_name}</td>
                     <td className="border px-4 py-3 text-gray-700">{item.avalible_qty ?? "N/A"}</td>
                     <td className="border px-4 py-3 text-gray-700">{item.currently_using_qty ?? "N/A"}</td>
-                    <td className="border px-4 py-3 text-gray-700">{item.lower_quantity}</td>
                     <td className="border px-4 py-3 text-gray-700">{item.total_qty}</td>
                     <td className="border px-4 py-3 text-center">
                       <button
                         className="text-blue-600 mr-4 hover:text-blue-800"
-                        onClick={() => handleEdit(item.barcode)}
+                        onClick={() => handleEdit(item.item_barcode)}
                       >
                         <Edit size={20} />
                       </button>
                       <button
                         className="text-red-600 hover:text-red-800"
-                        onClick={() => handleDelete(item.barcode)}
+                        onClick={() => handleDelete(item.item_barcode)}
                       >
                         <Trash2 size={20} />
                       </button>
