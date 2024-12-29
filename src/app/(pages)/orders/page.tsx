@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { DateRangePicker } from "react-date-range";
-import { createInvoice, uploadInvoicePDF, fetchInvoices } from "@/app/apis/invoice/api";
+import { createInvoice, uploadInvoicePDF, fetchInvoices, fetchQuotations, fetchPurchases } from "@/app/apis/invoice/api";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
@@ -17,16 +17,25 @@ const OrdersPage = () => {
   const [filteredInvoices, setFilteredInvoices] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [quotations, setQuotations] = useState([]); // Quotations state
 
+  const [currentQuotationPage, setCurrentQuotationPage] = useState(1); // Track current page for quotations
+  const [isLoadingQuotations, setIsLoadingQuotations] = useState(false); // Track loading state
+  const [hasMoreQuotations, setHasMoreQuotations] = useState(true);
 
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const [purchases, setPurchases] = useState([]); // Store loaded purchases
+  const [purchasePage, setPurchasePage] = useState(1); // Current page
+  const [hasMorePurchases, setHasMorePurchases] = useState(true); // Tracks if more data exists
+
 
   useEffect(() => {
     const getInvoices = async () => {
       try {
-        const { results, count } = await fetchInvoices(currentPage, 10); // Fetch invoices
+        const { results, count } = await fetchInvoices(currentPage, 7); // Fetch invoices
         const totalItems = count && count[0] && count[0]["COUNT(*)"]; // Total number of items
-        const itemsPerPage = 10; // Define items per page
+        const itemsPerPage = 7; // Define items per page
         setFilteredInvoices(results); // Set the fetched invoices
         setTotalPages(Math.ceil(totalItems / itemsPerPage)); // Calculate total pages
       } catch (error) {
@@ -35,7 +44,67 @@ const OrdersPage = () => {
     };
     getInvoices();
   }, [currentPage]);
-  
+
+  useEffect(() => {
+    const loadQuotations = async () => {
+      if (isLoadingQuotations || !hasMoreQuotations) return;
+
+      setIsLoadingQuotations(true);
+      try {
+        const { rows, count } = await fetchQuotations(currentQuotationPage, 10); // Fetch next page of quotations
+        if (rows.length > 0) {
+          setQuotations((prev) => [...prev, ...rows]); // Append new quotations to existing list
+          setCurrentQuotationPage((prev) => prev + 1); // Increment page
+        }
+        if (rows.length < 10) {
+          setHasMoreQuotations(false); // If fewer items were fetched, no more data
+        }
+      } catch (error) {
+        console.error("Failed to fetch quotations:", error);
+      } finally {
+        setIsLoadingQuotations(false);
+      }
+    };
+
+    loadQuotations();
+  }, [currentQuotationPage, isLoadingQuotations, hasMoreQuotations]);
+
+  const handleQuotationScroll = (e) => {
+    const bottom =
+      e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
+    if (bottom) {
+      setCurrentQuotationPage((prev) => prev + 1); // Trigger the next page load
+    }
+  };
+
+
+  const loadPurchases = async () => {
+    if (!hasMorePurchases) return; // Exit if no more data to fetch
+
+    try {
+      const { rows, count } = await fetchPurchases(purchasePage, 10);
+      setPurchases((prev) => [...prev, ...rows]); // Append new purchases
+      if (purchases.length + rows.length >= count) {
+        setHasMorePurchases(false); // No more pages
+      } else {
+        setPurchasePage((prev) => prev + 1); // Increment page
+      }
+    } catch (error) {
+      console.error("Failed to load purchases:", error);
+    }
+  };
+
+  const handlePurchasesScroll = (e) => {
+    const target = e.target;
+    if (target.scrollTop + target.clientHeight >= target.scrollHeight - 50) {
+      loadPurchases(); // Fetch more data when nearing the bottom
+    }
+  };
+
+  useEffect(() => {
+    loadPurchases();
+  }, []);
+
 
 
   const handleDateRangeSelect = (ranges) => {
@@ -70,6 +139,7 @@ const OrdersPage = () => {
     }
   };
 
+  console.log(quotations)
   return (
     <div className="p-6 w-full mx-auto mt-10">
       {/* Add New Invoice */}
@@ -99,29 +169,49 @@ const OrdersPage = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Quotation ID</label>
-            <select
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm"
-              value={newInvoice.quotationId}
-              onChange={(e) => setNewInvoice({ ...newInvoice, quotationId: e.target.value })}
+            <div
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm overflow-y-auto"
+              style={{ maxHeight: "200px" }} // Set max height for dropdown
+              onScroll={handleQuotationScroll} // Trigger loading on scroll
             >
-              <option value="QUOT001">QUOT001</option>
-              <option value="QUOT002">QUOT002</option>
-              <option value="QUOT003">QUOT003</option>
-            </select>
+              <select
+                className="w-full text-sm bg-white"
+                value={newInvoice.quotationId}
+                onChange={(e) => setNewInvoice({ ...newInvoice, quotationId: e.target.value })}
+              >
+                <option value="" disabled>Select Quotation</option>
+                {quotations.map((quotation) => (
+                  <option key={quotation.quotation_id} value={quotation.quotation_id}>
+                    {quotation.quotation_id}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {isLoadingQuotations && (
+              <p className="text-gray-500 text-sm mt-2">Loading more quotations...</p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Purchase ID</label>
-            <select
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm"
-              value={newInvoice.purchaseId}
-              onChange={(e) => setNewInvoice({ ...newInvoice, purchaseId: Number(e.target.value) })}
+            <div
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm overflow-auto max-h-40"
+              onScroll={handlePurchasesScroll}
             >
-              <option value={1}>1</option>
-              <option value={2}>2</option>
-              <option value={3}>3</option>
-            </select>
+              <select
+                className="w-full"
+                value={newInvoice.purchaseId}
+                onChange={(e) => setNewInvoice({ ...newInvoice, purchaseId: Number(e.target.value) })}
+              >
+                {purchases.map((purchase) => (
+                  <option key={purchase.id} value={purchase.id}>
+                    {purchase.id}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
+
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Invoice ID</label>
@@ -158,7 +248,7 @@ const OrdersPage = () => {
           <div className="flex items-end">
             <button
               onClick={handleAddInvoice}
-              className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+              className="w-full bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800"
             >
               Add Invoice
             </button>
@@ -207,9 +297,8 @@ const OrdersPage = () => {
       <div className="flex justify-center items-center mt-6 space-x-4">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${
-            currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
-          } transition`}
+          className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
+            } transition`}
           disabled={currentPage === 1}
         >
           Previous
@@ -219,9 +308,8 @@ const OrdersPage = () => {
         </span>
         <button
           onClick={() => setCurrentPage((prev) => (currentPage < totalPages ? prev + 1 : prev))}
-          className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${
-            currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
-          } transition`}
+          className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
+            } transition`}
           disabled={currentPage === totalPages}
         >
           Next

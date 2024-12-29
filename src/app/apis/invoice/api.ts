@@ -44,3 +44,43 @@ export const uploadInvoicePDF = async (invoiceId:any, pdfFile:any) => {
     throw error;
   }
 };
+
+// export const fetchQuotations = async (page = 1, pageSize = 10) => {
+//   const url:any = process.env.NEXT_PUBLIC_GET_ALL_QUOtATIONS;
+//   try {
+//     const response = await axios.get(`${url}`, {
+//       params: { page, pageSize },
+//     });
+//     console.log(response.data)
+//     return response.data;
+//   } catch (error) {
+//     console.error("Failed to fetch quotations:", error);
+//     throw error;
+//   }
+// };
+
+export const fetchQuotations = async (page, pageSize) => {
+  const url:any = process.env.NEXT_PUBLIC_GET_ALL_QUOtATIONS
+  try {
+    const response = await fetch(`${url}?page=${page}&pageSize=${pageSize}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json(); // Parse JSON response
+    return data; // Ensure you return the parsed data
+  } catch (error) {
+    console.error("Error fetching quotations:", error);
+    throw error; // Rethrow the error so it can be caught in the component
+  }
+};
+
+export const fetchPurchases = async (page: number, pageSize: number) => {
+  const url:any = process.env.NEXT_PUBLIC_GET_ALL_PURCHASES
+  try {
+    const response = await axios.get(`${url}?page=${page}&pageSize=${pageSize}`);
+    return response.data; // Ensure the response returns `{ rows, count }`
+  } catch (error) {
+    console.error("Failed to fetch purchases:", error);
+    throw error;
+  }
+};
