@@ -114,8 +114,8 @@ const AddItemForm = () => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-md shadow-md">
-      <h1 className="text-3xl font-semibold text-blue-600 mb-6 text-center">Add New Item</h1>
+    <div className="p-10 bg-white rounded-md">
+      <h1 className="text-3xl font-semibold text-gray-800 mb-6 text-center">Add New Item</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Category */}
         <div className="flex flex-col">
@@ -126,7 +126,7 @@ const AddItemForm = () => {
             id="category_id"
             value={formData.category_id}
             onChange={handleInputChange}
-            className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
+            className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-gray-500"
           >
             <option value="" disabled>
               Select a category
@@ -150,7 +150,7 @@ const AddItemForm = () => {
             value={formData.name}
             onChange={handleNameChange}
             placeholder="Enter item name"
-            className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
+            className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-gray-500"
           />
           {suggestions.length > 0 && (
             <ul className="bg-white border border-gray-300 rounded-lg mt-2 max-h-40 overflow-y-auto shadow-md">
@@ -179,13 +179,13 @@ const AddItemForm = () => {
               type="text"
               value={formData.barcode}
               onChange={handleInputChange}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
+              className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-gray-500"
               disabled={isExistingItem}
             />
             <button
               type="button"
               onClick={handleGenerateBarcode}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 focus:outline-none"
+              className="px-4 py-2 bg-gray-800 text-white rounded-lg shadow-md hover:bg-gray-900 focus:outline-none"
               disabled={isExistingItem}
             >
               Generate
@@ -214,7 +214,7 @@ const AddItemForm = () => {
               type="text"
               value={formData[field.id]}
               onChange={handleInputChange}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
+              className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-gray-500"
             />
           </div>
         ))}
@@ -222,7 +222,7 @@ const AddItemForm = () => {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full py-3 bg-green-500 text-white text-lg rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300"
+          className="w-full py-3 bg-gray-800 text-white text-lg rounded-lg shadow-md hover:bg-gray-900 focus:outline-none focus:ring focus:ring-gray-600"
         >
           Add Item
         </button>

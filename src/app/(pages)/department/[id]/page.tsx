@@ -1,14 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { updateDepartment, deleteDepartment } from "@/app/apis/department/api";
+import { updateDepartment, deleteDepartment, getDepartmentById } from "@/app/apis/department/api";
+import React from "react";
 
-const DepartmentDetailPage = ({ params }: { params: { id: string } }) => {
+const DepartmentDetailPage = ({ params }: { params: { id: any } }) => {
   const [name, setName] = useState("Sample Department");
   const [isEditing, setIsEditing] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+    const fetchDepartments = async () => {
+      setLoading(true);
+      try {
+        const response = await getDepartmentById(params.id);
+
+        if (response) {
+          setName(response.name); 
+        } else {
+          console.error("Invalid API response:", response);
+        }
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+      useEffect(() => {
+        fetchDepartments();
+      }, []);
+    
 
   const handleUpdate = async () => {
     if (!name.trim()) {
@@ -129,29 +153,111 @@ const DepartmentDetailPage = ({ params }: { params: { id: string } }) => {
 
      
       {/* Popup */}
-      {isPopupOpen && (
+            {/* Popup for Adding New Item */}
+            {isPopupOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-bold mb-4 text-gray-800">Add New Item</h2>
-            <input
-              type="text"
-              placeholder="Search for an item..."
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-4"
-            />
-            <div className="flex justify-end space-x-4">
-              <button
-                className="bg-gray-500 text-white px-5 py-2 rounded-lg hover:bg-gray-400"
-                onClick={() => setIsPopupOpen(false)}
-              >
-                Cancel
-              </button>
-              <button className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-500">
-                Add
-              </button>
-            </div>
+            <h2 className="text-xl font-bold mb-4">Add New Item</h2>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                // Add logic to handle form submission
+                alert("New item added!");
+                setIsPopupOpen(false);
+              }}
+            >
+              <div className="mb-4">
+                <label htmlFor="barcode" className="block text-gray-700 font-medium mb-2">
+                  Barcode
+                </label>
+                <input
+                  type="text"
+                  id="barcode"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                  placeholder="Enter Barcode"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="itemName" className="block text-gray-700 font-medium mb-2">
+                  Item Name
+                </label>
+                <input
+                  type="text"
+                  id="itemName"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                  placeholder="Enter Item Name"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="availableQty" className="block text-gray-700 font-medium mb-2">
+                  Available Quantity
+                </label>
+                <input
+                  type="number"
+                  id="availableQty"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                  placeholder="Enter Available Quantity"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="totalQty" className="block text-gray-700 font-medium mb-2">
+                  Total Quantity
+                </label>
+                <input
+                  type="number"
+                  id="totalQty"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                  placeholder="Enter Total Quantity"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="lowerQty" className="block text-gray-700 font-medium mb-2">
+                  Lower Quantity Limit
+                </label>
+                <input
+                  type="number"
+                  id="lowerQty"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                  placeholder="Enter Lower Quantity Limit"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="categoryId" className="block text-gray-700 font-medium mb-2">
+                  Category ID
+                </label>
+                <input
+                  type="number"
+                  id="categoryId"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                  placeholder="Enter Category ID"
+                  required
+                />
+              </div>
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-400"
+                  onClick={() => setIsPopupOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500"
+                >
+                  Add Item
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
+
     </div>
   );
 };

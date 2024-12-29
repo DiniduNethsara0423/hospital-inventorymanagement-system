@@ -27,7 +27,7 @@ const AddItemToDepartment = () => {
     try {
       let page = 1;
       const pageSize = 10;
-      let allDepartments = [];
+      let allDepartments:any = [];
       let response;
 
       do {
@@ -147,7 +147,7 @@ const AddItemToDepartment = () => {
                 onChange={handleInputChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
               >
-                {departments.map((dept) => (
+                {departments.map((dept:any) => (
                   <option key={dept.id} value={dept.id}>
                     {dept.name}
                   </option>

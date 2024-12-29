@@ -97,9 +97,9 @@ function DepartmentsPage() {
     <div className="w-full h-screen mt-12 px-3">
       {/* Page Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-blue-800">Departments</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Departments</h1>
         <button
-      className="bg-blue-700 flex items-center text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition"
+      className="bg-gray-700 flex items-center text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition"
       onClick={() => {
         setEditingDepartment(null);
         setOpenPopup(true);
@@ -146,12 +146,12 @@ function DepartmentsPage() {
       className={`flex items-center px-4 py-2 rounded-lg font-medium ${
         currentPage === 1
           ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-          : "bg-blue-600 text-white hover:bg-blue-700"
+          : "bg-gray-800 text-white hover:bg-gray-900"
       }`}
       onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
       disabled={currentPage === 1}
     >
-      Previous
+      <ChevronLeft className="w-5 h-5" />
     </button>
     <div className="text-gray-700 font-medium">
       Page {currentPage} of {totalPages}
@@ -160,12 +160,12 @@ function DepartmentsPage() {
       className={`flex items-center px-4 py-2 rounded-lg font-medium ${
         currentPage === totalPages
           ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-          : "bg-blue-600 text-white hover:bg-blue-700"
+          : "bg-gray-800 text-white hover:bg-gray-900"
       }`}
       onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
       disabled={currentPage === totalPages}
     >
-      Next
+      <ChevronRight className="w-5 h-5" />
     </button>
   </div>
 

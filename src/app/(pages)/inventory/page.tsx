@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAllItems, deleteItem } from "@/app/apis/inventory/api"; // Update the path as needed
-import { Edit, Trash2 } from "lucide-react"; // Updated icons from Lucide React
+import { Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react"; // Updated icons from Lucide React
 
 interface InventoryItem {
   item_barcode: string;
@@ -69,9 +69,9 @@ const ItemsPage: React.FC = () => {
   return (
     <div className="p-8 w-full min-h-screen bg-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-4xl font-extrabold text-blue-700">Hospital Inventory</h1>
+        <h1 className="text-4xl font-extrabold text-gray-800">Hospital Inventory</h1>
         <button
-          className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg text-base shadow-lg font-semibold"
+          className="bg-gray-700 hover:bg-gray-800 text-white px-8 py-3 rounded-lg text-base shadow-lg font-semibold"
           onClick={() => router.push("/add-Inventory")}
         >
           Add New Item
@@ -148,35 +148,36 @@ const ItemsPage: React.FC = () => {
       )}
 
       {/* Pagination */}
-      <div className="flex justify-between items-center mt-8">
-        <button
-          className={`px-6 py-2 rounded-md shadow-md text-white font-medium transition-colors ${
-            currentPage === 1
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
-          onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
+      <div className="flex justify-center items-center mt-6 space-x-4">
+  <button
+    onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+    className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${
+      currentPage === 1
+        ? "opacity-50 cursor-not-allowed"
+        : "hover:bg-gray-300"
+    } transition`}
+    disabled={currentPage === 1}
+  >
+    <ChevronLeft className="w-5 h-5" />
+  </button>
 
-        <div className="text-gray-800 font-medium">
-          Page {currentPage} of {totalPages}
-        </div>
+  <span className="text-gray-700 font-medium">
+    Page {currentPage} of {totalPages}
+  </span>
 
-        <button
-          className={`px-6 py-2 rounded-md shadow-md text-white font-medium transition-colors ${
-            currentPage === totalPages
-              ? "bg-gray-300 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
-          onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-      </div>
+  <button
+    onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+    className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${
+      currentPage === totalPages
+        ? "opacity-50 cursor-not-allowed"
+        : "hover:bg-gray-300"
+    } transition`}
+    disabled={currentPage === totalPages}
+  >
+    <ChevronRight className="w-5 h-5" />
+  </button>
+</div>
+
     </div>
   );
 };

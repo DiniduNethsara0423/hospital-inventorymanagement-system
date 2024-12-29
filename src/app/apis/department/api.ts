@@ -10,7 +10,7 @@ export const getDepartments = async (page = 1, pageSize = 5) => {
     throw new Error(error.response?.data?.message || "Failed to fetch departments.");
   } 
 };
-
+ 
 export const getDepartmentById = async (id: number) => {
   const url = `${process.env.NEXT_PUBLIC_GET_DEPARTMENT_BY_ID}/${id}`;
   try {
