@@ -1,36 +1,42 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DateRangePicker } from "react-date-range";
-import { fetchInvoices } from "@/app/apis/invoice/page"; // Import the API function
-import "react-date-range/dist/styles.css"; // Main style
-import "react-date-range/dist/theme/default.css"; // Theme style
+import { createInvoice, uploadInvoicePDF, fetchInvoices } from "@/app/apis/invoice/api";
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
 
 const OrdersPage = () => {
   const [newInvoice, setNewInvoice] = useState({
     dateRange: null,
-    quotationId: "",
+    quotationId: "QUOT001",
+    purchaseId: 1,
+    invoiceId: "",
     invoicePdf: null,
   });
-  const [quotationSuggestions, setQuotationSuggestions] = useState([]);
-  const [filteredInvoices, setFilteredInvoices] = useState([]);
-  const [showDatePicker, setShowDatePicker] = useState(false);
 
+  const [filteredInvoices, setFilteredInvoices] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   useEffect(() => {
     const getInvoices = async () => {
       try {
-        const {results, count} = await fetchInvoices(currentPage, 10); // Fetch invoices
-        const itemsperpage = count && count[0] && count[0]["COUNT(*)"];
+        const { results, count } = await fetchInvoices(currentPage, 10); // Fetch invoices
+        const totalItems = count && count[0] && count[0]["COUNT(*)"]; // Total number of items
+        const itemsPerPage = 10; // Define items per page
         setFilteredInvoices(results); // Set the fetched invoices
-        setTotalPages(itemsperpage); // Set total pages
+        setTotalPages(Math.ceil(totalItems / itemsPerPage)); // Calculate total pages
       } catch (error) {
         console.error("Failed to fetch invoices:", error);
       }
     };
     getInvoices();
   }, [currentPage]);
+  
+
 
   const handleDateRangeSelect = (ranges) => {
     setNewInvoice({
@@ -43,14 +49,25 @@ const OrdersPage = () => {
     setShowDatePicker(false);
   };
 
-  const handleQuotationSearch = async (value) => {
-    setNewInvoice({ ...newInvoice, quotationId: value });
-    const suggestions = await fakeQuotationSearch(value); // Replace with actual API call
-    setQuotationSuggestions(suggestions);
-  };
+  const handleAddInvoice = async () => {
+    try {
+      const { invoice_id } = await createInvoice({
+        invoice_id: newInvoice.invoiceId,
+        quotation_id: newInvoice.quotationId,
+        purchase_id: newInvoice.purchaseId,
+        pdf_path: "",
+      });
 
-  const handleAddInvoice = () => {
-    // Logic to add new invoice
+      if (newInvoice.invoicePdf) {
+        await uploadInvoicePDF(invoice_id, newInvoice.invoicePdf);
+        alert("Invoice created and PDF uploaded successfully!");
+      } else {
+        alert("Invoice created successfully!");
+      }
+    } catch (error) {
+      console.error("Failed to add invoice:", error);
+      alert("Failed to add invoice. Please try again.");
+    }
   };
 
   return (
@@ -82,26 +99,38 @@ const OrdersPage = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Quotation ID</label>
-            <input
-              type="text"
-              placeholder="Search Quotation ID"
+            <select
               className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm"
               value={newInvoice.quotationId}
-              onChange={(e) => handleQuotationSearch(e.target.value)}
+              onChange={(e) => setNewInvoice({ ...newInvoice, quotationId: e.target.value })}
+            >
+              <option value="QUOT001">QUOT001</option>
+              <option value="QUOT002">QUOT002</option>
+              <option value="QUOT003">QUOT003</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Purchase ID</label>
+            <select
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm"
+              value={newInvoice.purchaseId}
+              onChange={(e) => setNewInvoice({ ...newInvoice, purchaseId: Number(e.target.value) })}
+            >
+              <option value={1}>1</option>
+              <option value={2}>2</option>
+              <option value={3}>3</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Invoice ID</label>
+            <input
+              type="text"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm"
+              value={newInvoice.invoiceId}
+              onChange={(e) => setNewInvoice({ ...newInvoice, invoiceId: e.target.value })}
             />
-            {quotationSuggestions.length > 0 && (
-              <ul className="bg-white border rounded-lg shadow-lg mt-2">
-                {quotationSuggestions.map((item) => (
-                  <li
-                    key={item}
-                    className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-                    onClick={() => setNewInvoice({ ...newInvoice, quotationId: item })}
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
 
           <div>
@@ -127,7 +156,10 @@ const OrdersPage = () => {
           </div>
 
           <div className="flex items-end">
-            <button onClick={handleAddInvoice} className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+            <button
+              onClick={handleAddInvoice}
+              className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+            >
               Add Invoice
             </button>
           </div>
@@ -151,10 +183,10 @@ const OrdersPage = () => {
             {filteredInvoices.map((invoice) => (
               <tr key={invoice.invoice_id} className="border-t hover:bg-gray-100">
                 <td className="px-6 py-3">{invoice.quotation_id}</td>
-                <td className="px-6 py-3">{invoice.invoice_id_by_shop}</td>
+                <td className="px-6 py-3">{invoice.invoice_id_by_shop || "N/A"}</td>
                 <td className="px-6 py-3">{invoice.purchase_id}</td>
                 <td className="px-6 py-3">{invoice.vendors_id}</td>
-                <td className="px-6 py-3">{invoice.total_value}</td>
+                <td className="px-6 py-3">{invoice.total_value || "0"}</td>
                 <td className="px-6 py-3">
                   <a
                     href={invoice.pdf_path}

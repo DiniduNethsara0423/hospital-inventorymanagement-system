@@ -24,7 +24,7 @@ const UserManagement: React.FC = () => {
   );
 
   const handleAddUser = () => {
-    router.push("/add-user"); // Navigate to add user page
+    router.push("/create-user"); // Navigate to add user page
   };
 
   const handleEdit = (id: number) => {

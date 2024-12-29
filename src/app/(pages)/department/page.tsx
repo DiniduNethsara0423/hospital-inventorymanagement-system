@@ -193,7 +193,7 @@ function DepartmentsPage() {
             />
             <div className="flex justify-end space-x-4">
               <button
-                className="bg-gray-500 text-white px-4 py-2 rounded-md"
+                className="bg-gray-400 text-white px-4 py-2 rounded-md"
                 onClick={() => {
                   setOpenPopup(false);
                   setEditingDepartment(null); // Reset state on cancel
@@ -202,7 +202,7 @@ function DepartmentsPage() {
                 Cancel
               </button>
               <button
-                className="bg-blue-600 text-white px-4 py-2 rounded-md"
+                className="bg-gray-800 text-white px-4 py-2 rounded-md"
                 onClick={() => {
                   const departmentName = editingDepartment?.name || "";
                   if (!departmentName.trim()) {

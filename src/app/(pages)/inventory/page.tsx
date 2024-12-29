@@ -56,7 +56,7 @@ const ItemsPage: React.FC = () => {
   };
 
   const handleDelete = async (barcode: string) => {
-    if (confirm("Are you sure you want to delete this item?")) {
+    if (confirm("Are you sure you want to delete this item? It will delete Permenently")) {
       try {
         await deleteItem(barcode);
         setItems((prevItems) => prevItems.filter((item) => item.item_barcode !== barcode));

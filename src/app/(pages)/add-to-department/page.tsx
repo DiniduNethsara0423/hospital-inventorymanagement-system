@@ -79,7 +79,7 @@ const AddItemToDepartment = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="w-full h-screen flex flex-col">
       {/* Page Title */}
       <div className="py-6">
         <h1 className="text-center text-3xl font-bold text-gray-700">
@@ -91,8 +91,8 @@ const AddItemToDepartment = () => {
       </div>
 
       {/* Form Section */}
-      <main className="flex-1 flex items-center justify-center">
-        <div className="max-w-4xl w-full p-8 bg-white rounded-lg shadow-md">
+      <main className="flex-1 flex justify-center">
+        <div className="max-w-4xl w-full p-8 bg-white">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Barcode */}
             <div>
