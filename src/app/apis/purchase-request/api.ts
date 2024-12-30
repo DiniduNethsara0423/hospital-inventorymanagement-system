@@ -39,11 +39,9 @@ export const addPurchaseRequest = async (data: {
 // Get Purchase Requests
 export const getPurchaseRequest = async (page = 1, limit = 10) => {
   const url = `${process.env.NEXT_PUBLIC_GET_ALL_PURCHASE_REQUEST}?page=${page}&limit=${limit}`;
-  console.log("getPurchaseRequest URL:", url);
   try {
     const response = await API.get(url);
-    console.log(response);
-    console.log("getPurchaseRequest Response:", response.data);
+    console.log(response.data);
     return response.data;
   } catch (error: any) {
     console.error("Error in getPurchaseRequest:", error.response?.data || error.message);

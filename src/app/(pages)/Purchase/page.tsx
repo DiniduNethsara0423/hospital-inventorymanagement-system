@@ -43,7 +43,8 @@ const PurchaseRequests: React.FC = () => {
     setIsLoading(true);
     try {
       const data = await getPurchaseRequest(page, ITEMS_PER_PAGE);
-      setRequests(data?.requests || []);
+      console.log(data)
+      setRequests(data || []);
     } catch (error) {
       console.error("Failed to fetch requests:", error);
       setRequests([]);
@@ -155,9 +156,9 @@ const PurchaseRequests: React.FC = () => {
     }));
   };
 
-  // Filter requests based on the search query
   const filteredRequests = requests.filter((r) =>
-    r.name.toLowerCase().includes(searchQuery.toLowerCase())
+    // console.log(r)
+    r.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -201,18 +202,18 @@ const PurchaseRequests: React.FC = () => {
             <p className="text-gray-500 text-center">No requests found.</p>
           ) : (
             <>
-              {filteredRequests.map((request) => (
+              {filteredRequests.map((request:any) => (
                 <div
-                  key={request.id}
+                  key={request.purchase_request_id}
                   className="flex items-center justify-between bg-blue-50 p-4 rounded-lg shadow-sm hover:shadow-md transition"
                   onClick={() => handleOpenModal(request)}
                 >
                   <div>
                     <h3 className="font-bold text-lg text-blue-800">
-                      {request.name}
+                      {request.description}
                     </h3>
                     <p className="text-gray-600">
-                      Price: ${request.fullPrice.toFixed(2)}
+                      Price: ${request.total_value}
                     </p>
                     <p
                       className={`text-sm mt-1 ${
