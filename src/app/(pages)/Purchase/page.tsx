@@ -310,7 +310,7 @@ const PurchaseRequests: React.FC = () => {
               </p>
               <p className="text-lg text-gray-700">
                 <strong className="font-medium text-gray-800">Price:</strong> ${" "}
-                {selectedRequest.fullPrice.toFixed(2)}
+                {selectedRequest.total_value}
               </p>
               <p className="text-lg text-gray-700">
                 <strong className="font-medium text-gray-800">
