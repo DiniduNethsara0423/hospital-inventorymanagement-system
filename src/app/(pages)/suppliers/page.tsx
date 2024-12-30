@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import { getVendors, postVendor } from "@/app/apis/supplier/api"; // Import API methods
+import { getVendorId, getVendors, postVendor } from "@/app/apis/supplier/api"; // Import API methods
 import { Plus, Edit, Trash2, Search } from "lucide-react";
 
 type Supplier = {
@@ -46,17 +46,25 @@ export default function SuppliersPage() {
     }
   };
 
-  const openModal = (supplier?: Supplier) => {
+  const openModal = async (supplier?: Supplier) => {
     if (supplier) {
       setForm(supplier);
       setEditingId(supplier.id);
     } else {
-      setForm({});
+      try {
+        // Fetch the generated vendor ID from the backend
+        const  vendorId  = await getVendorId();
+        setForm({ id: vendorId }); // Set the generated ID in the form state
+      } catch (error) {
+        console.error("Error generating vendor ID:", error);
+        alert("Failed to generate vendor ID.");
+        return;
+      }
       setEditingId(null);
     }
     setIsModalOpen(true);
   };
-
+  
   const closeModal = () => {
     setIsModalOpen(false);
     setForm({});
@@ -70,17 +78,17 @@ export default function SuppliersPage() {
   const handleSubmit = async () => {
     try {
       const newSupplier = {
-        vendor_id: editingId !== null ? editingId : String(Date.now()),
+        vendor_id: form.id, // Use the ID generated earlier
         vendor_name: form.vendorName || "",
         email: form.email || "",
         shop_name: form.shopName || "",
         shop_address: form.shopAddress || "",
         telephone_number: form.telephoneNumber || "",
-        created_by: 1
+        created_by: 1,
       };
-
+  
       await postVendor(newSupplier);
-
+  
       if (editingId !== null) {
         setSuppliers((prev) =>
           prev.map((supplier) =>
@@ -90,13 +98,14 @@ export default function SuppliersPage() {
       } else {
         setSuppliers([...suppliers, { id: newSupplier.vendor_id, ...newSupplier }]);
       }
-
+  
       closeModal();
     } catch (error) {
       console.error("Error adding supplier:", error);
       alert(error.message || "Failed to add supplier.");
     }
   };
+  
 
   const handleDelete = (id: string) => {
     setSuppliers(suppliers.filter((supplier) => supplier.id !== id));
@@ -129,7 +138,7 @@ export default function SuppliersPage() {
         <div className="flex items-center space-x-2 mt-4 md:mt-0">
           <button
             onClick={() => openModal()}
-            className="flex items-center space-x-2 bg-gray-700 text-white px-6 py-2 rounded-full shadow-lg hover:bg-gray-800 transition"
+            className="flex items-center space-x-2 bg-gray-700 text-white px-6 py-3 rounded-full shadow-lg hover:bg-gray-800 transition"
           >
             <Plus className="w-5 h-5" />
             <span>Add Supplier</span>

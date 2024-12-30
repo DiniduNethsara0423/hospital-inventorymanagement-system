@@ -1,9 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { DateRangePicker } from "react-date-range";
-import { createInvoice, uploadInvoicePDF, fetchInvoices, fetchQuotations, fetchPurchases } from "@/app/apis/invoice/api";
+import { createInvoice, uploadInvoicePDF, fetchInvoices, fetchQuotations, fetchPurchases, generateInvoiceId } from "@/app/apis/invoice/api";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
+import debounce from 'lodash.debounce';
 
 const OrdersPage = () => {
   const [newInvoice, setNewInvoice] = useState({
@@ -14,21 +15,20 @@ const OrdersPage = () => {
     invoicePdf: null,
   });
 
-  const [filteredInvoices, setFilteredInvoices] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [quotations, setQuotations] = useState([]); // Quotations state
+  const [filteredInvoices, setFilteredInvoices]:any = useState([]);
+  const [currentPage, setCurrentPage]:any = useState(1);
+  const [totalPages, setTotalPages]:any = useState(1);
+  const [quotations, setQuotations]:any = useState([]); // Quotations state
 
-  const [currentQuotationPage, setCurrentQuotationPage] = useState(1); // Track current page for quotations
-  const [isLoadingQuotations, setIsLoadingQuotations] = useState(false); // Track loading state
-  const [hasMoreQuotations, setHasMoreQuotations] = useState(true);
+  const [currentQuotationPage, setCurrentQuotationPage]:any = useState(1); // Track current page for quotations
+  const [isLoadingQuotations, setIsLoadingQuotations]:any = useState(false); // Track loading state
+  const [hasMoreQuotations, setHasMoreQuotations]:any = useState(true);
 
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showDatePicker, setShowDatePicker]:any = useState(false);
 
-  const [purchases, setPurchases] = useState([]); // Store loaded purchases
-  const [purchasePage, setPurchasePage] = useState(1); // Current page
-  const [hasMorePurchases, setHasMorePurchases] = useState(true); // Tracks if more data exists
-
+  const [purchases, setPurchases]:any = useState([]); // Store loaded purchases
+  const [purchasePage, setPurchasePage]:any = useState(1); // Current page
+  const [hasMorePurchases, setHasMorePurchases]:any = useState(true); // Tracks if more data exists
 
   useEffect(() => {
     const getInvoices = async () => {
@@ -45,69 +45,49 @@ const OrdersPage = () => {
     getInvoices();
   }, [currentPage]);
 
-  useEffect(() => {
-    const loadQuotations = async () => {
-      if (isLoadingQuotations || !hasMoreQuotations) return;
+  
 
-      setIsLoadingQuotations(true);
-      try {
-        const { rows, count } = await fetchQuotations(currentQuotationPage, 10); // Fetch next page of quotations
-        if (rows.length > 0) {
-          setQuotations((prev) => [...prev, ...rows]); // Append new quotations to existing list
-          setCurrentQuotationPage((prev) => prev + 1); // Increment page
-        }
-        if (rows.length < 10) {
-          setHasMoreQuotations(false); // If fewer items were fetched, no more data
-        }
-      } catch (error) {
-        console.error("Failed to fetch quotations:", error);
-      } finally {
-        setIsLoadingQuotations(false);
-      }
-    };
-
-    loadQuotations();
-  }, [currentQuotationPage, isLoadingQuotations, hasMoreQuotations]);
-
-  const handleQuotationScroll = (e) => {
-    const bottom =
-      e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
-    if (bottom) {
-      setCurrentQuotationPage((prev) => prev + 1); // Trigger the next page load
-    }
-  };
-
-
-  const loadPurchases = async () => {
-    if (!hasMorePurchases) return; // Exit if no more data to fetch
-
+  const fetchAllQuotations = async () => {
     try {
-      const { rows, count } = await fetchPurchases(purchasePage, 10);
-      setPurchases((prev) => [...prev, ...rows]); // Append new purchases
-      if (purchases.length + rows.length >= count) {
-        setHasMorePurchases(false); // No more pages
-      } else {
-        setPurchasePage((prev) => prev + 1); // Increment page
-      }
+      const { rows } = await fetchQuotations(1, 1000); // Fetch all quotations at once
+      setQuotations(rows);
+      setHasMoreQuotations(false); // Disable further pagination
     } catch (error) {
-      console.error("Failed to load purchases:", error);
+      console.error("Failed to fetch quotations:", error);
     }
   };
+  
+  const fetchAllPurchases = async () => {
+    try {
+      const { rows } = await fetchPurchases(1, 1000); // Fetch all purchases at once
+      setPurchases(rows);
+      setHasMorePurchases(false); // Disable further pagination
+    } catch (error) {
+      console.error("Failed to fetch purchases:", error);
+    }
+  };
+  
+  useEffect(() => {
+    fetchAllQuotations();
+    fetchAllPurchases();
+  }, []);
+  
 
-  const handlePurchasesScroll = (e) => {
+  const handleQuotationScroll = debounce((e) => {
+    const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
+    if (bottom) {
+      setCurrentQuotationPage((prev:any) => prev + 1); // Trigger the next page load
+    }
+  }, 200); // Delay of 200ms
+  
+  const handlePurchasesScroll = debounce((e) => {
     const target = e.target;
     if (target.scrollTop + target.clientHeight >= target.scrollHeight - 50) {
-      loadPurchases(); // Fetch more data when nearing the bottom
+      purchases(); // Fetch more data when nearing the bottom
     }
-  };
+  }, 200); // Delay of 200ms
 
-  useEffect(() => {
-    loadPurchases();
-  }, []);
-
-
-
-  const handleDateRangeSelect = (ranges) => {
+  const handleDateRangeSelect = (ranges:any) => {
     setNewInvoice({
       ...newInvoice,
       dateRange: {
@@ -139,7 +119,19 @@ const OrdersPage = () => {
     }
   };
 
-  console.log(quotations)
+  const handleGenerateInvoiceId = async () => {
+    try {
+      const invoiceId = await generateInvoiceId();
+      setNewInvoice((prevState) => ({
+        ...prevState,
+        invoiceId: invoiceId,
+      }));
+    } catch (error) {
+      alert("Failed to generate invoice ID. Please try again.");
+    }
+  };
+
+
   return (
     <div className="p-6 w-full mx-auto mt-10">
       {/* Add New Invoice */}
@@ -171,8 +163,8 @@ const OrdersPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Quotation ID</label>
             <div
               className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm overflow-y-auto"
-              style={{ maxHeight: "200px" }} // Set max height for dropdown
-              onScroll={handleQuotationScroll} // Trigger loading on scroll
+              style={{ maxHeight: "200px" }} 
+              onScroll={handleQuotationScroll} 
             >
               <select
                 className="w-full text-sm bg-white"
@@ -180,7 +172,7 @@ const OrdersPage = () => {
                 onChange={(e) => setNewInvoice({ ...newInvoice, quotationId: e.target.value })}
               >
                 <option value="" disabled>Select Quotation</option>
-                {quotations.map((quotation) => (
+                {quotations.map((quotation:any) => (
                   <option key={quotation.quotation_id} value={quotation.quotation_id}>
                     {quotation.quotation_id}
                   </option>
@@ -215,13 +207,22 @@ const OrdersPage = () => {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Invoice ID</label>
-            <input
-              type="text"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm"
-              value={newInvoice.invoiceId}
-              onChange={(e) => setNewInvoice({ ...newInvoice, invoiceId: e.target.value })}
-            />
+            <div className="flex items-center">
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm bg-gray-100"
+                value={newInvoice.invoiceId}
+                readOnly // Disable the text field
+              />
+              <button
+                onClick={handleGenerateInvoiceId}
+                className="ml-2 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800"
+              >
+                Generate
+              </button>
+            </div>
           </div>
+
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Select Invoice PDF</label>
@@ -270,7 +271,7 @@ const OrdersPage = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredInvoices.map((invoice) => (
+            {filteredInvoices.map((invoice:any) => (
               <tr key={invoice.invoice_id} className="border-t hover:bg-gray-100">
                 <td className="px-6 py-3">{invoice.quotation_id}</td>
                 <td className="px-6 py-3">{invoice.invoice_id_by_shop || "N/A"}</td>

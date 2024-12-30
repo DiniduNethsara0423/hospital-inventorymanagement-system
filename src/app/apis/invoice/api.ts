@@ -84,3 +84,14 @@ export const fetchPurchases = async (page: number, pageSize: number) => {
     throw error;
   }
 };
+
+export const generateInvoiceId = async (): Promise<string> => {
+  const url:any = process.env.NEXT_PUBLIC_GENERATE_INVOICE_ID
+  try {
+    const response = await axios.get(`${url}`);
+    return response.data; 
+  } catch (error) {
+    console.error("Failed to generate invoice ID:", error);
+    throw error;
+  }
+};
