@@ -150,7 +150,8 @@ export default function SuppliersPage() {
         <table className="table-auto w-full border-collapse">
           <thead className="bg-blue-200 text-left">
             <tr>
-              <th className="px-4 py-3 rounded-tl-lg text-gray-800"> Vendor Name </th>
+              <th className="px-4 py-3 rounded-tl-lg text-gray-800"> Vendor ID </th>
+              <th className="px-4 py-3 border text-gray-800"> Vendor Name </th>
               <th className="border px-4 py-3 text-gray-800"> Email</th>
               <th className="border px-4 py-3 text-gray-800"> Shop Name </th>
               <th className="border px-4 py-3 text-gray-800"> Shop Address </th>
@@ -169,8 +170,9 @@ export default function SuppliersPage() {
                 </td>
               </tr>
             ) : (
-              suppliers.map((supplier) => (
-                <tr key={supplier.id} className="hover:bg-blue-50">
+              suppliers.map((supplier:any) => (
+                <tr key={supplier.vendor_id} className="hover:bg-blue-50">
+                  <td className="border px-4 py-3 text-gray-700">{supplier.id}</td>
                   <td className="border px-4 py-3 text-gray-700">{supplier.vendorName}</td>
                   <td className="border px-4 py-3 text-gray-700">{supplier.email || "-"}</td>
                   <td className="border px-4 py-3 text-gray-700">{supplier.shopName}</td>

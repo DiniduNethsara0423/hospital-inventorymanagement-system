@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { updateDepartment, deleteDepartment, getDepartmentById } from "@/app/apis/department/api";
+import { updateDepartment, deleteDepartment, getDepartmentById,  } from "@/app/apis/department/api";
+import { Trash2, Edit } from "lucide-react";
 import React from "react";
 
 const DepartmentDetailPage = ({ params }: { params: { id: any } }) => {
@@ -10,29 +11,46 @@ const DepartmentDetailPage = ({ params }: { params: { id: any } }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [items, setItems] = useState<any[]>([]);
   const router = useRouter();
 
-    const fetchDepartments = async () => {
-      setLoading(true);
-      try {
-        const response = await getDepartmentById(params.id);
-
-        if (response) {
-          setName(response.name); 
-        } else {
-          console.error("Invalid API response:", response);
-        }
-      } catch (error) {
-        console.error("Error fetching departments:", error);
-      } finally {
-        setLoading(false);
+  const fetchDepartmentDetails = async () => {
+    setLoading(true);
+    try {
+      const response = await getDepartmentById(params.id);
+      if (response) {
+        setName(response.name);
+      } else {
+        console.error("Invalid API response for department:", response);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching department details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      useEffect(() => {
-        fetchDepartments();
-      }, []);
-    
+  const fetchItemsByDepartment = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`http://localhost:3100/items/items-department/get-details/${params.id}`);
+      const data = await res.json();
+      if (data) {
+        setItems(Array.isArray(data) ? data : [data]);
+      } else {
+        console.error("Invalid API response for items:", data);
+      }
+    } catch (error) {
+      console.error("Error fetching items:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDepartmentDetails();
+    fetchItemsByDepartment();
+  }, []);
 
   const handleUpdate = async () => {
     if (!name.trim()) {
@@ -62,6 +80,18 @@ const DepartmentDetailPage = ({ params }: { params: { id: any } }) => {
     }
   };
 
+  const handleEditItem = (item: any) => {
+    alert(`Editing item: ${item.ITEM_NAME}`);
+    // Implement edit functionality here
+  };
+
+  const handleDeleteItem = (item: any) => {
+    if (confirm(`Are you sure you want to delete ${item.ITEM_NAME}?`)) {
+      alert(`Deleting item: ${item.ITEM_NAME}`);
+      // Implement delete functionality here
+    }
+  };
+
   return (
     <div className="p-8 bg-gray-50 min-h-screen flex flex-col relative">
       {/* Top Buttons */}
@@ -81,7 +111,7 @@ const DepartmentDetailPage = ({ params }: { params: { id: any } }) => {
       </div>
 
       {/* Main Content */}
-      <div className="bg-white shadow-md rounded-lg p-6">
+      <div className="bg-white rounded-lg p-6">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Department Details</h1>
 
         {isEditing ? (
@@ -113,151 +143,47 @@ const DepartmentDetailPage = ({ params }: { params: { id: any } }) => {
             <p className="text-lg font-medium text-gray-700">Department Name: {name}</p>
           </div>
         )}
-
-        <button
-          className="mt-8 bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-500"
-          onClick={() => setIsPopupOpen(true)}
-        >
-          Add New Item
-        </button>
       </div>
 
       {/* Table */}
-      <div className="mt-10 bg-white shadow-md rounded-lg p-6">
+      <div className="mt-10 bg-white rounded-lg p-6">
         <h2 className="text-xl font-bold mb-4 text-gray-800">Items</h2>
-        <table className="table-auto w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-200 text-left text-gray-700">
+        <table className="table-auto w-full text-left bg-white">
+          <thead className="bg-blue-100 text-gray-800 text-sm font-medium">
+            <tr>
               <th className="px-4 py-2 rounded-tl-lg">Barcode</th>
               <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Available Qty</th>
-              <th className="px-4 py-2">Total Qty</th>
-              <th className="px-4 py-2">Lower Quantity</th>
-              <th className="px-4 py-2 rounded-tr-lg">Category ID</th>
+              <th className="px-4 py-2">Quantity</th>
+              <th className="px-4 py-2">Department</th>
+              <th className="px-4 py-2 rounded-tr-lg">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {[...Array(7)].map((_, i) => (
-              <tr key={i} className="hover:bg-gray-100">
-                <td className="border px-4 py-2">123456</td>
-                <td className="border px-4 py-2">Sample Item</td>
-                <td className="border px-4 py-2">50</td>
-                <td className="border px-4 py-2">100</td>
-                <td className="border px-4 py-2">10</td>
-                <td className="border px-4 py-2">1</td>
+            {items.map((item, index) => (
+              <tr key={index} className=" border-t hover:bg-gray-100">
+                <td className="border px-4 py-2">{item.ITEM_BARCODE}</td>
+                <td className="border px-4 py-2">{item.ITEM_NAME}</td>
+                <td className="border px-4 py-2">{item.QTY}</td>
+                <td className="border px-4 py-2">{item.DEPARTMENT_NAME}</td>
+                <td className="border px-4 py-2 flex space-x-4">
+                <button
+                    className="text-blue-500 hover:text-blue-700"
+                    onClick={() => handleEditItem(item)}
+                  >
+                    <Edit size={20} />
+                  </button>
+                  <button
+                    className="text-red-500 hover:text-red-700"
+                    onClick={() => handleDeleteItem(item)}
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
-     
-      {/* Popup */}
-            {/* Popup for Adding New Item */}
-            {isPopupOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-bold mb-4">Add New Item</h2>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                // Add logic to handle form submission
-                alert("New item added!");
-                setIsPopupOpen(false);
-              }}
-            >
-              <div className="mb-4">
-                <label htmlFor="barcode" className="block text-gray-700 font-medium mb-2">
-                  Barcode
-                </label>
-                <input
-                  type="text"
-                  id="barcode"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                  placeholder="Enter Barcode"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="itemName" className="block text-gray-700 font-medium mb-2">
-                  Item Name
-                </label>
-                <input
-                  type="text"
-                  id="itemName"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                  placeholder="Enter Item Name"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="availableQty" className="block text-gray-700 font-medium mb-2">
-                  Available Quantity
-                </label>
-                <input
-                  type="number"
-                  id="availableQty"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                  placeholder="Enter Available Quantity"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="totalQty" className="block text-gray-700 font-medium mb-2">
-                  Total Quantity
-                </label>
-                <input
-                  type="number"
-                  id="totalQty"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                  placeholder="Enter Total Quantity"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="lowerQty" className="block text-gray-700 font-medium mb-2">
-                  Lower Quantity Limit
-                </label>
-                <input
-                  type="number"
-                  id="lowerQty"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                  placeholder="Enter Lower Quantity Limit"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="categoryId" className="block text-gray-700 font-medium mb-2">
-                  Category ID
-                </label>
-                <input
-                  type="number"
-                  id="categoryId"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                  placeholder="Enter Category ID"
-                  required
-                />
-              </div>
-              <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-400"
-                  onClick={() => setIsPopupOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500"
-                >
-                  Add Item
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 };

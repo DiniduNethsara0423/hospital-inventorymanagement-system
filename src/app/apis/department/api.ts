@@ -77,3 +77,19 @@ export const addItemToDepartment = async (barcode:String, itemDetailId: number, 
     throw error;
   }
 };
+
+
+
+
+export const getAssignedItems = async (page: number, pageSize: number) => {
+  const url:any = process.env.NEXT_PUBLIC_GET_ALL_DEPARTMENT_ITEMS
+  try {
+    const response = await api.get(`${url}`, {
+      params: { page, pageSize },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching items by department:", error);
+    throw error;
+  }
+};

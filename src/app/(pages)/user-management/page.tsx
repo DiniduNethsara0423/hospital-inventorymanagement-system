@@ -1,17 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Edit, Trash2, Eye, PlusCircle } from "lucide-react";
+import { PlusCircle, Edit, Trash2, Search, Plus } from "lucide-react";
+import RegistrationSteps from "@/app/components/RegisterUserPopUp";
 
 const UserManagement: React.FC = () => {
-  const router = useRouter();
   const [users, setUsers] = useState([
     { id: 1, name: "John Doe", email: "john@example.com", role: "Admin", status: "Active" },
     { id: 2, name: "Jane Smith", email: "jane@example.com", role: "User", status: "Inactive" },
-    // Example data; replace with API data
   ]);
   const [search, setSearch] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -24,42 +23,60 @@ const UserManagement: React.FC = () => {
   );
 
   const handleAddUser = () => {
-    router.push("/create-user"); // Navigate to add user page
+    setShowPopup(true);
   };
 
-  const handleEdit = (id: number) => {
-    router.push(`/edit-user/${id}`); // Navigate to edit user page
-  };
-
-  const handleDelete = (id: number) => {
-    if (confirm("Are you sure you want to delete this user?")) {
-      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
-    }
+  const handleClosePopup = () => {
+    setShowPopup(false);
   };
 
   return (
     <div className="p-8 w-full min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-4xl font-bold text-gray-800">User Management</h1>
-        <button
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-base shadow-lg font-semibold flex items-center"
-          onClick={handleAddUser}
-        >
-          <PlusCircle size={20} className="mr-2" /> Add New User
-        </button>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
-        <input
-          type="text"
-          placeholder="Search users..."
-          value={search}
-          onChange={handleSearchChange}
-          className="border border-gray-300 rounded-md px-4 py-2 w-1/2 text-gray-800 shadow-sm focus:outline-none focus:ring focus:ring-blue-300 hover:shadow-lg"
-        />
+      <div className="flex flex-wrap justify-between items-center mb-6">
+
+        {/* Search Bar */}
+        <div className="flex items-center w-full md:w-2/3 bg-white border border-gray-300 rounded-full shadow-sm px-4 py-2">
+          <Search className="text-gray-500 w-5 h-5 mr-2" />
+          <input
+            type="text"
+            value={search}
+            onChange={handleSearchChange}
+            placeholder="Search Users"
+            className="w-full focus:outline-none"
+          />
+        </div>
+        <div className="flex items-center space-x-2 mt-4 md:mt-0">
+          <button
+            onClick={handleAddUser}
+            className="flex items-center space-x-2 bg-gray-700 text-white px-6 py-3 rounded-full shadow-lg hover:bg-gray-800 transition"
+          >
+            <Plus className="w-5 h-5" />
+            <span>Add Users</span>
+          </button>
+        </div>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-lg shadow-md">
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white w-full max-w-md p-6 rounded-md shadow-lg relative">
+            <button
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+              onClick={handleClosePopup}
+            >
+              ✖
+            </button>
+            <RegistrationSteps />
+          </div>
+        </div>
+      )}
+
+
+
+<div className="overflow-x-auto bg-white rounded-lg">
         <table className="table-auto w-full border-collapse">
           <thead className="bg-blue-200 text-left">
             <tr>
@@ -81,13 +98,12 @@ const UserManagement: React.FC = () => {
                   <td className="border px-4 py-3 text-center flex justify-center space-x-4">
                     <button
                       className="text-blue-600 hover:text-blue-800"
-                      onClick={() => handleEdit(user.id)}
+                      
                     >
                       <Edit size={20} />
                     </button>
                     <button
                       className="text-red-600 hover:text-red-800"
-                      onClick={() => handleDelete(user.id)}
                     >
                       <Trash2 size={20} />
                     </button>
@@ -126,3 +142,6 @@ const UserManagement: React.FC = () => {
 };
 
 export default UserManagement;
+
+
+

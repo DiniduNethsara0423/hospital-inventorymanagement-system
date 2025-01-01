@@ -2,8 +2,9 @@
 
 import React, { useState, useRef } from 'react';
 import { initiateRegistration, verifyOtp, completeRegistration } from '@/app/apis/auth/api';
+import { Mail, Lock, User, CheckCircle, Shield } from 'lucide-react';
 
-const RegistrationSteps: React.FC = () => {
+const RegisterUserPopUp: React.FC = () => {
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -43,6 +44,7 @@ const RegistrationSteps: React.FC = () => {
             const response = await completeRegistration(email);
             if (response.success) {
                 setMessage('Registration complete');
+                
             }
         } catch {
             setMessage('Error completing registration');
@@ -70,41 +72,54 @@ const RegistrationSteps: React.FC = () => {
     };
 
     return (
-        <div className="p-6 max-w-md mx-auto bg-white shadow-md rounded-md">
-            <h1 className="text-2xl font-bold mb-6 text-center">Registration</h1>
+        <div className="p-6 w-full max-w-md">
+            <div className="flex justify-center mb-6">
+                <div className="bg-gray-800 rounded-full p-4">
+                    {step === 1 && <Mail className="text-white" size={36} />}
+                    {step === 2 && <Lock className="text-white" size={36} />}
+                    {step === 3 && <CheckCircle className="text-white" size={36} />}
+                </div>
+            </div>
+
+            <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Create User</h1>
             {renderMessage()}
 
             {step === 1 && (
                 <div>
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="block w-full mb-4 border rounded p-3"
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="block w-full mb-4 border rounded p-3"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="block w-full mb-4 border rounded p-3"
-                    />
+                    <div className="relative mb-4">
+                        <Mail className="absolute left-3 top-3 text-gray-400" size={20} />
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="block w-full pl-10 pr-4 border rounded p-3"
+                        />
+                    </div>
+                    <div className="relative mb-4">
+                        <Lock className="absolute left-3 top-3 text-gray-400" size={20} />
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="block w-full pl-10 pr-4 border rounded p-3"
+                        />
+                    </div>
+                    <div className="relative mb-4">
+                        <User className="absolute left-3 top-3 text-gray-400" size={20} />
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="block w-full pl-10 pr-4 border rounded p-3"
+                        />
+                    </div>
                     <div className="mb-4">
                         <p className="font-medium mb-2">Select Role:</p>
                         <div className="flex gap-4">
-                            {[
-                                { id: 1, label: 'Super Admin' },
-                                { id: 2, label: 'Admin' },
-                                { id: 3, label: 'User' },
-                            ].map((role) => (
+                            {[{ id: 1, label: 'Super Admin' }, { id: 2, label: 'Admin' }, { id: 3, label: 'User' }].map((role) => (
                                 <label key={role.id} className="flex items-center gap-2">
                                     <input
                                         type="radio"
@@ -120,7 +135,7 @@ const RegistrationSteps: React.FC = () => {
                     </div>
                     <button
                         onClick={handleInitiateRegistration}
-                        className="bg-blue-600 text-white px-4 py-2 rounded w-full hover:bg-blue-700"
+                        className="bg-gray-700 text-white px-4 py-2 rounded w-full hover:bg-gray-800"
                     >
                         Send OTP
                     </button>
@@ -145,7 +160,7 @@ const RegistrationSteps: React.FC = () => {
                     </div>
                     <button
                         onClick={handleVerifyOtp}
-                        className="bg-blue-600 text-white px-4 py-2 rounded w-full hover:bg-blue-700"
+                        className="bg-gray-700 text-white px-4 py-2 rounded w-full hover:bg-gray-800"
                     >
                         Verify OTP
                     </button>
@@ -156,7 +171,7 @@ const RegistrationSteps: React.FC = () => {
                 <div>
                     <button
                         onClick={handleCompleteRegistration}
-                        className="bg-green-600 text-white px-4 py-2 rounded w-full hover:bg-green-700"
+                        className="bg-gray-700 text-white px-4 py-2 rounded w-full hover:bg-gray-800"
                     >
                         Complete Registration
                     </button>
@@ -166,4 +181,4 @@ const RegistrationSteps: React.FC = () => {
     );
 };
 
-export default RegistrationSteps;
+export default RegisterUserPopUp;
