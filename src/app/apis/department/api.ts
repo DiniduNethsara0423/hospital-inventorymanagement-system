@@ -67,7 +67,7 @@ export const addItemToDepartment = async (barcode:String, itemDetailId: number, 
   try {
     const response = await api.post(`${url}`, {
       barcode: barcode,
-      itemDetailId: 3,
+      itemDetailId: itemDetailId,
       departmentId: departmentId,
       qty,
     });

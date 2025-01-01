@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { addItemToDepartment, getAssignedItems, getDepartments } from "@/app/apis/department/api";
+import { getAllItemDetails } from "@/app/apis/inventory/api"; // Update the path as needed
 
 const AddItemToDepartment = () => {
   const generateBarcode = () => {
@@ -25,6 +26,7 @@ const AddItemToDepartment = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [itemDetails, setItemDetails] = useState([]);
 
   const fetchAssignedItems = async () => {
     try {
@@ -36,6 +38,27 @@ const AddItemToDepartment = () => {
       alert("Failed to fetch assigned items.");
     }
   };
+
+  const fetchAllItemDetails = async () => {
+    try {
+      let page = 1;
+      const pageSize = 10;
+      let allItemDetails: any = [];
+      let response;
+
+      do {
+        response = await getAllItemDetails(page, pageSize);
+        allItemDetails = [...allItemDetails, ...response.results];
+        page++;
+      } while (response.totalCount === pageSize);
+
+      setItemDetails(allItemDetails);
+    } catch (error) {
+      console.error("Error fetching item details:", error);
+      alert("Failed to fetch item details.");
+    }
+  };
+
   const fetchAllDepartments = async () => {
     try {
       let page = 1;
@@ -58,6 +81,7 @@ const AddItemToDepartment = () => {
 
   useEffect(() => {
     fetchAllDepartments();
+    fetchAllItemDetails();
   }, []);
 
   useEffect(() => {
@@ -67,6 +91,7 @@ const AddItemToDepartment = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    console.log(`Updating ${name} to ${value}`); // Debugging
     setFormData({ ...formData, [name]: value });
   };
 
@@ -76,7 +101,9 @@ const AddItemToDepartment = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+  
+    console.log("Submitting formData:", formData); // Debugging
+  
     try {
       await addItemToDepartment(
         formData.barcode,
@@ -96,7 +123,7 @@ const AddItemToDepartment = () => {
       alert("Failed to add item to department. Please try again.");
     }
   };
-
+  
   const handlePageChange = (page: any) => {
     setCurrentPage(page);
     fetchAssignedItems();
@@ -107,7 +134,6 @@ const AddItemToDepartment = () => {
     setCurrentPage(1); // Reset to first page
     fetchAssignedItems();
   };
-
 
   return (
     <div className="w-full h-screen flex flex-col p-6">
@@ -156,13 +182,20 @@ const AddItemToDepartment = () => {
                 <select
                   id="itemDetailId"
                   name="itemDetailId"
-                  value={formData.itemDetailId}
+                  value={formData.itemDetailId} // Ensure this is updated correctly
                   onChange={handleInputChange}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
                 >
-                  <option value={1}>Mock Item 1</option>
-                  <option value={2}>Mock Item 2</option>
+                  <option value="" disabled>
+                    Select an item
+                  </option>
+                  {itemDetails.map((item: any) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
                 </select>
+
               </div>
             </div>
 

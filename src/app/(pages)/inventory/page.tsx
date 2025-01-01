@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAllItems, deleteItem } from "@/app/apis/inventory/api"; // Update the path as needed
-import { Edit, Trash2, ChevronLeft, ChevronRight } from "lucide-react"; // Updated icons from Lucide React
+import { getAllItems, getAllItemDetails, deleteItem } from "@/app/apis/inventory/api"; // Update the path as needed
+import { Edit, Trash2 } from "lucide-react";
 
 interface InventoryItem {
   item_barcode: string;
@@ -13,33 +13,49 @@ interface InventoryItem {
   category_name: number;
 }
 
+interface ItemDetails {
+  id: number;
+  barcode: string;
+  name: string;
+  price: string;
+  invoice_id: string;
+  qty: number;
+  maintance_date: string | null;
+}
+
 const ItemsPage: React.FC = () => {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<"items" | "itemDetails">("items");
   const [items, setItems] = useState<InventoryItem[]>([]);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemDetails, setItemDetails] = useState<ItemDetails[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchItems = async () => {
-      console.log("Fetching inventory...");
       setIsLoading(true);
       try {
-        const data = await getAllItems(currentPage, itemsPerPage);
-        setItems(data.items || []); // Ensure your API response has an `items` key
-        const count = data.count && data.count[0] && data.count[0]["COUNT(*)"];
-        setTotalItems(parseInt(count, 10) || 0); // Parse the total count
+        if (activeTab === "items") {
+          const data = await getAllItems(currentPage, itemsPerPage);
+          setItems(data.items || []);
+          setTotalItems(parseInt(data.count[0]["COUNT(*)"], 10) || 0);
+        } else {
+          const data = await getAllItemDetails(currentPage, itemsPerPage);
+          setItemDetails(data.results || []);
+          setTotalItems(data.totalCount || 0);
+        }
       } catch (error) {
-        console.error("Failed to fetch items:", error);
+        console.error("Failed to fetch data:", error);
       } finally {
         setIsLoading(false);
       }
     };
-
+  
     fetchItems();
-  }, [currentPage, itemsPerPage]);
-
+  }, [activeTab, currentPage, itemsPerPage]);
+  
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const handlePageChange = (page: number) => {
@@ -48,18 +64,18 @@ const ItemsPage: React.FC = () => {
 
   const handleItemsPerPageChange = (value: number) => {
     setItemsPerPage(value);
-    setCurrentPage(1); // Reset to the first page
+    setCurrentPage(1);
   };
 
-  const handleEdit = (barcode: string) => {
-    router.push(`/edit-inventory/${barcode}`); // Navigate to edit page with barcode as parameter
-  };
-
-  const handleDelete = async (barcode: string) => {
-    if (confirm("Are you sure you want to delete this item? It will delete Permenently")) {
+  const handleDelete = async (id: string | number) => {
+    if (confirm("Are you sure you want to delete this item? It will delete permanently.")) {
       try {
-        await deleteItem(barcode);
-        setItems((prevItems) => prevItems.filter((item) => item.item_barcode !== barcode));
+        await deleteItem(id);
+        if (activeTab === "items") {
+          setItems((prevItems) => prevItems.filter((item) => item.item_barcode !== id));
+        } else {
+          setItemDetails((prevDetails) => prevDetails.filter((detail) => detail.id !== id));
+        }
       } catch (error) {
         console.error("Failed to delete item:", error);
       }
@@ -75,6 +91,23 @@ const ItemsPage: React.FC = () => {
           onClick={() => router.push("/add-Inventory")}
         >
           Add New Item
+        </button>
+      </div>
+
+      <div className="flex space-x-4 mb-6">
+        <button
+          onClick={() => setActiveTab("items")}
+          className={`px-6 py-2 rounded-lg font-medium ${activeTab === "items" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
+            }`}
+        >
+          Items
+        </button>
+        <button
+          onClick={() => setActiveTab("itemDetails")}
+          className={`px-6 py-2 rounded-lg font-medium ${activeTab === "itemDetails" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
+            }`}
+        >
+          Item Details
         </button>
       </div>
 
@@ -100,83 +133,94 @@ const ItemsPage: React.FC = () => {
           <table className="table-auto w-full border-collapse">
             <thead className="bg-blue-200 text-left">
               <tr>
-                <th className="px-4 py-3 rounded-tl-lg text-gray-800">Barcode</th>
-                <th className="border px-4 py-3 text-gray-800">Name</th>
-                <th className="border px-4 py-3 text-gray-800">Category</th>
-                <th className="border px-4 py-3 text-gray-800">Available Qty</th>
-                <th className="border px-4 py-3 text-gray-800">Currently Using Qty</th>
-                <th className="border px-4 py-3 text-gray-800">Total Qty</th>
-                <th className="px-4 py-3 rounded-tr-lg text-gray-800 text-center">Actions</th>
+                {activeTab === "items" ? (
+                  <>
+                    <th className="px-4 py-3 text-gray-800">Barcode</th>
+                    <th className="px-4 py-3 text-gray-800">Name</th>
+                    <th className="px-4 py-3 text-gray-800">Category</th>
+                    <th className="px-4 py-3 text-gray-800">Available Qty</th>
+                    <th className="px-4 py-3 text-gray-800">Currently Using Qty</th>
+                    <th className="px-4 py-3 text-gray-800">Total Qty</th>
+                  </>
+                ) : (
+                  <>
+                    <th className="px-4 py-3 text-gray-800">ID</th>
+                    <th className="px-4 py-3 text-gray-800">Barcode</th>
+                    <th className="px-4 py-3 text-gray-800">Name</th>
+                    <th className="px-4 py-3 text-gray-800">Price</th>
+                    <th className="px-4 py-3 text-gray-800">Invoice ID</th>
+                    <th className="px-4 py-3 text-gray-800">Qty</th>
+                    <th className="px-4 py-3 text-gray-800">Maintenance Date</th>
+                  </>
+                )}
+                <th className="px-4 py-3 text-gray-800 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {items.length > 0 ? (
-                items.map((item) => (
-                  <tr key={item.item_barcode} className="hover:bg-blue-50">
-                    <td className="border px-4 py-3 text-gray-700">{item.item_barcode}</td>
-                    <td className="border px-4 py-3 text-gray-700">{item.item_name}</td>
-                    <td className="border px-4 py-3 text-gray-700">{item.category_name}</td>
-                    <td className="border px-4 py-3 text-gray-700">{item.avalible_qty ?? "N/A"}</td>
-                    <td className="border px-4 py-3 text-gray-700">{item.currently_using_qty ?? "N/A"}</td>
-                    <td className="border px-4 py-3 text-gray-700">{item.total_qty}</td>
-                    <td className="border px-4 py-3 text-center">
-                      <button
-                        className="text-blue-600 mr-4 hover:text-blue-800"
-                        onClick={() => handleEdit(item.item_barcode)}
-                      >
-                        <Edit size={20} />
-                      </button>
-                      <button
-                        className="text-red-600 hover:text-red-800"
-                        onClick={() => handleDelete(item.item_barcode)}
-                      >
-                        <Trash2 size={20} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={8} className="text-center py-6 text-gray-700">
-                    No items found.
+              {(activeTab === "items" ? items : itemDetails).map((item: any) => (
+                <tr key={item.id || item.item_barcode} className="hover:bg-blue-50">
+                  {activeTab === "items" ? (
+                    <>
+                      <td className="border px-4 py-3 text-gray-700">{item.item_barcode}</td>
+                      <td className="border px-4 py-3 text-gray-700">{item.item_name}</td>
+                      <td className="border px-4 py-3 text-gray-700">{item.category_name}</td>
+                      <td className="border px-4 py-3 text-gray-700">{item.available_qty}</td>
+                      <td className="border px-4 py-3 text-gray-700">{item.currently_using_qty ?? "N/A"}</td>
+                      <td className="border px-4 py-3 text-gray-700">{item.total_qty}</td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="border px-4 py-3 text-gray-700">{item.id}</td>
+                      <td className="border px-4 py-3 text-gray-700">{item.barcode}</td>
+                      <td className="border px-4 py-3 text-gray-700">{item.name}</td>
+                      <td className="border px-4 py-3 text-gray-700">{item.price}</td>
+                      <td className="border px-4 py-3 text-gray-700">{item.invoice_id}</td>
+                      <td className="border px-4 py-3 text-gray-700">{item.qty}</td>
+                      <td className="border px-4 py-3 text-gray-700">{item.maintance_date ?? "N/A"}</td>
+                    </>
+                  )}
+                  <td className="border px-4 py-3 text-center">
+                    <button
+                      className="text-blue-600 mr-4 hover:text-blue-800"
+                      onClick={() => router.push(`/edit-${activeTab}/${item.id || item.item_barcode}`)}
+                    >
+                      <Edit size={20} />
+                    </button>
+                    <button
+                      className="text-red-600 hover:text-red-800"
+                      onClick={() => handleDelete(item.id || item.item_barcode)}
+                    >
+                      <Trash2 size={20} />
+                    </button>
                   </td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
         </div>
       )}
 
-      {/* Pagination */}
-      <div className="flex justify-center items-center mt-6 space-x-4">
-  <button
-    onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-    className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${
-      currentPage === 1
-        ? "opacity-50 cursor-not-allowed"
-        : "hover:bg-gray-300"
-    } transition`}
-    disabled={currentPage === 1}
-  >
-    <ChevronLeft className="w-5 h-5" />
-  </button>
-
-  <span className="text-gray-700 font-medium">
-    Page {currentPage} of {totalPages}
-  </span>
-
-  <button
-    onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-    className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${
-      currentPage === totalPages
-        ? "opacity-50 cursor-not-allowed"
-        : "hover:bg-gray-300"
-    } transition`}
-    disabled={currentPage === totalPages}
-  >
-    <ChevronRight className="w-5 h-5" />
-  </button>
-</div>
+      <div className="flex justify-between items-center mt-4">
+        <button
+          disabled={currentPage === 1}
+          onClick={() => handlePageChange(currentPage - 1)}
+          className={`px-4 py-2 rounded-lg font-medium ${currentPage === 1 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-blue-500 text-white"
+            }`}
+        >
+          Previous
+        </button>
+        <span className="text-gray-800 font-medium">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => handlePageChange(currentPage + 1)}
+          className={`px-4 py-2 rounded-lg font-medium ${currentPage === totalPages ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-blue-500 text-white"
+            }`}
+        >
+          Next
+        </button>
+      </div>
 
     </div>
   );

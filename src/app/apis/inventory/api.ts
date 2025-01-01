@@ -74,3 +74,8 @@ export const deleteItem = async (id:any)=>{
     throw error;
   }
 }
+
+export const getAllItemDetails = async (page: number, pageSize: number) => {
+  const response = await apiClient.get(`/items/item-details/get-all-item-details?page=${page}&pageSize=${pageSize}`);
+  return response.data;
+};
