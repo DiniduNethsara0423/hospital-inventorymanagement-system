@@ -14,7 +14,8 @@ const AddItemForm = () => {
     lower_quantity: "",
     price: "",
     invoice_id: "",
-    created_by: 5,
+    vendor_id: "", // New field added
+    created_by: 101, // Update with required default value
   });
   const [suggestions, setSuggestions] = useState([]);
   const [isExistingItem, setIsExistingItem] = useState(false);
@@ -80,9 +81,9 @@ const AddItemForm = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const { category_id, name, barcode, total_qty, lower_quantity, price, invoice_id } = formData;
+    const { category_id, name, barcode, total_qty, lower_quantity, price, invoice_id, vendor_id } = formData;
 
-    if (!category_id || !name || !barcode || !total_qty || !lower_quantity || !price || !invoice_id) {
+    if (!category_id || !name || !barcode || !total_qty || !lower_quantity || !price || !invoice_id || !vendor_id) {
       alert("Please fill in all required fields.");
       return;
     }
@@ -104,6 +105,7 @@ const AddItemForm = () => {
         lower_quantity: "",
         price: "",
         invoice_id: "",
+        vendor_id: "",
       });
       setSuggestions([]);
       setIsExistingItem(false);
@@ -199,7 +201,8 @@ const AddItemForm = () => {
         </div>
 
         {/* Other Fields */}
-        {[
+        {[ 
+          { id: "vendor_id", label: "Vendor ID" }, // Added vendor_id field
           { id: "total_qty", label: "Total Quantity" },
           { id: "lower_quantity", label: "Lower Quantity" },
           { id: "price", label: "Price" },

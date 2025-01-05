@@ -1,0 +1,255 @@
+// ItemDetails.tsx
+"use client";
+import React, { useEffect, useState } from "react";
+import { getAllItemDetails, deleteItemDetail, updateItemDetail } from "@/app/apis/inventory/api";
+import { Edit, Trash2 } from "lucide-react";
+import { format } from "date-fns";
+
+interface ItemDetails {
+  id: number;
+  barcode: string;
+  name: string;
+  price: number;
+  invoice_id: string;
+  qty: number;
+  maintance_date: string | null;
+}
+
+interface ItemDetailsProps {
+  currentPage: number;
+  itemsPerPage: number;
+  onTotalItemsChange: (total: number) => void;
+}
+
+const ItemDetails: React.FC<ItemDetailsProps> = ({ currentPage, itemsPerPage, onTotalItemsChange }) => {
+  const [itemDetails, setItemDetails] = useState<ItemDetails[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [editingItem, setEditingItem] = useState<ItemDetails | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchItemDetails = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getAllItemDetails(currentPage, itemsPerPage);
+        setItemDetails(data.results || []);
+        onTotalItemsChange(data.totalCount || 0);
+      } catch (error) {
+        console.error("Failed to fetch item details:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchItemDetails();
+  }, [currentPage, itemsPerPage, onTotalItemsChange]);
+
+  const handleDelete = async (id: number, qty: number) => {
+    const removingQty = parseInt(prompt("Enter quantity to remove:") || "0", 10);
+    if (!removingQty || removingQty <= 0 || removingQty > qty) {
+      alert("Invalid quantity entered.");
+      return;
+    }
+
+    try {
+      await deleteItemDetail(id, removingQty);
+      setItemDetails((prev) => prev.map((item) => (item.id === id ? { ...item, qty: item.qty - removingQty } : item)));
+    } catch (error) {
+      console.error("Failed to delete item detail:", error);
+    }
+  };
+
+  const handleEdit = (item: ItemDetails) => {
+    setEditingItem({ ...item });
+    setIsModalOpen(true);
+  };
+  const formatDate = (date: string | null) => {
+    return date ? format(new Date(date), "PPpp") : "N/A"; // Example: "Jan 4, 2025, 2:34 PM"
+  };
+  
+  const handleUpdate = async () => {
+    if (!editingItem) return;
+
+    const { price, removed_qty = 0 } = editingItem;
+
+    if (removed_qty <= 0 || removed_qty > editingItem.qty) {
+      alert("Invalid removed quantity entered.");
+      return;
+    }
+
+    const updatedQty = editingItem.qty - removed_qty;
+
+    const updatedData = {
+      ...editingItem,
+      price: parseFloat(price),
+      removed_qty,
+      qty: updatedQty,
+    };
+
+    // Remove unwanted fields
+    const { maintance_date, created_at, updated_at, ...dataToSend } = updatedData;
+
+    try {
+      await updateItemDetail(editingItem.id, dataToSend);
+      setItemDetails((prev) =>
+        prev.map((item) => (item.id === editingItem.id ? { ...item, ...dataToSend } : item))
+      );
+      setEditingItem(null);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Failed to update item detail:", error);
+    }
+  };
+
+  
+
+  return (
+    <div>
+      {isLoading ? (
+        <p className="text-center text-gray-700 font-medium">Loading item details...</p>
+      ) : (
+        <table className="table-auto w-full border-collapse">
+          <thead className="bg-blue-200 text-left">
+            <tr>
+              <th className="px-4 py-3 text-gray-800">ID</th>
+              <th className="px-4 py-3 text-gray-800">Barcode</th>
+              <th className="px-4 py-3 text-gray-800">Price</th>
+              <th className="px-4 py-3 text-gray-800">Invoice ID</th>
+              <th className="px-4 py-3 text-gray-800">Qty</th>
+              <th className="px-4 py-3 text-gray-800">Maintenance Date</th>
+              <th className="px-4 py-3 text-gray-800">Removed Qty</th>
+              <th className="px-4 py-3 text-gray-800">Removed Purpose</th>
+              <th className="px-4 py-3 text-gray-800 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {itemDetails.map((detail) => (
+              <tr key={detail.id} className="hover:bg-blue-50">
+                <td className="border px-4 py-3 text-gray-700">{detail.id}</td>
+                <td className="border px-4 py-3 text-gray-700">{detail.barcode}</td>
+                <td className="border px-4 py-3 text-gray-700">{detail.price}</td>
+                <td className="border px-4 py-3 text-gray-700">{detail.invoice_id}</td>
+                <td className="border px-4 py-3 text-gray-700">{detail.qty}</td>
+                <td className="border px-4 py-3 text-gray-700">{formatDate(detail.maintance_date) ?? "N/A"}</td>
+                <td className="border px-4 py-3 text-gray-700">{detail.removed_qty}</td>
+                <td className="border px-4 py-3 text-gray-700">{detail.removed_purpose ?? "N/A"}</td>
+                <td className="border px-4 py-3 text-center">
+                  <button
+                    className="text-red-600 hover:text-red-800 mr-2"
+                    onClick={() => handleDelete(detail.id, detail.qty)}
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                  <button
+                    className="text-blue-600 hover:text-blue-800"
+                    onClick={() => handleEdit(detail)}
+                  >
+                    <Edit size={20} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+{isModalOpen && editingItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-md flex justify-center items-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-xl relative">
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            <h2 className="text-3xl font-semibold text-gray-800 mb-6 text-center">Edit Item</h2>
+
+            <div className="grid gap-6">
+              <div>
+                <label className="block text-lg font-medium text-gray-700 mb-1">Price</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={editingItem.price}
+                  onChange={(e) =>
+                    setEditingItem((prev) =>
+                      prev ? { ...prev, price: parseFloat(e.target.value) || 0 } : null
+                    )
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-lg font-medium text-gray-700 mb-1">Removed Quantity</label>
+                <input
+                  type="number"
+                  value={editingItem.removed_qty || ""}
+                  onChange={(e) => {
+                    const removedQty = parseInt(e.target.value, 10) || 0;
+                    setEditingItem((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            removed_qty: removedQty,
+                          }
+                        : null
+                    );
+                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-lg font-medium text-gray-700 mb-1">Removed Purpose</label>
+                <input
+                  type="text"
+                  value={editingItem.removed_purpose || ""}
+                  onChange={(e) =>
+                    setEditingItem((prev) => prev && { ...prev, removed_purpose: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-lg"
+                />
+              </div>
+              <div>
+                <p className="text-lg font-medium text-gray-700">
+                  Updated Quantity: {editingItem.qty - (editingItem.removed_qty || 0)}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={handleUpdate}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg mr-2"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+};
+
+export default ItemDetails;

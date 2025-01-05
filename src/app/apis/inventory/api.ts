@@ -79,3 +79,16 @@ export const getAllItemDetails = async (page: number, pageSize: number) => {
   const response = await apiClient.get(`/items/item-details/get-all-item-details?page=${page}&pageSize=${pageSize}`);
   return response.data;
 };
+
+export const deleteItemDetail = async (id, removingQty) => {
+  const response = await axios.post(`http://localhost:3100/items/remove-item-detail/${id}`, {
+    removing_qty: removingQty,
+  });
+  return response.data;
+};
+
+// Update item detail
+export const updateItemDetail = async (id, updateData) => {
+  const response = await axios.patch(`http://localhost:3100/items/item-details/${id}`, updateData);
+  return response.data;
+};

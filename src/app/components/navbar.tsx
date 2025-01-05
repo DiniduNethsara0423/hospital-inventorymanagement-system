@@ -12,6 +12,7 @@ import {
   LucideUsers,
   LucidePlus,
   LucideSearch,
+  LucideBook
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -44,6 +45,7 @@ const SidebarNavbar = () => {
           {/* Bottom Section */}
           <ul className="space-y-2 font-medium">
             <SidebarItem href="/settings" Icon={LucideSettings} label="Settings" />
+            <SidebarItem href="/logs" Icon={LucideBook} label="Logs" />
             <SidebarItem href="/login" Icon={LucideLogOut} label="Log Out" />
           </ul>
         </div>
