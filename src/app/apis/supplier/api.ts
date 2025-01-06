@@ -26,3 +26,17 @@ export const getVendorId = async () => {
   const response = await axios.get(`${BASE_URL}/vendors/vendorId/get`);
   return response.data; // Assuming the response contains { vendorId: "generated_id" }
 };
+
+export const updateVendor = (vendorId: string, updatedData: any) => {
+  return axios.patch(`${BASE_URL}/vendors/${vendorId}`, updatedData);
+};
+
+export const deleteVendor = async (vendorId: string) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/vendors/${vendorId}`);
+    return response.data; // or any response that the API returns
+  } catch (error) {
+    console.error("Error deleting vendor:", error);
+    throw new Error("Failed to delete vendor");
+  }
+};

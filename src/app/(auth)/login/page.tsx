@@ -1,17 +1,18 @@
-'use client';
-
+"use client"
 import React, { useState } from 'react';
 import Image from 'next/image';
 import loginImg from '@/app/images/login.jpg';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { login } from '@/app/apis/auth/api';
+import ResetPasswordModal from '@/app/components/ResetPasswordModal';
 
 function LoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -22,29 +23,23 @@ function LoginPage() {
     event.preventDefault();
     setError('');
     setIsLoading(true);
-  
+
     try {
       const response = await login(formData);
-  
-      // Check if the response status is 200 or 201 and the token exists
+
       if (response.token && (response.status === 200 || response.status === 201)) {
-        // Store the token in localStorage or sessionStorage
         localStorage.setItem('token', response.token);
-  
-        // Navigate to the dashboard or another page upon successful login
         router.push('/dashboard');
       } else {
-        // Handle unexpected cases
         setError('Unexpected response from the server. Please try again.');
       }
     } catch (err: any) {
-      // Capture and display error messages
       setError(err.message || 'Invalid login credentials');
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div className="flex flex-col md:flex-row h-screen">
       {/* Left Section */}
@@ -110,9 +105,13 @@ function LoginPage() {
                 </label>
               </div>
               <div>
-                <a href="#" className="text-sm text-blue-600 hover:underline">
+                <button
+                  type="button"
+                  className="text-sm text-blue-600 hover:underline"
+                  onClick={() => setIsModalOpen(true)}
+                >
                   Forgot Password?
-                </a>
+                </button>
               </div>
             </div>
 
@@ -137,6 +136,12 @@ function LoginPage() {
           </div>
         </div>
       </div>
+
+      <ResetPasswordModal
+        email={formData.username}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

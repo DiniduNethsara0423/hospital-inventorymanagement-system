@@ -92,3 +92,13 @@ export const updateItemDetail = async (id, updateData) => {
   const response = await axios.patch(`http://localhost:3100/items/item-details/${id}`, updateData);
   return response.data;
 };
+
+export const updateItem = async (barcode: string, updatedData: { name: string; lower_quantity: number; category_id: number }) => {
+  try {
+    const response = await axios.patch(`http://localhost:3100/items/${barcode}`, updatedData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating item:", error);
+    throw error;
+  }
+};

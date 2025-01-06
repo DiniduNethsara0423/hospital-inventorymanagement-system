@@ -14,12 +14,7 @@ const AddItemToDepartment = () => {
     ).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}`;
   };
 
-  const [formData, setFormData] = useState({
-    barcode: generateBarcode(),
-    itemDetailId: 1, // Mock ID, replace with dropdown later
-    departmentId: 1, // Mock ID, replace with dropdown later
-    qty: 0,
-  });
+
 
   const [departments, setDepartments] = useState([]);
   const [assignedItems, setAssignedItems] = useState([]);
@@ -27,6 +22,13 @@ const AddItemToDepartment = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [itemDetails, setItemDetails] = useState([]);
+
+  const [formData, setFormData] = useState({
+    barcode: generateBarcode(),
+    itemDetailId: itemDetails, // Mock ID, replace with dropdown later
+    departmentId: departments, // Mock ID, replace with dropdown later
+    qty: 0,
+  });
 
   const fetchAssignedItems = async () => {
     try {
@@ -182,7 +184,7 @@ const AddItemToDepartment = () => {
                 <select
                   id="itemDetailId"
                   name="itemDetailId"
-                  value={formData.itemDetailId} // Ensure this is updated correctly
+                  value={formData.itemDetailId}
                   onChange={handleInputChange}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
                 >
@@ -191,7 +193,7 @@ const AddItemToDepartment = () => {
                   </option>
                   {itemDetails.map((item: any) => (
                     <option key={item.id} value={item.id}>
-                      {item.name}
+                      {item.id}
                     </option>
                   ))}
                 </select>

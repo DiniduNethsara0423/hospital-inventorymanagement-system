@@ -1,10 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { DateRangePicker } from "react-date-range";
-import { createInvoice, uploadInvoicePDF, fetchInvoices, fetchQuotations, fetchPurchases, generateInvoiceId } from "@/app/apis/invoice/api";
+import { createInvoice, uploadInvoicePDF, fetchInvoices, fetchQuotations, fetchPurchases, generateInvoiceId, deleteInvoice } from "@/app/apis/invoice/api";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import debounce from 'lodash.debounce';
+import { Trash2 } from "lucide-react";
 
 const OrdersPage = () => {
   const [newInvoice, setNewInvoice] = useState({
@@ -15,20 +16,20 @@ const OrdersPage = () => {
     invoicePdf: null,
   });
 
-  const [filteredInvoices, setFilteredInvoices]:any = useState([]);
-  const [currentPage, setCurrentPage]:any = useState(1);
-  const [totalPages, setTotalPages]:any = useState(1);
-  const [quotations, setQuotations]:any = useState([]); // Quotations state
+  const [filteredInvoices, setFilteredInvoices]: any = useState([]);
+  const [currentPage, setCurrentPage]: any = useState(1);
+  const [totalPages, setTotalPages]: any = useState(1);
+  const [quotations, setQuotations]: any = useState([]); // Quotations state
 
-  const [currentQuotationPage, setCurrentQuotationPage]:any = useState(1); // Track current page for quotations
-  const [isLoadingQuotations, setIsLoadingQuotations]:any = useState(false); // Track loading state
-  const [hasMoreQuotations, setHasMoreQuotations]:any = useState(true);
+  const [currentQuotationPage, setCurrentQuotationPage]: any = useState(1); // Track current page for quotations
+  const [isLoadingQuotations, setIsLoadingQuotations]: any = useState(false); // Track loading state
+  const [hasMoreQuotations, setHasMoreQuotations]: any = useState(true);
 
-  const [showDatePicker, setShowDatePicker]:any = useState(false);
+  const [showDatePicker, setShowDatePicker]: any = useState(false);
 
-  const [purchases, setPurchases]:any = useState([]); // Store loaded purchases
-  const [purchasePage, setPurchasePage]:any = useState(1); // Current page
-  const [hasMorePurchases, setHasMorePurchases]:any = useState(true); // Tracks if more data exists
+  const [purchases, setPurchases]: any = useState([]); // Store loaded purchases
+  const [purchasePage, setPurchasePage]: any = useState(1); // Current page
+  const [hasMorePurchases, setHasMorePurchases]: any = useState(true); // Tracks if more data exists
 
   useEffect(() => {
     const getInvoices = async () => {
@@ -45,7 +46,7 @@ const OrdersPage = () => {
     getInvoices();
   }, [currentPage]);
 
-  
+
 
   const fetchAllQuotations = async () => {
     try {
@@ -56,7 +57,7 @@ const OrdersPage = () => {
       console.error("Failed to fetch quotations:", error);
     }
   };
-  
+
   const fetchAllPurchases = async () => {
     try {
       const { rows } = await fetchPurchases(1, 1000); // Fetch all purchases at once
@@ -66,20 +67,20 @@ const OrdersPage = () => {
       console.error("Failed to fetch purchases:", error);
     }
   };
-  
+
   useEffect(() => {
     fetchAllQuotations();
     fetchAllPurchases();
   }, []);
-  
+
 
   const handleQuotationScroll = debounce((e) => {
     const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
     if (bottom) {
-      setCurrentQuotationPage((prev:any) => prev + 1); // Trigger the next page load
+      setCurrentQuotationPage((prev: any) => prev + 1); // Trigger the next page load
     }
   }, 200); // Delay of 200ms
-  
+
   const handlePurchasesScroll = debounce((e) => {
     const target = e.target;
     if (target.scrollTop + target.clientHeight >= target.scrollHeight - 50) {
@@ -87,7 +88,7 @@ const OrdersPage = () => {
     }
   }, 200); // Delay of 200ms
 
-  const handleDateRangeSelect = (ranges:any) => {
+  const handleDateRangeSelect = (ranges: any) => {
     setNewInvoice({
       ...newInvoice,
       dateRange: {
@@ -131,6 +132,25 @@ const OrdersPage = () => {
     }
   };
 
+  const handleDeleteInvoice = async (invoiceId: string) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this invoice?");
+    if (confirmDelete) {
+      try {
+        await deleteInvoice(invoiceId);
+        console.log(invoiceId)
+        alert("Invoice deleted successfully!");
+
+        // Refresh the invoices list after deletion
+        const { results, count } = await fetchInvoices(currentPage, 7);
+        setFilteredInvoices(results);
+        setTotalPages(Math.ceil(count[0]["COUNT(*)"] / 7));
+      } catch (error) {
+        console.error("Failed to delete invoice:", error);
+        alert("Failed to delete invoice. Please try again.");
+      }
+    }
+  };
+
 
   return (
     <div className="p-6 w-full mx-auto mt-10">
@@ -163,8 +183,8 @@ const OrdersPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Quotation ID</label>
             <div
               className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm overflow-y-auto"
-              style={{ maxHeight: "200px" }} 
-              onScroll={handleQuotationScroll} 
+              style={{ maxHeight: "200px" }}
+              onScroll={handleQuotationScroll}
             >
               <select
                 className="w-full text-sm bg-white"
@@ -172,7 +192,7 @@ const OrdersPage = () => {
                 onChange={(e) => setNewInvoice({ ...newInvoice, quotationId: e.target.value })}
               >
                 <option value="" disabled>Select Quotation</option>
-                {quotations.map((quotation:any) => (
+                {quotations.map((quotation: any) => (
                   <option key={quotation.quotation_id} value={quotation.quotation_id}>
                     {quotation.quotation_id}
                   </option>
@@ -268,10 +288,12 @@ const OrdersPage = () => {
               <th className="px-6 py-3">Vendor ID</th>
               <th className="px-6 py-3">Total Value</th>
               <th className="px-6 py-3">Invoice PDF</th>
+              <th className="px-6 py-3 text-center">Actions</th>
+
             </tr>
           </thead>
           <tbody>
-            {filteredInvoices.map((invoice:any) => (
+            {filteredInvoices.map((invoice: any) => (
               <tr key={invoice.invoice_id} className="border-t hover:bg-gray-100">
                 <td className="px-6 py-3">{invoice.quotation_id}</td>
                 <td className="px-6 py-3">{invoice.invoice_id_by_shop || "N/A"}</td>
@@ -280,14 +302,24 @@ const OrdersPage = () => {
                 <td className="px-6 py-3">{invoice.total_value || "0"}</td>
                 <td className="px-6 py-3">
                   <a
-                    href={invoice.pdf_path}
+                    href={`http://localhost:3100/${invoice.pdf_path.replace("./", "")}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline"
                   >
                     View PDF
                   </a>
+
                 </td>
+
+                <td className="text-center">
+                <button
+                  onClick={() => handleDeleteInvoice(invoice.invoice_id)} 
+                  className="text-red-600 hover:text-red-800"
+                    >
+                      <Trash2 size={20} />
+                </button>
+              </td>
               </tr>
             ))}
           </tbody>

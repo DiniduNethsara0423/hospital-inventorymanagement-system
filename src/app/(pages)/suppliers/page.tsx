@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import { getVendorId, getVendors, postVendor } from "@/app/apis/supplier/api"; // Import API methods
+import { deleteVendor, getVendorId, getVendors, postVendor, updateVendor } from "@/app/apis/supplier/api"; // Import API methods
 import { Plus, Edit, Trash2, Search } from "lucide-react";
 
 type Supplier = {
@@ -77,38 +77,52 @@ export default function SuppliersPage() {
 
   const handleSubmit = async () => {
     try {
-      const newSupplier = {
-        vendor_id: form.id, // Use the ID generated earlier
+      const supplierData = {
+        vendor_id: form.id, // Use the ID
         vendor_name: form.vendorName || "",
         email: form.email || "",
         shop_name: form.shopName || "",
         shop_address: form.shopAddress || "",
         telephone_number: form.telephoneNumber || "",
-        created_by: 1,
+        created_by: 1, // Adjust as necessary
       };
   
-      await postVendor(newSupplier);
-  
-      if (editingId !== null) {
+      if (editingId) {
+        // Update existing supplier
+        await updateVendor(editingId, supplierData);
         setSuppliers((prev) =>
           prev.map((supplier) =>
-            supplier.id === editingId ? { ...supplier, ...newSupplier } : supplier
+            supplier.id === editingId ? { ...supplier, ...supplierData } : supplier
           )
         );
       } else {
-        setSuppliers([...suppliers, { id: newSupplier.vendor_id, ...newSupplier }]);
+        // Add new supplier
+        await postVendor(supplierData);
+        setSuppliers([...suppliers, { id: supplierData.vendor_id, ...supplierData }]);
       }
   
       closeModal();
+      fetchSuppliers(currentPage,pageSize)
     } catch (error) {
-      console.error("Error adding supplier:", error);
-      alert(error.message || "Failed to add supplier.");
+      console.error("Error saving supplier:", error);
+      alert(error.message || "Failed to save supplier.");
     }
   };
   
+  
 
-  const handleDelete = (id: string) => {
-    setSuppliers(suppliers.filter((supplier) => supplier.id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      // Call the delete API function
+      await deleteVendor(id);
+  
+      // Remove supplier from state if the deletion was successful
+      setSuppliers(suppliers.filter((supplier) => supplier.id !== id));
+      alert("Supplier deleted successfully");
+    } catch (error) {
+      alert("Failed to delete supplier.");
+      console.error("Error deleting supplier:", error);
+    }
   };
 
   return (

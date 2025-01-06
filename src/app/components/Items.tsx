@@ -1,15 +1,21 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { getAllItems, deleteItem } from "@/app/apis/inventory/api";
+import { getAllItems, deleteItem, updateItem, getAllCategories } from "@/app/apis/inventory/api";
 import { Edit, Trash2 } from "lucide-react";
 
 interface InventoryItem {
   item_barcode: string;
   item_name: string;
-  avalible_qty: number | null;
+  available_qty: number | null;
   currently_using_qty: number | null;
   total_qty: number;
-  category_name: number;
+  category_name: string;
+  lower_quantity: number | null;
+}
+
+interface Category {
+  id: number;
+  category_name: string;
 }
 
 interface ItemsProps {
@@ -20,7 +26,12 @@ interface ItemsProps {
 
 const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsChange }) => {
   const [items, setItems] = useState<InventoryItem[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteItemBarcode, setDeleteItemBarcode] = useState<string | null>(null);
+  const [editItem, setEditItem] = useState<Partial<InventoryItem> | null>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -36,15 +47,84 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
       }
     };
 
+    const fetchCategories = async () => {
+      try {
+        const data = await getAllCategories();
+        setCategories(data || []);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+
     fetchItems();
+    fetchCategories();
   }, [currentPage, itemsPerPage, onTotalItemsChange]);
 
-  const handleDelete = async (barcode: string) => {
+  const confirmDelete = (barcode: string) => {
+    setDeleteItemBarcode(barcode);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteItemBarcode) return;
+
     try {
-      await deleteItem(barcode);
-      setItems((prev) => prev.filter((item) => item.item_barcode !== barcode));
+      await deleteItem(deleteItemBarcode);
+      setItems((prev) => prev.filter((item) => item.item_barcode !== deleteItemBarcode));
+      setIsDeleteModalOpen(false);
+      setDeleteItemBarcode(null);
     } catch (error) {
       console.error("Failed to delete item:", error);
+    }
+  };
+
+  const handleEditClick = (item: InventoryItem) => {
+    setEditItem({
+      item_barcode: item.item_barcode,
+      item_name: item.item_name,
+      lower_quantity: item.lower_quantity,
+      category_name: item.category_name,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setEditItem(null);
+  };
+
+  const handleSave = async () => {
+    if (!editItem || !editItem.item_barcode) return;
+
+    try {
+      const selectedCategory = categories.find((cat) => cat.category_name === editItem.category_name);
+      if (!selectedCategory) {
+        console.error("Invalid category selected");
+        return;
+      }
+
+      await updateItem(editItem.item_barcode, {
+        name: editItem.item_name,
+        lower_quantity: editItem.lower_quantity,
+        category_id: selectedCategory.id,
+      });
+
+      setItems((prev) =>
+        prev.map((item) =>
+          item.item_barcode === editItem.item_barcode
+            ? {
+                ...item,
+                item_name: editItem.item_name!,
+                lower_quantity: editItem.lower_quantity!,
+                category_name: selectedCategory.category_name,
+              }
+            : item
+        )
+      );
+
+      handleModalClose();
+    } catch (error) {
+      console.error("Failed to update item:", error);
     }
   };
 
@@ -54,14 +134,13 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
         <p className="text-center text-gray-700 font-medium">Loading items...</p>
       ) : (
         <table className="table-auto w-full border-collapse">
-            <thead className="bg-blue-200 text-left">
+          <thead className="bg-blue-200 text-left">
             <tr>
               <th className="px-4 py-3 text-gray-800">Barcode</th>
               <th className="px-4 py-3 text-gray-800">Name</th>
               <th className="px-4 py-3 text-gray-800">Category</th>
               <th className="px-4 py-3 text-gray-800">Available Qty</th>
               <th className="px-4 py-3 text-gray-800">Currently Using Qty</th>
-              <th className="px-4 py-3 text-gray-800">Removed Qty</th>
               <th className="px-4 py-3 text-gray-800">Lower Qty</th>
               <th className="px-4 py-3 text-gray-800">Total Qty</th>
               <th className="px-4 py-3 text-gray-800 text-center">Actions</th>
@@ -75,19 +154,110 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
                 <td className="border px-4 py-3 text-gray-700">{item.category_name}</td>
                 <td className="border px-4 py-3 text-gray-700">{item.available_qty}</td>
                 <td className="border px-4 py-3 text-gray-700">{item.currently_using_qty ?? "N/A"}</td>
-                <td className="border px-4 py-3 text-gray-700">{item.removed_qty}</td>
                 <td className="border px-4 py-3 text-gray-700">{item.lower_quantity}</td>
-                <td className="border px-4 py-3 text-gray-700">{item.qty}</td>
+                <td className="border px-4 py-3 text-gray-700">{item.total_qty}</td>
                 <td className="border px-4 py-3 text-center">
-                  <button className="text-red-600 hover:text-red-800" onClick={() => handleDelete(item.item_barcode)}>
+                  <button
+                    className="text-blue-600 hover:text-blue-800 mr-2"
+                    onClick={() => handleEditClick(item)}
+                  >
+                    <Edit size={20} />
+                  </button>
+                  <button
+                    className="text-red-600 hover:text-red-800"
+                    onClick={() => confirmDelete(item.item_barcode)}
+                  >
                     <Trash2 size={20} />
                   </button>
-                  
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+      )}
+
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-lg w-1/3">
+            <h3 className="text-xl font-semibold mb-4">Delete Item</h3>
+            <p className="mb-6 text-gray-700">
+              Are you sure you want to delete this item? This action is permanent and cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                onClick={handleDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-lg w-1/3">
+            <h3 className="text-xl font-semibold mb-4">Edit Item</h3>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-1">Name</label>
+              <input
+                type="text"
+                className="w-full border px-3 py-2 rounded"
+                value={editItem?.item_name || ""}
+                onChange={(e) => setEditItem((prev) => ({ ...prev, item_name: e.target.value }))}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-1">Lower Qty</label>
+              <input
+                type="number"
+                className="w-full border px-3 py-2 rounded"
+                value={editItem?.lower_quantity || ""}
+                onChange={(e) =>
+                  setEditItem((prev) => ({ ...prev, lower_quantity: parseInt(e.target.value, 10) }))
+                }
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-1">Category</label>
+              <select
+                className="w-full border px-3 py-2 rounded"
+                value={editItem?.category_name || ""}
+                onChange={(e) =>
+                  setEditItem((prev) => ({ ...prev, category_name: e.target.value }))
+                }
+              >
+                <option value="">Select Category</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.category_name}>
+                    {category.category_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="flex justify-end space-x-4">
+              <button
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                onClick={handleModalClose}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                onClick={handleSave}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

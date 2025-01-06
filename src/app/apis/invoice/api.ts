@@ -95,3 +95,13 @@ export const generateInvoiceId = async (): Promise<string> => {
     throw error;
   }
 };
+
+export const deleteInvoice = async (invoiceId: string) => {
+  try {
+    const response = await axios.post(`http://localhost:3100/invoices/${invoiceId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting invoice:", error);
+    throw new Error("Failed to delete invoice");
+  }
+};

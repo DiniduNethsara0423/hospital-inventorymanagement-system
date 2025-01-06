@@ -11,22 +11,22 @@
 //     }
 // };
 
-// // export const login = async (credentials: { username: string; password: string }) => {
-// //     const url:any = process.env.NEXT_PUBLIC_LOGIN_USER;
-// //     try {
-// //       const response = await axios.post(`${url}`, credentials);
-// //       return response.data;
-// //     } catch (error: any) {
-// //       throw error.response?.data || { message: 'An error occurred' };
-// //     }
-// //   };
-
-//   export const login = async (credentials: { username: string; password: string }) => {
+// export const login = async (credentials: { username: string; password: string }) => {
 //     const url:any = process.env.NEXT_PUBLIC_LOGIN_USER;
-
-//     const response = await axios.post(`${url}`, credentials);
-//     return { ...response.data, status: response.status }; // Include status in the returned object
+//     try {
+//       const response = await axios.post(`${url}`, credentials);
+//       return response.data;
+//     } catch (error: any) {
+//       throw error.response?.data || { message: 'An error occurred' };
+//     }
 //   };
+
+  export const login = async (credentials: { username: string; password: string }) => {
+    const url:any = process.env.NEXT_PUBLIC_LOGIN_USER;
+
+    const response = await axios.post(`${url}`, credentials);
+    return { ...response.data, status: response.status }; // Include status in the returned object
+  };
   
 
 
@@ -114,3 +114,21 @@ export const completeRegistration = async (email: string) => {
     }
 };
 
+
+
+
+
+export const requestPasswordReset = async (email: string) => {
+    const response = await axios.post(`http://localhost:3100/auth/update-password`, { email });
+    return response.data;
+  };
+  
+//   export const verifyOtp = async (email: string, otp: string) => {
+//     const response = await axios.post(`http://localhost:3100/auth/verify-otp`, { email, otp });
+//     return response.data;
+//   };
+  
+  export const updatePassword = async (email: string, password: string) => {
+    const response = await axios.patch(`http://localhost:3100/auth/complete-updating-password`, { email, password });
+    return response.data;
+  };
