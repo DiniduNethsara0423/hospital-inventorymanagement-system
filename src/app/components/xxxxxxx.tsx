@@ -1,13 +1,9 @@
 "use client";
 
-import React, { useState, useEffect ,useRef, useCallback } from "react";
+import React, { useState,useEffect  } from "react";
 import { FaSearch, FaCheck, FaTimes, FaTrash, FaPlus } from "react-icons/fa";
 import { X, CheckCircle, FileText } from "lucide-react";
-import {
-  addPurchaseRequest,
-  getPurchaseRequest,
-} from "@/app/apis/purchase-request/api";
-import { getVendors } from "@/app/apis/get-vendors/api";
+import { addPurchaseRequest, getPurchaseRequest } from "@/app/apis/purchase-request/api";
 
 // Define the types for better type-checking
 interface PurchaseRequest {
@@ -30,77 +26,11 @@ const PurchaseRequests: React.FC = () => {
   const [newTotalValue, setNewTotalValue] = useState<number | "">("");
   const [isLoading, setIsLoading] = useState(false);
   const [requests, setRequests] = useState<Request[]>([]);
-  const [uploadedPDFs, setUploadedPDFs] = useState<
-    Record<number, UploadedPDF[]>
-  >({});
-  const [selectedRequest, setSelectedRequest] =
-    useState<PurchaseRequest | null>(null);
+  const [uploadedPDFs, setUploadedPDFs] = useState<Record<number, UploadedPDF[]>>({});
+  const [selectedRequest, setSelectedRequest] = useState<PurchaseRequest | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedPDFs, setSelectedPDFs] = useState<Record<number, string[]>>(
-    {}
-  );
+  const [selectedPDFs, setSelectedPDFs] = useState<Record<number, string[]>>({});
   const [currentPage, setCurrentPage] = useState(1);
-
-  const [purchaseRequestId, setPurchaseRequestId] = useState("");
-  // const [selectedSupplier, setSelectedSupplier] = useState("");
-  const [totalValue, setTotalValue] = useState("");
-  // const [suppliers, setSuppliers] = useState([]);
-  const [suppliers, setSuppliers] = useState<any[]>([]);
-  const [selectedSupplier, setSelectedSupplier] = useState<string>("");
-  const [page, setPage] = useState<number>(1);
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const pageSize = 50; 
-
-  //supplier fetch
-  const observer = useRef<IntersectionObserver | null>(null);
-const observerTimeout = useRef<NodeJS.Timeout | null>(null);
-
-const lastElementRef = useCallback(
-  (node: HTMLDivElement) => {
-    if (observer.current) observer.current.disconnect();
-    observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting && hasMore) {
-        if (observerTimeout.current) clearTimeout(observerTimeout.current);
-
-        observerTimeout.current = setTimeout(() => {
-          setPage((prevPage) => prevPage + 1);
-        }, 100); // Debounce by 100ms to avoid state update during rendering
-      }
-    });
-    if (node) observer.current.observe(node);
-  },
-  [hasMore]
-);
-
-useEffect(() => {
-  let isMounted = true;  
-  const fetchSuppliers = async () => {
-    try {
-      const response = await getVendors(page, pageSize);
-      const { data = [], total = 0 } = response;
-
-      if (isMounted) {
-        if (data.length > 0) {
-          setSuppliers((prev) => [...prev, ...data]);
-        } else {
-          setHasMore(false);  // Stop further fetch if no data
-        }
-
-        if (page * pageSize >= total) {
-          setHasMore(false);
-        }
-      }
-    } catch (error) {
-      if (isMounted) console.error("Failed to fetch suppliers:", error);
-    }
-  };
-
-  fetchSuppliers();
-  return () => {
-    isMounted = false;  
-  };
-}, [page]);
-
 
   // Pagination logic
   const totalPages = Math.ceil((requests?.length || 0) / ITEMS_PER_PAGE);
@@ -108,12 +38,12 @@ useEffect(() => {
     setCurrentPage(page);
   };
 
-  // Fetch purchase requests
-  const fetchRequests = async (page: number) => {
+   // Fetch purchase requests
+   const fetchRequests = async (page: number) => {
     setIsLoading(true);
     try {
       const data = await getPurchaseRequest(page, ITEMS_PER_PAGE);
-      console.log(data);
+      console.log(data)
       setRequests(data || []);
     } catch (error) {
       console.error("Failed to fetch requests:", error);
@@ -122,11 +52,13 @@ useEffect(() => {
       setIsLoading(false);
     }
   };
+  
 
   useEffect(() => {
     console.log("Fetching requests for page:", currentPage);
     fetchRequests(currentPage);
   }, [currentPage]);
+  
 
   // Add a new purchase request
   const handleAddRequest = async () => {
@@ -161,9 +93,7 @@ useEffect(() => {
       setNewTotalValue("");
     } catch (error: any) {
       console.error("Failed to add purchase request:", error.message);
-      alert(
-        "Failed to add purchase request. Please check the console for details."
-      );
+      alert("Failed to add purchase request. Please check the console for details.");
     } finally {
       setIsLoading(false);
     }
@@ -187,8 +117,7 @@ useEffect(() => {
   };
 
   // Modal handlers
-  const handleOpenModal = (request: PurchaseRequest) =>
-    setSelectedRequest(request);
+  const handleOpenModal = (request: PurchaseRequest) => setSelectedRequest(request);
   const handleCloseModal = () => setSelectedRequest(null);
 
   // Handle PDF uploads
@@ -273,7 +202,7 @@ useEffect(() => {
             <p className="text-gray-500 text-center">No requests found.</p>
           ) : (
             <>
-              {filteredRequests.map((request: any) => (
+              {filteredRequests.map((request:any) => (
                 <div
                   key={request.purchase_request_id}
                   className="flex items-center justify-between bg-blue-50 p-4 rounded-lg shadow-sm hover:shadow-md transition"
@@ -381,84 +310,14 @@ useEffect(() => {
               </p>
               <p className="text-lg text-gray-700">
                 <strong className="font-medium text-gray-800">Price:</strong> ${" "}
-                {selectedRequest.fullPrice
-                  ? selectedRequest.fullPrice.toFixed(2)
-                  : "N/A"}
+                {selectedRequest.fullPrice.toFixed(2)}
               </p>
-
               <p className="text-lg text-gray-700">
                 <strong className="font-medium text-gray-800">
                   Description:
                 </strong>{" "}
                 {selectedRequest.description}
               </p>
-            </div>
-
-            {/* Additional Fields */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                Add Additional Information
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Purchase Request ID
-                  </label>
-                  <input
-                    type="text"
-                    value={purchaseRequestId} // state variable
-                    onChange={(e) => setPurchaseRequestId(e.target.value)}
-                    className="block w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200"
-                  />
-                </div>
-{/* aaaaaaaaaaaaaaaa */}
-<div>
-  <label
-    htmlFor="supplier"
-    className="block text-sm font-medium text-gray-700"
-  >
-    Supplier
-  </label>
-  <div className="relative max-h-60 overflow-auto border border-gray-300 rounded-md">
-    <select
-      id="supplier"
-      name="supplier"
-      aria-label="Supplier"
-      value={selectedSupplier}
-      onChange={(e) => setSelectedSupplier(e.target.value)}
-      className="block w-full border-none px-4 py-2 text-sm focus:outline-none"
-    >
-      <option value="">Select Supplier</option>
-      {suppliers.length === 0 ? (
-        <option disabled>No suppliers available</option>
-      ) : (
-        suppliers.map((supplier) => (
-          <option key={supplier.id} value={supplier.id}>
-            {supplier.name}
-          </option>
-        ))
-      )}
-    </select>
-    {hasMore && (
-      <div ref={lastElementRef} className="h-1 bg-transparent"></div>
-    )}
-  </div>
-</div>
-
-    {/* aaaaaaaaaaaaaaa */}
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Total Value
-                  </label>
-                  <input
-                    type="number"
-                    value={totalValue} // state variable
-                    onChange={(e) => setTotalValue(e.target.value)}
-                    className="block w-full border border-gray-300 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring focus:ring-blue-200"
-                  />
-                </div>
-              </div>
             </div>
 
             <div className="mb-8">
@@ -470,11 +329,7 @@ useEffect(() => {
                 accept="application/pdf"
                 multiple
                 onChange={(e) =>
-                  handleUploadPDFs(e.target.files, selectedRequest.id, {
-                    purchaseRequestId,
-                    selectedSupplier,
-                    totalValue,
-                  })
+                  handleUploadPDFs(e.target.files, selectedRequest.id)
                 }
                 className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
               />
@@ -559,6 +414,7 @@ useEffect(() => {
                   ))}
               </ul>
             </div>
+
             <div className="text-right">
               <button
                 onClick={handleCloseModal}
