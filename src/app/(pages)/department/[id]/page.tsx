@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { updateDepartment, deleteDepartment, getDepartmentById,  } from "@/app/apis/department/api";
+import { updateDepartment, deleteDepartment, getDepartmentById, removeItemFromDepartment,  } from "@/app/apis/department/api";
 import { Trash2, Edit } from "lucide-react";
 import React from "react";
 
@@ -13,6 +13,12 @@ const DepartmentDetailPage = ({ params }: { params: { id: any } }) => {
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<any[]>([]);
   const router = useRouter();
+
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [removingQty, setRemovingQty] = useState(1);
+  const [reason, setReason] = useState("");
 
   const fetchDepartmentDetails = async () => {
     setLoading(true);
@@ -85,10 +91,24 @@ const DepartmentDetailPage = ({ params }: { params: { id: any } }) => {
     // Implement edit functionality here
   };
 
-  const handleDeleteItem = (item: any) => {
-    if (confirm(`Are you sure you want to delete ${item.ITEM_NAME}?`)) {
-      alert(`Deleting item: ${item.ITEM_NAME}`);
-      // Implement delete functionality here
+
+  const handleDeleteItem = async () => {
+    if (!selectedItem) return;
+
+    if (removingQty > selectedItem.QTY) {
+      alert("Removing quantity cannot exceed available quantity.");
+      return;
+    }
+
+    try {
+      const payload = { qty: removingQty, reason };
+      await removeItemFromDepartment(selectedItem.ITEM_BARCODE, payload);
+      alert("Item removed successfully.");
+      setIsModalOpen(false);
+      fetchItemsByDepartment();
+    } catch (error) {
+      console.error("Error removing item:", error);
+      alert("Failed to remove item.");
     }
   };
 
@@ -154,27 +174,22 @@ const DepartmentDetailPage = ({ params }: { params: { id: any } }) => {
               <th className="px-4 py-2 rounded-tl-lg">Barcode</th>
               <th className="px-4 py-2">Name</th>
               <th className="px-4 py-2">Quantity</th>
-              <th className="px-4 py-2">Department</th>
               <th className="px-4 py-2 rounded-tr-lg">Actions</th>
             </tr>
           </thead>
           <tbody>
             {items.map((item, index) => (
-              <tr key={index} className=" border-t hover:bg-gray-100">
+              <tr key={index} className="border-t hover:bg-gray-100">
                 <td className="border px-4 py-2">{item.ITEM_BARCODE}</td>
                 <td className="border px-4 py-2">{item.ITEM_NAME}</td>
                 <td className="border px-4 py-2">{item.QTY}</td>
-                <td className="border px-4 py-2">{item.DEPARTMENT_NAME}</td>
                 <td className="border px-4 py-2 flex space-x-4">
-                <button
-                    className="text-blue-500 hover:text-blue-700"
-                    onClick={() => handleEditItem(item)}
-                  >
-                    <Edit size={20} />
-                  </button>
                   <button
                     className="text-red-500 hover:text-red-700"
-                    onClick={() => handleDeleteItem(item)}
+                    onClick={() => {
+                      setSelectedItem(item);
+                      setIsModalOpen(true);
+                    }}
                   >
                     <Trash2 size={20} />
                   </button>
@@ -184,6 +199,53 @@ const DepartmentDetailPage = ({ params }: { params: { id: any } }) => {
           </tbody>
         </table>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Remove Item</h2>
+            <p className="mb-2">Item: {selectedItem.ITEM_NAME}</p>
+            <p className="mb-4">Available Quantity: {selectedItem.QTY}</p>
+
+            <label className="block mb-2">
+              Quantity to Remove:
+              <input
+                type="number"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1"
+                value={removingQty}
+                onChange={(e) => setRemovingQty(parseInt(e.target.value) || 1)}
+                min={1}
+              />
+            </label>
+
+            <label className="block mb-4">
+              Reason:
+              <textarea
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Enter reason for removal"
+              />
+            </label>
+
+            <div className="flex justify-end space-x-4">
+              <button
+                className="bg-gray-500 text-white px-5 py-2 rounded-lg hover:bg-gray-400"
+                onClick={() => setIsModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-500"
+                onClick={handleDeleteItem}
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

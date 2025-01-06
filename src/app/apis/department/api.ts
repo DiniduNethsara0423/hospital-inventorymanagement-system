@@ -93,3 +93,15 @@ export const getAssignedItems = async (page: number, pageSize: number) => {
     throw error;
   }
 };
+
+export const removeItemFromDepartment = async (id:any, payload:any) => {
+  try {
+    const response = await api.post(
+      `http://localhost:3100/items/item-departments/remove/${id}`,
+      payload
+    );
+    return response.data;
+  } catch (error:any) {
+    throw new Error(error.response?.data?.message || "Failed to remove item.");
+  }
+};
