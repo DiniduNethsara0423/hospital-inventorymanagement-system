@@ -15,6 +15,7 @@ import {
   LucideBook
 } from 'lucide-react';
 import Link from 'next/link';
+import SearchBar from './SearchBar';
 
 const SidebarNavbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -64,14 +65,7 @@ const SidebarNavbar = () => {
           <h1 className="text-xl font-semibold text-gray-900 dark:text-white">Hospital Inventory</h1>
 
           {/* Search Bar */}
-          <div className="relative w-1/2 md:w-1/3">
-            <input
-              type="text"
-              className="w-full px-4 py-2 text-gray-900 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"
-              placeholder="Search items..."
-            />
-            <LucideSearch className="absolute top-3 right-3 w-5 h-5 text-gray-500 dark:text-gray-400" />
-          </div>
+          <SearchBar/>
 
           {/* Profile Section */}
           <div className="relative">

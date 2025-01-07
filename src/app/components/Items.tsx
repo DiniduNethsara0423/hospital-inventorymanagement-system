@@ -33,13 +33,19 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
   const [deleteItemBarcode, setDeleteItemBarcode] = useState<string | null>(null);
   const [editItem, setEditItem] = useState<Partial<InventoryItem> | null>(null);
 
+  const [totalItems, setTotalItems] = useState(0); // For total items count
+  const [current, setCurrent] = useState(currentPage); // Current page state
+  const [pageSize, setPageSize] = useState(itemsPerPage); // Page size state
+
   useEffect(() => {
     const fetchItems = async () => {
       setIsLoading(true);
       try {
-        const data = await getAllItems(currentPage, itemsPerPage);
+        const data = await getAllItems(current, pageSize);
         setItems(data.items || []);
-        onTotalItemsChange(parseInt(data.count[0]["COUNT(*)"], 10) || 0);
+        const total = parseInt(data.count[0]["COUNT(*)"], 10) || 0;
+        onTotalItemsChange(total);
+        setTotalItems(total);
       } catch (error) {
         console.error("Failed to fetch items:", error);
       } finally {
@@ -58,7 +64,18 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
 
     fetchItems();
     fetchCategories();
-  }, [currentPage, itemsPerPage, onTotalItemsChange]);
+  }, [current, pageSize, onTotalItemsChange]);
+
+  const totalPages = Math.ceil(totalItems / pageSize);
+
+  const handlePageChange = (page: number) => {
+    setCurrent(page);
+  };
+
+  const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setPageSize(parseInt(event.target.value, 10));
+    setCurrent(1); 
+  };
 
   const confirmDelete = (barcode: string) => {
     setDeleteItemBarcode(barcode);
@@ -130,6 +147,28 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
 
   return (
     <div>
+
+<div className="flex justify-between items-center mb-4">
+        <div>
+          <label htmlFor="pageSize" className="mr-2 text-gray-700">
+            Items per page:
+          </label>
+          <select
+            id="pageSize"
+            className="border px-3 py-2 rounded"
+            value={pageSize}
+            onChange={handlePageSizeChange}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+          </select>
+        </div>
+        <p className="text-gray-700">Total Items: {totalItems}</p>
+      </div>
+
+      
       {isLoading ? (
         <p className="text-center text-gray-700 font-medium">Loading items...</p>
       ) : (
@@ -259,6 +298,34 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
           </div>
         </div>
       )}
+      
+      <div className="flex justify-between items-center mt-4">
+        <button
+          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          onClick={() => handlePageChange(current - 1)}
+          disabled={current === 1}
+        >
+          Previous
+        </button>
+        <div className="flex space-x-2">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              className={`px-4 py-2 rounded ${current === index + 1 ? "bg-blue-600 text-white" : "bg-gray-200"}`}
+              onClick={() => handlePageChange(index + 1)}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+        <button
+          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          onClick={() => handlePageChange(current + 1)}
+          disabled={current === totalPages}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };
