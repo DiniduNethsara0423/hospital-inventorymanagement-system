@@ -1,120 +1,26 @@
 "use client";
 import React, { useState } from "react";
-import { FaSearch, FaCheck, FaTimes, FaTrash, FaPlus,  } from "react-icons/fa";
-import { X, CheckCircle, FileText } from "lucide-react";
-
-interface Quotation {
-  id: number;
-  name: string;
-  description: string;
-  fullPrice: number;
-  approved: boolean;
-}
+import { FaSearch } from "react-icons/fa";
+import { QuotationForm } from "@/app/components/QuotationForm"; 
+import { QuotationList } from "@/app/components/QuotationList"; 
+import { QuotationModal } from "@/app/components/QuotationModal"; 
 
 const PurchaseOrders: React.FC = () => {
   const [quotations, setQuotations] = useState<Quotation[]>([]);
-  const [newName, setNewName] = useState("");
-  const [newDescription, setNewDescription] = useState("");
-  const [newFullPrice, setNewFullPrice] = useState<number | "">("");
-  const [selectedQuotation, setSelectedQuotation] = useState<Quotation | null>(
-    null
-  );
   const [searchQuery, setSearchQuery] = useState("");
-  const [uploadedPDFs, setUploadedPDFs] = useState<
-    Record<number, { file: File; approved: boolean }[]>
-  >({});
+  const [selectedQuotation, setSelectedQuotation] = useState<Quotation | null>(null);
 
-  const handleAddQuotation = () => {
-    if (
-      newName.trim() === "" ||
-      newDescription.trim() === "" ||
-      newFullPrice === ""
-    )
-      return;
-    setQuotations([
-      ...quotations,
-      {
-        id: Date.now(),
-        name: newName,
-        description: newDescription,
-        fullPrice: Number(newFullPrice),
-        approved: false,
-      },
-    ]);
-    setNewName("");
-    setNewDescription("");
-    setNewFullPrice("");
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
-
-  const handleDeleteQuotation = (id: number) => {
-    setQuotations(quotations.filter((q) => q.id !== id));
-    setUploadedPDFs((prev) => {
-      const newUploadedPDFs = { ...prev };
-      delete newUploadedPDFs[id];
-      return newUploadedPDFs;
-    });
-  };
-
-  const handleApproveQuotation = (id: number) => {
-    setQuotations(
-      quotations.map((q) => (q.id === id ? { ...q, approved: !q.approved } : q))
-    );
-  };
-
-  const handleOpenModal = (quotation: Quotation) => {
-    setSelectedQuotation(quotation);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedQuotation(null);
-  };
-
-  const handleUploadPDFs = (files: FileList | null, quotationId: number) => {
-    if (!files) return;
-    const newFiles = Array.from(files).map((file) => ({
-      file,
-      approved: false,
-    }));
-    setUploadedPDFs((prev) => ({
-      ...prev,
-      [quotationId]: [...(prev[quotationId] || []), ...newFiles],
-    }));
-  };
-
-  const handleApproveSelectedPDFs = (quotationId: number) => {
-    setUploadedPDFs((prev) => ({
-      ...prev,
-      [quotationId]: prev[quotationId].map((pdf) =>
-        selectedPDFs[quotationId]?.includes(pdf.file.name)
-          ? { ...pdf, approved: true }
-          : pdf
-      ),
-    }));
-    setSelectedPDFs((prev) => ({ ...prev, [quotationId]: [] }));
-  };
-
-  const [selectedPDFs, setSelectedPDFs] = useState<Record<number, string[]>>(
-    {}
-  );
-
-  const togglePDFSelection = (quotationId: number, fileName: string) => {
-    setSelectedPDFs((prev) => ({
-      ...prev,
-      [quotationId]: prev[quotationId]?.includes(fileName)
-        ? prev[quotationId].filter((name) => name !== fileName)
-        : [...(prev[quotationId] || []), fileName],
-    }));
-  };
-
-  const filteredQuotations = quotations.filter((q) =>
-    q.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
-    <div className="p-4  min-h-screen">
+    <div className="p-4 min-h-screen">
       <h1 className="text-4xl font-extrabold text-center text-blue-900 mb-6 mt-4">
         Purchase Orders
       </h1>
+
       {/* Search Bar */}
       <div className="mb-6 flex items-center bg-white rounded-full border px-4 py-2">
         <FaSearch className="text-gray-400 mr-3" />
@@ -122,243 +28,31 @@ const PurchaseOrders: React.FC = () => {
           type="text"
           placeholder="Search quotations by name"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleSearchChange}
           className="w-full outline-none text-gray-600"
         />
       </div>
 
       {/* Main Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ">
-          {/* Left Side - Add Quotation Form */}
-          <div className="bg-white p-6 rounded-lg border">
-            <h2 className="text-xl font-bold text-blue-900 mb-4 flex items-center">
-              <FaPlus className="mr-2" /> Add Quotation
-            </h2>
-
-            <input
-              type="text"
-              placeholder="Quotation Name"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              className="border rounded-lg p-3 w-full mb-4 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            />
-            <textarea
-              placeholder="Detailed Description"
-              value={newDescription}
-              onChange={(e) => setNewDescription(e.target.value)}
-              className="border rounded-lg p-3 w-full h-32 focus:ring-2 focus:ring-blue-400 focus:outline-none resize-none mb-4"
-            ></textarea>
-            <input
-              type="number"
-              placeholder="Full Price"
-              value={newFullPrice}
-              onChange={(e) => setNewFullPrice(e.target.valueAsNumber || "")}
-              className="border rounded-lg p-3 w-full mb-4 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            />
-            <button
-              onClick={handleAddQuotation}
-              className="w-full bg-blue-500 text-white py-3 rounded-lg font-bold hover:bg-blue-600 transition"
-            >
-              Add Quotation
-            </button>
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Side - Add Quotation Form */}
+        <QuotationForm setQuotations={setQuotations} />
 
         {/* Right Side - Quotation List */}
-        <div className="col-span-2 bg-white p-6 rounded-lg border">
-        <h2 className="text-xl font-bold text-blue-900 mb-4">Quotations</h2>
-          {filteredQuotations.length === 0 ? (
-            <p className="text-gray-500 text-center">No quotations found.</p>
-          ) : (
-            
-            filteredQuotations.map((quotation) => (
-              <div
-                key={quotation.id}
-                className="flex items-center justify-between bg-blue-50 p-4 rounded-lg shadow-sm hover:shadow-md transition"
-                onClick={() => handleOpenModal(quotation)}
-              >
-                <div>
-                <h3 className="font-bold text-lg text-blue-800">
-                        {quotation.name}
-                      </h3>
-                      <p className="text-gray-600">
-                        Price: ${quotation.fullPrice.toFixed(2)}
-                      </p>
-                      <p
-                        className={`text-sm mt-1 ${
-                          quotation.approved ? "text-green-600 font-semibold" : ""
-                        }`}
-                      >
-                    {quotation.description}
-                  </p>
-                </div>
-                <div className="flex items-center space-x-3">
-                      <button
-                        onClick={() => handleApproveQuotation(quotation.id)}
-                        className={`px-4 py-2 rounded-md font-bold text-sm transition ${
-                          quotation.approved
-                            ? "bg-gray-400 text-white hover:bg-gray-500"
-                            : "bg-green-500 text-white hover:bg-green-600"
-                        }`}
-                      >
-                        {quotation.approved ? "Unapprove" : "Approve"}
-                      </button>
-                      <button
-                        onClick={() => handleDeleteQuotation(quotation.id)}
-                        className="px-4 py-2 rounded-md font-bold text-sm bg-red-500 text-white hover:bg-red-600 transition"
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-              </div>
-            ))
-          )}
-        </div>
+        <QuotationList
+          quotations={quotations}
+          searchQuery={searchQuery}
+          setSelectedQuotation={setSelectedQuotation}
+        />
       </div>
 
       {/* Modal for Viewing Full Quotation */}
       {selectedQuotation && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md flex items-center justify-center z-50">
-            <div
-              className="bg-white rounded-lg shadow-2xl w-full max-w-3xl p-8 relative"
-              style={{
-                maxHeight: "90vh", // Limits the height of the modal
-                overflowY: "auto", // Adds vertical scrolling if content exceeds maxHeight
-              }}
-            >
-              {/* Modal Header */}
-              <div className="flex justify-between items-center border-b pb-4 mb-6">
-                <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-                  <FileText className="mr-2 text-blue-600" /> Quotation Details
-                </h2>
-                <button
-                  onClick={handleCloseModal}
-                  className="text-gray-400 hover:text-gray-600 text-2xl"
-                >
-                  <X />
-                </button>
-              </div>
-      
-              {/* Quotation Details */}
-              <div className="space-y-4 mb-8">
-                <p className="text-lg text-gray-700">
-                  <strong className="font-medium text-gray-800">Name:</strong> {" "}
-                  {selectedQuotation.name}
-                </p>
-                <p className="text-lg text-gray-700">
-                  <strong className="font-medium text-gray-800">Price:</strong> $ {" "}
-                  {selectedQuotation.fullPrice.toFixed(2)}
-                </p>
-                <p className="text-lg text-gray-700">
-                  <strong className="font-medium text-gray-800">Description:</strong> {" "}
-                  {selectedQuotation.description}
-                </p>
-              </div>
-      
-              {/* File Upload Section */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  Upload Supplier PDFs
-                </h3>
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  multiple
-                  onChange={(e) => handleUploadPDFs(e.target.files, selectedQuotation.id)}
-                  className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-200"
-                />
-              </div>
-      
-              {/* Uploaded PDFs */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  Uploaded PDFs
-                </h3>
-                <ul className="space-y-3">
-                  {(uploadedPDFs[selectedQuotation?.id] || []).map((pdf, index) => (
-                    <li
-                      key={index}
-                      className="flex items-center justify-between bg-gray-100 p-4 rounded-lg shadow-sm"
-                    >
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          className="mr-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          checked={
-                            selectedPDFs[selectedQuotation.id]?.includes(pdf.file.name) ||
-                            false
-                          }
-                          onChange={() =>
-                            togglePDFSelection(selectedQuotation.id, pdf.file.name)
-                          }
-                        />
-                        <a
-                          href={URL.createObjectURL(pdf.file)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`text-blue-600 underline ${pdf.approved ? "font-semibold text-green-600" : ""}`}
-                        >
-                          {pdf.file.name}
-                        </a>
-                      </div>
-                      <span
-                        className={`text-sm ${pdf.approved
-                          ? "text-green-500 font-bold"
-                          : "text-gray-500"
-                        }`}
-                      >
-                        {pdf.approved ? "Approved" : ""}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={() => handleApproveSelectedPDFs(selectedQuotation.id)}
-                  className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-md shadow hover:bg-blue-700 transition-all"
-                >
-                  Approve Selected PDFs
-                </button>
-              </div>
-      
-              {/* Approved PDFs */}
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  Approved PDFs
-                </h3>
-                <ul className="space-y-3">
-                  {(uploadedPDFs[selectedQuotation?.id] || [])
-                    .filter((pdf) => pdf.approved)
-                    .map((pdf, index) => (
-                      <li
-                        key={index}
-                        className="flex items-center bg-green-50 p-4 rounded-lg shadow-sm"
-                      >
-                        <CheckCircle className="text-green-500 w-5 h-5 mr-3" />
-                        <a
-                          href={URL.createObjectURL(pdf.file)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 underline"
-                        >
-                          {pdf.file.name}
-                        </a>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-      
-              {/* Close Button */}
-              <div className="text-right">
-                <button
-                  onClick={handleCloseModal}
-                  className="bg-gray-500 text-white px-6 py-2 rounded-md shadow hover:bg-gray-600 transition-all"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
+        <QuotationModal
+          selectedQuotation={selectedQuotation}
+          setSelectedQuotation={setSelectedQuotation}
+        />
       )}
-
     </div>
   );
 };
