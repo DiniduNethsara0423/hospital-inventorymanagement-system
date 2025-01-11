@@ -53,9 +53,9 @@ export const getPurchaseRequest = async (page = 1, limit = 10) => {
 
 
 
-export const getVendors = async (page: number, pageSize: number) => {
+export const fetchSuppliers = async (page: number, pageSize: number) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/vendors`, {
+    const response = await axios.get(`http://localhost:3100/vendors`, {
       params: { page, pageSize },
     });
 
@@ -69,3 +69,39 @@ export const getVendors = async (page: number, pageSize: number) => {
     return { data: [], total: 0 };  // Return empty data on error
   }
 };
+
+export const addQuotation = async (data: any) => {
+    try {
+      const response = await axios.post("http://localhost:3100/quotation", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error adding quotation:", error);
+      throw error;
+    }
+  };
+  
+  // Upload a PDF for a quotation
+  export const uploadQuotationPDF = async (quotationId: string, pdfFile: File) => {
+    const formData = new FormData();
+    formData.append("file", pdfFile);
+  
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_ADD_PDF_TO_INVOICE}?fType=quotation&id=${quotationId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error uploading quotation PDF:", error);
+      throw error;
+    }
+  };
+  
+  
+
+  export const fetchQuotationPDFs = async (id:any) => {}

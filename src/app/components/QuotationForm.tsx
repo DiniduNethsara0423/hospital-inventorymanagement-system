@@ -61,7 +61,7 @@ export const QuotationForm: React.FC<QuotationFormProps> = ({ setQuotations }) =
 
   return (
     <div className="bg-white p-6 rounded-lg border">
-      <h2 className="text-xl font-bold text-blue-900 mb-4">Add Quotation</h2>
+      <h2 className="text-xl font-bold text-blue-900 mb-4">Add Purchase Requests</h2>
       <textarea
         placeholder="Detailed Description"
         value={newDescription}

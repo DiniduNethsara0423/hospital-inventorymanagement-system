@@ -284,7 +284,7 @@ const AddItemToDepartment = () => {
                 <tr key={item.id} className="border-t hover:bg-gray-100">
                   <td className="px-6 py-3">{item.ITEM_BARCODE}</td>
                   <td className="px-6 py-3">{item.ITEM_NAME}</td>
-                  <td className="px-6 py-3">{item.ITEM_BARCODE}</td>
+                  <td className="px-6 py-3">{item.DEPARTMENT_NAME}</td>
                   <td className="px-6 py-3">{item.QTY}</td>
                 </tr>
               ))}
