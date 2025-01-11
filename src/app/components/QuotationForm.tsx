@@ -10,7 +10,7 @@ interface Quotation {
 
 interface QuotationFormProps {
   setQuotations: React.Dispatch<React.SetStateAction<Quotation[]>>;
-}
+} 
 
 export const QuotationForm: React.FC<QuotationFormProps> = ({ setQuotations }) => {
   const [newDescription, setNewDescription] = useState("");

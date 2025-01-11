@@ -14,7 +14,7 @@ interface QuotationListProps {
   searchQuery: string;
   setSelectedQuotation: React.Dispatch<React.SetStateAction<Quotation | null>>;
 }
-
+ 
 export const QuotationList: React.FC<QuotationListProps> = ({
   searchQuery,
   setSelectedQuotation,

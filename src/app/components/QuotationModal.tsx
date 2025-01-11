@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { X, FileText, CheckCircle, Upload } from "lucide-react";
 import { addQuotation, uploadQuotationPDF, fetchSuppliers, fetchQuotationPDFs } from "@/app/apis/purchase/api"; // Adjust the path as necessary
 
-interface Quotation {
+interface Quotation { 
   id: string;
   name: string;
   fullPrice: number;
