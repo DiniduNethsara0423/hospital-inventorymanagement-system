@@ -12,3 +12,20 @@
    -ms-overflow-style: none; 
    scrollbar-width: none; 
  }
+
+ /* Hide the scrollbar for WebKit browsers */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ensure the content is still scrollable */
+.scroll-container {
+  overflow-y: scroll; /* or auto */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scroll-container {
+  overflow-y: scroll; /* or auto */
+  scrollbar-width: none; /* Firefox hides the scrollbar */
+}

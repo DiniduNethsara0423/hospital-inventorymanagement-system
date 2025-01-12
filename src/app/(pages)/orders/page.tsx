@@ -302,7 +302,7 @@ const OrdersPage = () => {
                 <td className="px-6 py-3">{invoice.total_value || "0"}</td>
                 <td className="px-6 py-3">
                   <a
-                    href={`http://localhost:3100/${invoice.pdf_path.replace("./", "")}`}
+                    href={`http://localhost:3100/${invoice.pdf_path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline"
@@ -310,16 +310,17 @@ const OrdersPage = () => {
                     View PDF
                   </a>
 
+
                 </td>
 
                 <td className="text-center">
-                <button
-                  onClick={() => handleDeleteInvoice(invoice.invoice_id)} 
-                  className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 size={20} />
-                </button>
-              </td>
+                  <button
+                    onClick={() => handleDeleteInvoice(invoice.invoice_id)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

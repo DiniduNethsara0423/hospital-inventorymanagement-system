@@ -105,3 +105,44 @@ export const addQuotation = async (data: any) => {
   
 
   export const fetchQuotationPDFs = async (id:any) => {}
+
+
+  export const fetchQuotationsByPurchaseRequestId = async (purchaseRequestId: string) => {
+    try {
+      const response = await axios.get(`http://localhost:3100/quotation/get-quotations-by-pr-id/${purchaseRequestId}`);
+      return response.data; // Assuming the API returns the data in the response body
+    } catch (error) {
+      console.error("Error fetching quotations by purchase request ID:", error);
+      throw error;
+    }
+  };
+
+  export const addPurchase = async (purchaseData: {
+    approverd_by: string;
+    vendor_id: string;
+    deliver_status: string;
+    pdf_path: string;
+    quotation_id: string;
+  }) => {
+    const response = await axios.post("http://localhost:3100/purchases", purchaseData);
+    return response.data;
+  };
+
+
+  // Delete a purchase request
+export const deletePurchaseRequest = async (requestId: string) => {
+  const response = await axios.delete(`http://localhost:3100/purchase-orders/${requestId}`);
+  return response.data; // Assuming API responds with some acknowledgment or updated data
+};
+
+export const updateQuotationStatus = async (quotationId: string, data: any) => {
+  try {
+    const response = await axios.patch(
+      `http://localhost:3100/quotation/update/${quotationId}`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to update quotation status: ${error}`);
+  }
+};
