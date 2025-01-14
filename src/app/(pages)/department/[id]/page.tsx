@@ -102,7 +102,7 @@ const DepartmentDetailPage = ({ params }: { params: { id: any } }) => {
 
     try {
       const payload = { qty: removingQty, reason };
-      await removeItemFromDepartment(selectedItem.ITEM_BARCODE, payload);
+      await removeItemFromDepartment(selectedItem.ITEM_DEPARTMENT_BARCODE, payload);
       alert("Item removed successfully.");
       setIsModalOpen(false);
       fetchItemsByDepartment();
@@ -180,7 +180,7 @@ const DepartmentDetailPage = ({ params }: { params: { id: any } }) => {
           <tbody>
             {items.map((item, index) => (
               <tr key={index} className="border-t hover:bg-gray-100">
-                <td className="border px-4 py-2">{item.ITEM_BARCODE}</td>
+                <td className="border px-4 py-2">{item.ITEM_DEPARTMENT_BARCODE}</td>
                 <td className="border px-4 py-2">{item.ITEM_NAME}</td>
                 <td className="border px-4 py-2">{item.QTY}</td>
                 <td className="border px-4 py-2 flex space-x-4">

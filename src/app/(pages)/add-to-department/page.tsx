@@ -1,20 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import JsBarcode from "jsbarcode"; // Barcode generation library
 import { addItemToDepartment, getAssignedItems, getDepartments } from "@/app/apis/department/api";
-import { getAllItemDetails } from "@/app/apis/inventory/api"; // Update the path as needed
+import { getAllItemDetails, getBarcode } from "@/app/apis/inventory/api"; // Update the path as needed
+import Barcode from "@/app/components/Barcode";
+
 
 const AddItemToDepartment = () => {
-  const generateBarcode = () => {
-    const now = new Date();
-    return `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(
-      now.getDate()
-    ).padStart(2, "0")}${String(now.getHours()).padStart(2, "0")}${String(
-      now.getMinutes()
-    ).padStart(2, "0")}${String(now.getSeconds()).padStart(2, "0")}`;
-  };
-
-
 
   const [departments, setDepartments] = useState([]);
   const [assignedItems, setAssignedItems] = useState([]);
@@ -24,7 +17,7 @@ const AddItemToDepartment = () => {
   const [itemDetails, setItemDetails] = useState([]);
 
   const [formData, setFormData] = useState({
-    barcode: generateBarcode(),
+    barcode: "",
     itemDetailId: itemDetails, // Mock ID, replace with dropdown later
     departmentId: departments, // Mock ID, replace with dropdown later
     qty: 0,
@@ -81,6 +74,33 @@ const AddItemToDepartment = () => {
     }
   };
 
+  // Fetch a new barcode from the backend
+  const handleGenerateBarcode = async () => {
+    try {
+      const response = await getBarcode();
+      setFormData({ ...formData, barcode: String(response.data) });
+    } catch (error) {
+      console.error("Error fetching barcode:", error);
+      alert("Failed to fetch barcode.");
+    }
+  };
+
+  // Render barcodes dynamically
+  const generateBarcodeSVG = (id: string, barcode: string) => {
+    useEffect(() => {
+      if (barcode) {
+        JsBarcode(`#barcode-${id}`, barcode, {
+          format: "CODE128",
+          lineColor: "#000",
+          width: 2,
+          height: 50,
+          displayValue: false,
+        });
+      }
+    }, [barcode]);
+    return <svg id={`barcode-${id}`} />;
+  };
+
   useEffect(() => {
     fetchAllDepartments();
     fetchAllItemDetails();
@@ -97,10 +117,6 @@ const AddItemToDepartment = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleGenerateBarcode = () => {
-    setFormData({ ...formData, barcode: generateBarcode() });
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
@@ -115,7 +131,7 @@ const AddItemToDepartment = () => {
       );
       alert("Item successfully added to department!");
       setFormData({
-        barcode: generateBarcode(),
+        barcode: "",
         itemDetailId: 1,
         departmentId: 1,
         qty: 0,
@@ -155,28 +171,28 @@ const AddItemToDepartment = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Barcode and Item Detail ID */}
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="barcode" className="block text-sm font-medium text-gray-700">
-                  Barcode
-                </label>
-                <div className="flex gap-2 mt-1">
-                  <input
-                    id="barcode"
-                    name="barcode"
-                    type="text"
-                    value={formData.barcode}
-                    readOnly
-                    className="flex-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleGenerateBarcode}
-                    className="px-4 py-2 bg-gray-800 text-white rounded-md shadow hover:bg-gray-900 focus:outline-none"
-                  >
-                    Generate
-                  </button>
-                </div>
+            <div>
+              <label htmlFor="barcode" className="block text-sm font-medium text-gray-700">
+                Barcode
+              </label>
+              <div className="flex gap-2 mt-1">
+                <input
+                  id="barcode"
+                  name="barcode"
+                  type="text"
+                  value={formData.barcode}
+                  readOnly
+                  className="flex-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={handleGenerateBarcode}
+                  className="px-4 py-2 bg-gray-800 text-white rounded-md shadow hover:bg-gray-900 focus:outline-none"
+                >
+                  Generate
+                </button>
               </div>
+            </div>
               <div>
                 <label htmlFor="itemDetailId" className="block text-sm font-medium text-gray-700">
                   Item Detail ID
@@ -274,6 +290,7 @@ const AddItemToDepartment = () => {
             <thead className="bg-blue-100 text-gray-800 text-sm font-medium">
               <tr>
                 <th className="px-6 py-3 rounded-tl-lg">Barcode</th>
+                <th className="px-6 py-3">Generated Barcode</th>
                 <th className="px-6 py-3">Item</th>
                 <th className="px-6 py-3">Department</th>
                 <th className="px-6 py-3 rounded-tr-lg">Quantity</th>
@@ -281,8 +298,9 @@ const AddItemToDepartment = () => {
             </thead>
             <tbody>
               {assignedItems.map((item: any) => (
-                <tr key={item.id} className="border-t hover:bg-gray-100">
-                  <td className="px-6 py-3">{item.ITEM_BARCODE}</td>
+                <tr key={item.ITEM_DEPARTMENT_BARCODE} className="border-t hover:bg-gray-100">
+                  <td className="px-6 py-3">{item.ITEM_DEPARTMENT_BARCODE}</td>
+                  <Barcode barcode={item.ITEM_DEPARTMENT_BARCODE} />
                   <td className="px-6 py-3">{item.ITEM_NAME}</td>
                   <td className="px-6 py-3">{item.DEPARTMENT_NAME}</td>
                   <td className="px-6 py-3">{item.QTY}</td>

@@ -284,7 +284,7 @@ const OrdersPage = () => {
             <tr>
               <th className="px-6 py-3">Quotation ID</th>
               <th className="px-6 py-3">Invoice ID</th>
-              <th className="px-6 py-3">Purchase Request ID</th>
+              <th className="px-6 py-3">Purchase ID</th>
               <th className="px-6 py-3">Vendor ID</th>
               <th className="px-6 py-3">Total Value</th>
               <th className="px-6 py-3">Invoice PDF</th>

@@ -1,7 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import JsBarcode from "jsbarcode";
 import { getAllItems, deleteItem, updateItem, getAllCategories } from "@/app/apis/inventory/api";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, X } from "lucide-react";
 
 interface InventoryItem {
   item_barcode: string;
@@ -36,6 +37,11 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
   const [totalItems, setTotalItems] = useState(0); // For total items count
   const [current, setCurrent] = useState(currentPage); // Current page state
   const [pageSize, setPageSize] = useState(itemsPerPage); // Page size state
+
+
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const barcodeRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -145,6 +151,46 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
     }
   };
 
+  const handleRowClick = (item: InventoryItem) => {
+    setSelectedItem(item);
+    setIsDetailsModalOpen(true);
+  };
+  
+
+  const handleDownloadBarcode = () => {
+    if (barcodeRef.current) {
+      const link = document.createElement("a");
+      link.href = barcodeRef.current.toDataURL("image/png");
+      link.download = `${selectedItem?.item_name}_barcode.png`;
+      link.click();
+    }
+  };
+
+  const clearBarcodeCanvas = () => {
+    if (barcodeRef.current) {
+      const context = barcodeRef.current.getContext("2d");
+      context?.clearRect(0, 0, barcodeRef.current.width, barcodeRef.current.height);
+    }
+  };
+
+  const generateBarcode = () => {
+    if (selectedItem && barcodeRef.current) {
+      clearBarcodeCanvas();
+      JsBarcode(barcodeRef.current, selectedItem.item_barcode, {
+        format: "CODE128",
+        displayValue: true,
+        fontSize: 16,
+      });
+    }
+  };
+  
+  useEffect(() => {
+    if (isDetailsModalOpen) {
+      generateBarcode();
+    }
+  }, [isDetailsModalOpen, selectedItem]);
+  
+
   return (
     <div>
 
@@ -187,14 +233,17 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
           </thead>
           <tbody>
             {items.map((item) => (
-              <tr key={item.item_barcode} className="hover:bg-blue-50">
-                <td className="border px-4 py-3 text-gray-700">{item.item_barcode}</td>
+              <tr
+                key={item.item_barcode}
+                className="hover:bg-blue-50 cursor-pointer"
+                onClick={() => handleRowClick(item)}
+              >                <td className="border px-4 py-3 text-gray-700">{item.item_barcode}</td>
                 <td className="border px-4 py-3 text-gray-700">{item.item_name}</td>
                 <td className="border px-4 py-3 text-gray-700">{item.category_name}</td>
                 <td className="border px-4 py-3 text-gray-700">{item.available_qty}</td>
                 <td className="border px-4 py-3 text-gray-700">{item.currently_using_qty ?? "N/A"}</td>
                 <td className="border px-4 py-3 text-gray-700">{item.lower_quantity}</td>
-                <td className="border px-4 py-3 text-gray-700">{item.total_qty}</td>
+                <td className="border px-4 py-3 text-gray-700">{item.qty}</td>
                 <td className="border px-4 py-3 text-center">
                   <button
                     className="text-blue-600 hover:text-blue-800 mr-2"
@@ -326,6 +375,81 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
           Next
         </button>
       </div>
+
+      {isDetailsModalOpen && selectedItem && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg w-11/12 max-w-lg">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+          Item Details
+        </h2>
+        <button
+          onClick={() => setIsDetailsModalOpen(false)}
+          className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-300"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Details */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <span className="font-medium text-gray-600 dark:text-gray-400">Name:</span>
+          <span className="text-gray-800 dark:text-gray-200">{selectedItem.item_name}</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="font-medium text-gray-600 dark:text-gray-400">Barcode:</span>
+          <span className="text-gray-800 dark:text-gray-200">{selectedItem.item_barcode}</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="font-medium text-gray-600 dark:text-gray-400">Category:</span>
+          <span className="text-gray-800 dark:text-gray-200">{selectedItem.category_name}</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="font-medium text-gray-600 dark:text-gray-400">Available Qty:</span>
+          <span className="text-gray-800 dark:text-gray-200">{selectedItem.available_qty}</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="font-medium text-gray-600 dark:text-gray-400">Currently Using Qty:</span>
+          <span className="text-gray-800 dark:text-gray-200">
+            {selectedItem.currently_using_qty ?? "N/A"}
+          </span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="font-medium text-gray-600 dark:text-gray-400">Lower Qty:</span>
+          <span className="text-gray-800 dark:text-gray-200">{selectedItem.lower_quantity}</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="font-medium text-gray-600 dark:text-gray-400">Total Qty:</span>
+          <span className="text-gray-800 dark:text-gray-200">{selectedItem.qty}</span>
+        </div>
+      </div>
+
+      {/* Barcode Canvas */}
+      <div className="mt-6">
+        <canvas ref={barcodeRef} className="border p-2 bg-gray-50 rounded w-auto  " />
+      </div>
+
+      {/* Action Buttons */}
+      <div className="mt-6 flex justify-end space-x-4">
+        <button
+          className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900"
+          onClick={handleDownloadBarcode}
+        >
+          Download Barcode
+        </button>
+        <button
+          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+          onClick={() => setIsDetailsModalOpen(false)}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

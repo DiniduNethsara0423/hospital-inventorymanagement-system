@@ -102,3 +102,8 @@ export const updateItem = async (barcode: string, updatedData: { name: string; l
     throw error;
   }
 };
+
+export const getBarcode = async () => {
+  const response = await axios.get("http://localhost:3100/items/get-item-department-barcode/barcode");
+  return response;
+};
