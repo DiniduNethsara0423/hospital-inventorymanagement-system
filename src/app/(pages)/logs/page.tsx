@@ -5,11 +5,11 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 
 // Dynamically import components
-const ByTable = dynamic(() => import("../../components/ByTable"));
-const TableAndUserId = dynamic(() => import("../../components/TableAndUserId"));
-const Action = dynamic(() => import("../../components/Action"));
-const UserId = dynamic(() => import("../../components/UserId"));
-const TableAndDate = dynamic(() => import("../../components/TableAndDate"));
+const ByTable = dynamic(() => import("../../components/ByTable"));//done
+const TableAndUserId = dynamic(() => import("../../components/TableAndUserId"));//done
+const Action = dynamic(() => import("../../components/Action"));//done
+const UserId = dynamic(() => import("../../components/UserId"));// done
+const TableAndDate = dynamic(() => import("../../components/TableAndDate"));//done
 const DateComponent = dynamic(() => import("../../components/Date")); // Renamed to avoid conflict with `Date`
 
 interface Log {
@@ -30,7 +30,7 @@ const Page: React.FC = () => {
     { name: "By Table And Date", key: "TableAndDate" },
     { name: "By Date", key: "DateComponent" },
   ];
-
+ 
   const renderComponent = () => {
     switch (currentComponent) {
       case "ByTable":

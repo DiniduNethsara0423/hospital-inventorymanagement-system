@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import ByTable from './ByTable';
 import { getLogsByTableName } from '@/app/apis/logs/api';
 
 const Page: React.FC = () => {
   const [data, setData] = useState<any[]>([]);
+  const [columns, setColumns] = useState<string[]>([]);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
@@ -20,16 +20,24 @@ const Page: React.FC = () => {
         pageSize.toString(),
         selectedTable
       );
-      setData(result.data || []); // Ensure `data` is always an array
-      setTotal(result.total || 0); // Handle cases where `total` might be undefined
+      const logs = result || [];
+      setData(logs);
+      setTotal(result.total || 0);
+
+      if (logs.length > 0) {
+        const dynamicColumns = Object.keys(logs[0]);
+        setColumns(dynamicColumns);
+      } else {
+        setColumns([]);
+      }
     } catch (err: any) {
       setError(err.message);
-      setData([]); // Reset data on error
+      setData([]);
+      setColumns([]);
     } finally {
       setIsLoading(false);
     }
   };
-  
 
   useEffect(() => {
     fetchLogs();
@@ -41,19 +49,21 @@ const Page: React.FC = () => {
 
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
-    setCurrentPage(1); // Reset to the first page when page size changes
+    setCurrentPage(1);
   };
 
   const handleTableChange = (tableName: string) => {
     setSelectedTable(tableName);
-    setCurrentPage(1); // Reset to the first page when table changes
+    setCurrentPage(1);
   };
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-semibold mb-4">Logs Viewer</h1>
       <div className="mb-6">
-        <label htmlFor="tableSelector" className="block font-medium mb-2">Table Name Selector:</label>
+        <label htmlFor="tableSelector" className="block font-medium mb-2">
+          Table Name Selector:
+        </label>
         <select
           id="tableSelector"
           value={selectedTable}
@@ -74,61 +84,77 @@ const Page: React.FC = () => {
           <option value="vendors_log">vendors_log</option>
         </select>
       </div>
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <label htmlFor="pageSize" className="mr-2 font-medium">Rows per page:</label>
-            <select
-              id="pageSize"
-              value={pageSize}
-              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-              className="px-2 py-1 border rounded"
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
-          </div>
-          <div>
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-4 py-2 border rounded bg-blue-500 text-white disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <span className="mx-2">Page {currentPage} of {Math.ceil(total / pageSize)}</span>
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === Math.ceil(total / pageSize)}
-              className="px-4 py-2 border rounded bg-blue-500 text-white disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <label htmlFor="pageSize" className="mr-2 font-medium">
+            Rows per page:
+          </label>
+          <select
+            id="pageSize"
+            value={pageSize}
+            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+            className="px-2 py-1 border rounded"
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+          </select>
         </div>
+        <div>
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 border rounded bg-blue-500 text-white disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span className="mx-2">
+            Page {currentPage} of {Math.ceil(total / pageSize)}
+          </span>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === Math.ceil(total / pageSize)}
+            className="px-4 py-2 border rounded bg-blue-500 text-white disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      </div>
       {isLoading ? (
         <p className="text-center">Loading...</p>
       ) : error ? (
         <p className="text-center text-red-500">{error}</p>
       ) : (
-        <table className="table-auto w-full border-collapse border border-gray-300">
-          <thead>
-            <tr>
-              <th className="border border-gray-300 px-4 py-2">ID</th>
-              <th className="border border-gray-300 px-4 py-2">Name</th>
-              <th className="border border-gray-300 px-4 py-2">Email</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item: any) => (
-              <tr key={item.id} className="hover:bg-blue-50">
-                <td className="border border-gray-300 px-4 py-2">{item.id}</td>
-                <td className="border border-gray-300 px-4 py-2">{item.name}</td>
-                <td className="border border-gray-300 px-4 py-2">{item.email}</td>
-              </tr>
+        <div className="p-6 bg-gray-100 min-h-screen">
+  <h1 className="text-2xl font-semibold mb-4">Logs Viewer</h1>
+  <div className="overflow-x-auto">
+    <table className="table-auto w-full border-collapse border border-gray-300">
+      <thead>
+        <tr>
+          {columns.map((column) => (
+            <th key={column} className="border border-gray-300 px-4 py-2">
+              {column}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((row) => (
+          <tr key={row.id} className="hover:bg-blue-50">
+            {columns.map((column) => (
+              <td key={column} className="border border-gray-300 px-4 py-2">
+                {row[column] !== null && row[column] !== undefined
+                  ? row[column]
+                  : '-'}
+              </td>
             ))}
-          </tbody>
-        </table>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
       )}
     </div>
   );

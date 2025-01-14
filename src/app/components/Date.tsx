@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getLogsByDate } from '@/app/apis/logs/api'; 
+import { getLogsByDate } from '@/app/apis/logs/api';
 
 const DatePage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,6 +26,31 @@ const DatePage: React.FC = () => {
     } catch (error) {
       console.error('Error fetching logs:', error);
     }
+  };
+
+  // Render dynamic table headers based on the keys of the first log object
+  const renderTableHeaders = (log: any) => {
+    if (log && Object.keys(log).length > 0) {
+      return Object.keys(log).map((key) => (
+        <th key={key} className="border border-gray-300 px-4 py-2">
+          {key.replace(/([A-Z])/g, ' $1').toUpperCase()} {/* Formatting the header */}
+        </th>
+      ));
+    }
+    return null;
+  };
+
+  // Render dynamic table rows based on the logs
+  const renderTableRows = () => {
+    return logs.map((log, index) => (
+      <tr key={index} className="hover:bg-blue-50">
+        {Object.values(log).map((value, i) => (
+          <td key={i} className="border border-gray-300 px-4 py-2">
+            {value}
+          </td>
+        ))}
+      </tr>
+    ));
   };
 
   return (
@@ -59,30 +84,28 @@ const DatePage: React.FC = () => {
       {/* Table */}
       <table className="table-auto w-full border-collapse border border-gray-300">
         <thead>
-          <tr>
-            <th className="border border-gray-300 px-4 py-2">ID</th>
-            <th className="border border-gray-300 px-4 py-2">Name</th>
-            <th className="border border-gray-300 px-4 py-2">Email</th>
-          </tr>
-        </thead>
-        <tbody>
-  {Array.isArray(logs) && logs.length > 0 ? (
-    logs.map((log) => (
-      <tr key={log.id} className="hover:bg-blue-50">
-        <td className="border border-gray-300 px-4 py-2">{log.id}</td>
-        <td className="border border-gray-300 px-4 py-2">{log.name}</td>
-        <td className="border border-gray-300 px-4 py-2">{log.email}</td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan={3} className="text-center py-4">
-        No logs found for the selected date.
-      </td>
-    </tr>
-  )}
-</tbody>
+  <tr>
+    {logs?.length > 0
+      ? Object.keys(logs[0]).map((key) => (
+          <th key={key} className="border border-gray-300 px-4 py-2">
+            {key.replace(/([A-Z])/g, ' $1').toUpperCase()}
+          </th>
+        ))
+      : null}
+  </tr>
+</thead>
 
+        <tbody>
+          {Array.isArray(logs) && logs.length > 0 ? (
+            renderTableRows() // Render rows dynamically based on logs
+          ) : (
+            <tr>
+              <td colSpan={10} className="text-center py-4">
+                No logs found for the selected date.
+              </td>
+            </tr>
+          )}
+        </tbody>
       </table>
 
       {/* Pagination Controls */}

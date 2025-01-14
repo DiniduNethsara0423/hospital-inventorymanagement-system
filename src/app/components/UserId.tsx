@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { getAllUsers } from '@/app/apis/get-all-users/api';
-import { getLogsByUserId } from '@/app/apis/logs/api';
+import React, { useEffect, useState } from "react";
+import { getAllUsers } from "@/app/apis/get-all-users/api";
+import { getLogsByUserId } from "@/app/apis/logs/api";
 
 interface User {
   id: number;
@@ -8,16 +8,14 @@ interface User {
   email: string;
 }
 
-interface Log {
-  id: number;
-  action: string;
-  timestamp: string;
+interface LogsResponse {
+  [key: string]: any[]; // Flexible type to accommodate different log structures
 }
 
 const UserId: React.FC = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const [users, setUsers] = useState<User[]>([]);
-  const [logs, setLogs] = useState<Log[]>([]); // Ensure logs is initialized as an empty array
+  const [logs, setLogs] = useState<LogsResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,7 +40,7 @@ const UserId: React.FC = () => {
     setError(null);
     try {
       const data = await getLogsByUserId(id.toString());
-      setLogs(data?.data || []); // Safely set logs, default to an empty array if undefined
+      setLogs(data); // Update logs state with the fetched object
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -56,9 +54,37 @@ const UserId: React.FC = () => {
     if (selectedId) {
       fetchLogs(selectedId);
     } else {
-      setLogs([]); // Clear logs when no user is selected
+      setLogs(null); // Clear logs when no user is selected
     }
   };
+
+  const renderLogsTable = (logs: any[], logType: string) => (
+    <div className="mb-6">
+      <h2 className="text-xl font-semibold mb-2 capitalize">{logType}</h2>
+      <table className="table-auto w-full border-collapse border border-gray-300">
+        <thead>
+          <tr>
+            {Object.keys(logs[0]).map((key) => (
+              <th key={key} className="border border-gray-300 px-4 py-2">
+                {key.replace(/_/g, " ").toUpperCase()}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {logs.map((log, index) => (
+            <tr key={index} className="hover:bg-blue-50">
+              {Object.values(log).map((value, i) => (
+                <td key={i} className="border border-gray-300 px-4 py-2">
+                  {value !== null ? value.toString() : "N/A"}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -74,7 +100,7 @@ const UserId: React.FC = () => {
           </label>
           <select
             id="userDropdown"
-            value={userId || ''}
+            value={userId || ""}
             onChange={handleUserChange}
             className="px-4 py-2 border rounded w-full"
           >
@@ -90,32 +116,13 @@ const UserId: React.FC = () => {
         </div>
       )}
 
-      <table className="table-auto w-full border-collapse border border-gray-300 mt-4">
-        <thead>
-          <tr>
-            <th className="border border-gray-300 px-4 py-2">ID</th>
-            <th className="border border-gray-300 px-4 py-2">Action</th>
-            <th className="border border-gray-300 px-4 py-2">Timestamp</th>
-          </tr>
-        </thead>
-        <tbody>
-          {logs.length > 0 ? (
-            logs.map((log) => (
-              <tr key={log.id} className="hover:bg-blue-50">
-                <td className="border border-gray-300 px-4 py-2">{log.id}</td>
-                <td className="border border-gray-300 px-4 py-2">{log.action}</td>
-                <td className="border border-gray-300 px-4 py-2">{log.timestamp}</td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={3} className="text-center py-4">
-                No logs available.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      {logs ? (
+        Object.entries(logs).map(([logType, logEntries]) =>
+          logEntries.length > 0 ? renderLogsTable(logEntries, logType) : null
+        )
+      ) : (
+        <p className="text-center py-4">No logs available.</p>
+      )}
     </div>
   );
 };

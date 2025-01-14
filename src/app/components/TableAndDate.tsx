@@ -6,7 +6,7 @@ const TableAndDate: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
-  const [logs, setLogs] = useState([]);
+  const [logs, setLogs] = useState<any[]>([]); // Adjusted to `any[]` for dynamic logs
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -104,19 +104,23 @@ const TableAndDate: React.FC = () => {
         <table className="table-auto w-full border-collapse border border-gray-300">
           <thead>
             <tr>
-              <th className="border border-gray-300 px-4 py-2">Log ID</th>
-              <th className="border border-gray-300 px-4 py-2">Table Name</th>
-              <th className="border border-gray-300 px-4 py-2">Date</th>
-              <th className="border border-gray-300 px-4 py-2">Details</th>
+              {/* Dynamically create table headers based on log data keys */}
+              {Object.keys(logs[0]).map((key) => (
+                <th key={key} className="border border-gray-300 px-4 py-2">
+                  {key.replace(/_/g, " ").toUpperCase()}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {logs.map((log: any, index) => (
+            {logs.map((log, index) => (
               <tr key={index} className="hover:bg-blue-50">
-                <td className="border border-gray-300 px-4 py-2">{log.id}</td>
-                <td className="border border-gray-300 px-4 py-2">{log.table_name}</td>
-                <td className="border border-gray-300 px-4 py-2">{log.date}</td>
-                <td className="border border-gray-300 px-4 py-2">{log.details}</td>
+                {/* Dynamically create table rows based on log data values */}
+                {Object.values(log).map((value, idx) => (
+                  <td key={idx} className="border border-gray-300 px-4 py-2">
+                    {value}
+                  </td>
+                ))}
               </tr>
             ))}
           </tbody>
