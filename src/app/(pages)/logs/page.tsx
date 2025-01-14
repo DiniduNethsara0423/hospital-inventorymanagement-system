@@ -1,6 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import Link from "next/link";
+import dynamic from "next/dynamic";
+
+// Dynamically import components
+const ByTable = dynamic(() => import("../../components/ByTable"));
+const TableAndUserId = dynamic(() => import("../../components/TableAndUserId"));
+const Action = dynamic(() => import("../../components/Action"));
+const UserId = dynamic(() => import("../../components/UserId"));
+const TableAndDate = dynamic(() => import("../../components/TableAndDate"));
+const DateComponent = dynamic(() => import("../../components/Date")); // Renamed to avoid conflict with `Date`
 
 interface Log {
   id: number;
@@ -9,82 +19,60 @@ interface Log {
   timestamp: string;
 }
 
-const LogsPage: React.FC = () => {
-  const [logs, setLogs] = useState<Log[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+const Page: React.FC = () => {
+  const [currentComponent, setCurrentComponent] = useState<string>("ByTable");
 
-  useEffect(() => {
-    const fetchLogs = async () => {
-      setIsLoading(true);
-      try {
-        // Replace with actual API call
-        const dummyLogs = [
-          {
-            id: 1,
-            user: "User A",
-            action: "Added a new item",
-            timestamp: "2025-01-01 10:00 AM",
-          },
-          {
-            id: 2,
-            user: "User B",
-            action: "Added a new department",
-            timestamp: "2025-01-01 11:30 AM",
-          },
-          {
-            id: 3,
-            user: "User C",
-            action: "Added a new invoice",
-            timestamp: "2025-01-01 12:15 PM",
-          },
-        ];
-        setLogs(dummyLogs);
-      } catch (error) {
-        console.error("Failed to fetch logs:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const navigationItems = [
+    { name: "By Table", key: "ByTable" },
+    { name: "By Table And User ID", key: "TableAndUserId" },
+    { name: "By Action", key: "Action" },
+    { name: "By User ID", key: "UserId" },
+    { name: "By Table And Date", key: "TableAndDate" },
+    { name: "By Date", key: "DateComponent" },
+  ];
 
-    fetchLogs();
-  }, []);
+  const renderComponent = () => {
+    switch (currentComponent) {
+      case "ByTable":
+        return <ByTable />;
+      case "TableAndUserId":
+        return <TableAndUserId />;
+      case "Action":
+        return <Action />;
+      case "UserId":
+        return <UserId />;
+      case "TableAndDate":
+        return <TableAndDate />;
+      case "DateComponent":
+        return <DateComponent />;
+      default:
+        return <ByTable />;
+    }
+  };
+
+  
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-semibold mb-6">Activity Logs</h1>
-      {isLoading ? (
-        <p className="text-center text-gray-600">Loading logs...</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="table-auto w-full border-collapse border border-gray-300">
-            <thead className="bg-gray-200">
-              <tr>
-                <th className="border border-gray-300 px-4 py-2 text-left">#</th>
-                <th className="border border-gray-300 px-4 py-2 text-left">User</th>
-                <th className="border border-gray-300 px-4 py-2 text-left">Action</th>
-                <th className="border border-gray-300 px-4 py-2 text-left">Timestamp</th>
-              </tr>
-            </thead>
-            <tbody>
-              {logs.map((log, index) => (
-                <tr
-                  key={log.id}
-                  className={`${
-                    index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                  } hover:bg-blue-50`}
-                >
-                  <td className="border border-gray-300 px-4 py-2">{log.id}</td>
-                  <td className="border border-gray-300 px-4 py-2">{log.user}</td>
-                  <td className="border border-gray-300 px-4 py-2">{log.action}</td>
-                  <td className="border border-gray-300 px-4 py-2">{log.timestamp}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <h1 className="text-2xl font-semibold mb-6">Navigation</h1>
+      <ul className="flex flex-wrap gap-4 mb-6">
+        {navigationItems.map((item) => (
+          <li key={item.key}>
+            <button
+              onClick={() => setCurrentComponent(item.key)}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              {item.name}
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mb-6">{renderComponent()}</div>
+
+      
     </div>
   );
 };
 
-export default LogsPage;
+export default Page;
