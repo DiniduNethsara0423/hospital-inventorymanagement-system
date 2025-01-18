@@ -25,7 +25,7 @@ const DepartmentDetailPage = ({ params }:any ) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [removingQty, setRemovingQty] = useState(1);
+  const [removingQty, setRemovingQty] = useState(0);
   const [reason, setReason] = useState("");
 
   const fetchDepartmentDetails = async () => {
@@ -222,7 +222,7 @@ const DepartmentDetailPage = ({ params }:any ) => {
                 type="number"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1"
                 value={removingQty}
-                onChange={(e) => setRemovingQty(parseInt(e.target.value) || 1)}
+                onChange={(e) => setRemovingQty(parseInt(e.target.value) )}
                 min={1}
               />
             </label>

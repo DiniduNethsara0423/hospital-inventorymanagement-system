@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getLogsByTableName } from '@/app/apis/logs/api';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Page: React.FC = () => {
   const [data, setData] = useState<any[]>([]);
@@ -58,91 +59,87 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-semibold mb-4">Logs Viewer</h1>
-      <div className="mb-6">
-        <label htmlFor="tableSelector" className="block font-medium mb-2">
-          Table Name Selector:
-        </label>
-        <select
-          id="tableSelector"
-          value={selectedTable}
-          onChange={(e) => handleTableChange(e.target.value)}
-          className="px-4 py-2 border rounded w-full"
-        >
-          <option value="category_log">category_log</option>
-          <option value="department_log">department_log</option>
-          <option value="invoices_log">invoices_log</option>
-          <option value="item_departments_log">item_departments_log</option>
-          <option value="item_details_log">item_details_log</option>
-          <option value="items_log">items_log</option>
-          <option value="purchase_request_log">purchase_request_log</option>
-          <option value="purchases_log">purchases_log</option>
-          <option value="quotations_log">quotations_log</option>
-          <option value="roles_log">roles_log</option>
-          <option value="users_log">users_log</option>
-          <option value="vendors_log">vendors_log</option>
-        </select>
-      </div>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <label htmlFor="pageSize" className="mr-2 font-medium">
-            Rows per page:
+    <div className="min-h-screen ">
+      <div className=" py-8">
+        <h1 className="text-3xl font-bold mb-6 text-center">Logs Viewer</h1>
+
+        {/* Table Selector */}
+        <div className="mb-6  rounded-lg bg-white ">
+          <label htmlFor="tableSelector" className="block font-medium mb-2 text-gray-700">
+            Table Name Selector:
           </label>
           <select
-            id="pageSize"
-            value={pageSize}
-            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-            className="px-2 py-1 border rounded"
+            id="tableSelector"
+            value={selectedTable}
+            onChange={(e) => handleTableChange(e.target.value)}
+            className="px-4 py-2 border-2 rounded w-full focus:outline-none focus:ring-2"
           >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={20}>20</option>
+            <option value="category_log">Category Log</option>
+            <option value="department_log">Department Log</option>
+            <option value="invoices_log">Invoices Log</option>
+            <option value="item_departments_log">Item Departments Log</option>
+            <option value="item_details_log">Item Details Log</option>
+            <option value="items_log">Items Log</option>
+            <option value="purchase_request_log">Purchase Request Log</option>
+            <option value="purchases_log">Purchases Log</option>
+            <option value="quotations_log">Quotations Log</option>
+            <option value="roles_log">Roles Log</option>
+            <option value="users_log">Users Log</option>
+            <option value="vendors_log">Vendors Log</option>
           </select>
         </div>
-        <div>
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="px-4 py-2 border rounded bg-blue-500 text-white disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span className="mx-2">
-            Page {currentPage} of {Math.ceil(total / pageSize)}
-          </span>
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === Math.ceil(total / pageSize)}
-            className="px-4 py-2 border rounded bg-blue-500 text-white disabled:opacity-50"
-          >
-            Next
-          </button>
+
+        {/* Pagination and Page Size */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <label htmlFor="pageSize" className="mr-2 font-medium text-gray-700">
+              Rows per page:
+            </label>
+            <select
+              id="pageSize"
+              value={pageSize}
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+              className="px-3 py-2 border rounded text-gray-700 bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+            </select>
+          </div>
+
         </div>
-      </div>
-      {isLoading ? (
-        <p className="text-center">Loading...</p>
-      ) : error ? (
-        <p className="text-center text-red-500">{error}</p>
-      ) : (
-        <div className="p-6 bg-gray-100 min-h-screen">
-          <h1 className="text-2xl font-semibold mb-4">Logs Viewer</h1>
-          <div className="overflow-x-auto">
-            <table className="table-auto w-full border-collapse border border-gray-300">
+
+        {/* Table Display */}
+        {isLoading ? (
+          <p className="text-center">Loading...</p>
+        ) : error ? (
+          <p className="text-center text-red-500">{error}</p>
+        ) : (
+          <div className="overflow-x-auto rounded-lg bg-white">
+            <table className="table-auto w-full border-collapse text-sm text-gray-800">
               <thead>
-                <tr>
+                <tr className="bg-indigo-100">
                   {columns.map((column) => (
-                    <th key={column} className="border border-gray-300 px-4 py-2">
+                    <th
+                      key={column}
+                      className="border border-gray-300 px-4 py-2 text-left font-semibold"
+                    >
                       {column}
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {data.map((row) => (
-                  <tr key={row.id} className="hover:bg-blue-50">
+                {data.map((row, index) => (
+                  <tr
+                    key={index}
+                    className="hover:bg-indigo-50 transition-colors"
+                  >
                     {columns.map((column) => (
-                      <td key={column} className="border border-gray-300 px-4 py-2">
+                      <td
+                        key={column}
+                        className="border border-gray-300 px-4 py-2 text-left"
+                      >
                         {row[column] !== null && row[column] !== undefined
                           ? row[column]
                           : '-'}
@@ -153,9 +150,36 @@ const Page: React.FC = () => {
               </tbody>
             </table>
           </div>
-        </div>
+        )}
+      </div>
 
-      )}
+      <div className="flex justify-center items-center mt-6 space-x-4">
+
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${currentPage === 1
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:bg-gray-300"
+            } transition`}
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <span className="mx-2 text-lg">
+          Page {currentPage}
+        </span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === Math.ceil(total / pageSize)}
+          className={`px-4 py-2 bg-gray-200 rounded-lg shadow 
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-300"
+              } transition`}
+
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
     </div>
   );
 };

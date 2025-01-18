@@ -53,14 +53,13 @@ const Page: React.FC = () => {
   
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-semibold mb-6">Navigation</h1>
-      <ul className="flex flex-wrap gap-4 mb-6">
+    <div className="p-6 min-h-screen">
+      <ul className="flex flex-wrap gap-4 mb-6 justify-center">
         {navigationItems.map((item) => (
           <li key={item.key}>
             <button
               onClick={() => setCurrentComponent(item.key)}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="px-3 py-2 text-gray-700 hover:text-gray-800 font-bold text-lg"
             >
               {item.name}
             </button>
