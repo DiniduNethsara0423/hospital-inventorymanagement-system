@@ -22,9 +22,9 @@ interface ItemDetailsProps {
 }
 
 const ItemDetails: React.FC<ItemDetailsProps> = ({ currentPage, itemsPerPage, onTotalItemsChange }) => {
-  const [itemDetails, setItemDetails] = useState<ItemDetails[]>([]);
+  const [itemDetails, setItemDetails]:any = useState<ItemDetails[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [editingItem, setEditingItem] = useState<ItemDetails | null>(null);
+  const [editingItem, setEditingItem]:any = useState<ItemDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [totalItems, setTotalItems] = useState(0); // For total items count
@@ -69,7 +69,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ currentPage, itemsPerPage, on
 
     try {
       await deleteItemDetail(id, removingQty);
-      setItemDetails((prev) => prev.map((item) => (item.id === id ? { ...item, qty: item.qty - removingQty } : item)));
+      setItemDetails((prev:any) => prev.map((item:any) => (item.id === id ? { ...item, qty: item.qty - removingQty } : item)));
     } catch (error) {
       console.error("Failed to delete item detail:", error);
     }
@@ -107,8 +107,8 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ currentPage, itemsPerPage, on
 
     try {
       await updateItemDetail(editingItem.id, dataToSend);
-      setItemDetails((prev) =>
-        prev.map((item) => (item.id === editingItem.id ? { ...item, ...dataToSend } : item))
+      setItemDetails((prev:any) =>
+        prev.map((item:any) => (item.id === editingItem.id ? { ...item, ...dataToSend } : item))
       );
       setEditingItem(null);
       setIsModalOpen(false);
@@ -160,7 +160,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ currentPage, itemsPerPage, on
             </tr>
           </thead>
           <tbody>
-            {itemDetails.map((detail) => (
+            {itemDetails.map((detail:any) => (
               <tr key={detail.id} className="hover:bg-blue-50">
                 <td className="border px-4 py-3 text-gray-700">{detail.id}</td>
                 <td className="border px-4 py-3 text-gray-700">{detail.barcode}</td>
@@ -223,7 +223,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ currentPage, itemsPerPage, on
                   step="0.01"
                   value={editingItem.price}
                   onChange={(e) =>
-                    setEditingItem((prev) =>
+                    setEditingItem((prev:any) =>
                       prev ? { ...prev, price: parseFloat(e.target.value) || 0 } : null
                     )
                   }
@@ -237,7 +237,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ currentPage, itemsPerPage, on
                   value={editingItem.removed_qty || ""}
                   onChange={(e) => {
                     const removedQty = parseInt(e.target.value, 10) || 0;
-                    setEditingItem((prev) =>
+                    setEditingItem((prev:any) =>
                       prev
                         ? {
                             ...prev,
@@ -255,7 +255,7 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ currentPage, itemsPerPage, on
                   type="text"
                   value={editingItem.removed_purpose || ""}
                   onChange={(e) =>
-                    setEditingItem((prev) => prev && { ...prev, removed_purpose: e.target.value })
+                    setEditingItem((prev:any) => prev && { ...prev, removed_purpose: e.target.value })
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-lg"
                 />

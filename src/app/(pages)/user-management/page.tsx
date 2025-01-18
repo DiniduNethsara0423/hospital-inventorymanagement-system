@@ -1,24 +1,23 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PlusCircle, Edit, Trash2, Search, Plus } from "lucide-react";
 import RegistrationSteps from "@/app/components/RegisterUserPopUp";
+import { fetchAllUsers } from "@/app/apis/auth/api";
 
 const UserManagement: React.FC = () => {
-  const [users, setUsers] = useState([
-    { id: 1, name: "John Doe", email: "john@example.com", role: "Admin", status: "Active" },
-    { id: 2, name: "Jane Smith", email: "jane@example.com", role: "User", status: "Inactive" },
-  ]);
+  const [users, setUsers]:any = useState([]);
   const [search, setSearch] = useState("");
   const [showPopup, setShowPopup] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
 
   const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(search.toLowerCase()) ||
+    (user: any) =>
+      user.username.toLowerCase().includes(search.toLowerCase()) ||
       user.email.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -29,6 +28,22 @@ const UserManagement: React.FC = () => {
   const handleClosePopup = () => {
     setShowPopup(false);
   };
+  
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchAllUsers();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error loading users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   return (
     <div className="p-8 w-full min-h-screen">
@@ -77,66 +92,40 @@ const UserManagement: React.FC = () => {
 
 
 <div className="overflow-x-auto bg-white rounded-lg">
-        <table className="table-auto w-full border-collapse">
-          <thead className="bg-blue-200 text-left">
-            <tr>
-              <th className="px-4 py-3 text-gray-800">Name</th>
-              <th className="px-4 py-3 text-gray-800">Email</th>
-              <th className="px-4 py-3 text-gray-800">Role</th>
-              <th className="px-4 py-3 text-gray-800">Status</th>
-              <th className="px-4 py-3 text-gray-800 text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.length > 0 ? (
-              filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-blue-50">
-                  <td className="border px-4 py-3 text-gray-700">{user.name}</td>
-                  <td className="border px-4 py-3 text-gray-700">{user.email}</td>
-                  <td className="border px-4 py-3 text-gray-700">{user.role}</td>
-                  <td className="border px-4 py-3 text-gray-700">{user.status}</td>
-                  <td className="border px-4 py-3 text-center flex justify-center space-x-4">
-                    <button
-                      className="text-blue-600 hover:text-blue-800"
-                      
-                    >
-                      <Edit size={20} />
-                    </button>
-                    <button
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 size={20} />
-                    </button>
+        {loading ? (
+          <div className="text-center py-6 text-gray-700">Loading users...</div>
+        ) : (
+          <table className="table-auto w-full border-collapse">
+            <thead className="bg-blue-200 text-left">
+              <tr>
+                <th className="px-4 py-3 text-gray-800">ID</th>
+                <th className="px-4 py-3 text-gray-800">Username</th>
+                <th className="px-4 py-3 text-gray-800">Email</th>
+                <th className="px-4 py-3 text-gray-800">Role ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user: any) => (
+                  <tr key={user.id} className="hover:bg-blue-50">
+                    <td className="border px-4 py-3 text-gray-700">{user.id}</td>
+                    <td className="border px-4 py-3 text-gray-700">{user.username}</td>
+                    <td className="border px-4 py-3 text-gray-700">{user.email}</td>
+                    <td className="border px-4 py-3 text-gray-700">{user.role_id}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="text-center py-6 text-gray-700">
+                    No users found.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={5} className="text-center py-6 text-gray-700">
-                  No users found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
-
-      {/* Pagination Placeholder */}
-      <div className="flex justify-between items-center mt-8">
-        <button
-          className="px-6 py-2 bg-gray-300 rounded-md shadow-md text-gray-600 font-medium cursor-not-allowed"
-          disabled
-        >
-          Previous
-        </button>
-        <div className="text-gray-800 font-medium">Page 1 of 1</div>
-        <button
-          className="px-6 py-2 bg-gray-300 rounded-md shadow-md text-gray-600 font-medium cursor-not-allowed"
-          disabled
-        >
-          Next
-        </button>
-      </div>
+      
     </div>
   );
 };

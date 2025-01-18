@@ -6,7 +6,15 @@ import { updateDepartment, deleteDepartment, getDepartmentById, removeItemFromDe
 import { Trash2, Edit } from "lucide-react";
 import React from "react";
 
-const DepartmentDetailPage = ({ params }: { params: { id: any } }) => {
+// type DepartmentDetailPageProps = {
+//   params: {
+//     id: string;
+//   };
+// };
+
+const DepartmentDetailPage = ({ params }:any ) => {
+  // const id = parseInt(params.id, 10); 
+  
   const [name, setName] = useState("Sample Department");
   const [isEditing, setIsEditing] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -23,7 +31,7 @@ const DepartmentDetailPage = ({ params }: { params: { id: any } }) => {
   const fetchDepartmentDetails = async () => {
     setLoading(true);
     try {
-      const response = await getDepartmentById(params.id);
+      const response = await getDepartmentById(Number(params.id));
       if (response) {
         setName(response.name);
       } else {

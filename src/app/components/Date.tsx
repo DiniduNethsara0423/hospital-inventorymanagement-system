@@ -5,7 +5,7 @@ const DatePage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [selectedDate, setSelectedDate] = useState('');
-  const [logs, setLogs] = useState<any[]>([]);
+  const [logs, setLogs]:any = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
 
   // Fetch logs from the API
@@ -42,9 +42,9 @@ const DatePage: React.FC = () => {
 
   // Render dynamic table rows based on the logs
   const renderTableRows = () => {
-    return logs.map((log, index) => (
+    return logs.map((log:any, index:any) => (
       <tr key={index} className="hover:bg-blue-50">
-        {Object.values(log).map((value, i) => (
+        {Object.values(log).map((value:any, i:any) => (
           <td key={i} className="border border-gray-300 px-4 py-2">
             {value}
           </td>

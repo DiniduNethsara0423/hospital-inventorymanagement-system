@@ -5,6 +5,8 @@ import departmentImg from "@/app/images/department.jpg";
 interface DepartmentCardProps {
   department: { id: number; name: string; imageUrl?: string };
   onClick?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 const DepartmentCard: React.FC<DepartmentCardProps> = ({ department, onClick }) => {

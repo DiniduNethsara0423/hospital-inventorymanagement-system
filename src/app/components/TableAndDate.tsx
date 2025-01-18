@@ -116,7 +116,7 @@ const TableAndDate: React.FC = () => {
             {logs.map((log, index) => (
               <tr key={index} className="hover:bg-blue-50">
                 {/* Dynamically create table rows based on log data values */}
-                {Object.values(log).map((value, idx) => (
+                {Object.values(log).map((value:any, idx) => (
                   <td key={idx} className="border border-gray-300 px-4 py-2">
                     {value}
                   </td>

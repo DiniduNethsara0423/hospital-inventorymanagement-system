@@ -3,16 +3,16 @@ import { getAllUsers } from '@/app/apis/get-all-users/api';
 import { getLogsByTableNameAndUserId } from '@/app/apis/logs/api';
 
 const TableAndUserId: React.FC = () => {
-  const [userId, setUserId] = useState<number | null>(null);
-  const [selectedTable, setSelectedTable] = useState('');
+  const [userId, setUserId]:any = useState<number | null>(null);
+  const [selectedTable, setSelectedTable]:any = useState('');
   const [users, setUsers] = useState<{ id: number; name: string }[]>([]);
-  const [tableData, setTableData] = useState<any[]>([]);
-  const [headers, setHeaders] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [tableData, setTableData]:any = useState<any[]>([]);
+  const [headers, setHeaders]:any = useState<string[]>([]);
+  const [loading, setLoading]:any = useState(false);
+  const [error, setError]:any = useState<string | null>(null);
 
-  const [pageSize, setPageSize] = useState(5);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize]:any = useState(5);
+  const [currentPage, setCurrentPage]:any = useState(1);
   const [total, setTotal] = useState(0);
 
   // Fetch users on component mount
@@ -39,7 +39,7 @@ const TableAndUserId: React.FC = () => {
         setLoading(true);
         setError(null);
         try {
-          const data = await getLogsByTableNameAndUserId(
+          const data:any = await getLogsByTableNameAndUserId(
             '1', // Store ID (hardcoded)
             '5', // Another parameter (hardcoded)
             selectedTable,
@@ -150,7 +150,7 @@ const TableAndUserId: React.FC = () => {
               <table className="table-auto w-full border-collapse border border-gray-300">
                 <thead>
                   <tr>
-                    {headers.map((header) => (
+                    {headers.map((header:any) => (
                       <th key={header} className="border border-gray-300 px-4 py-2">
                         {header.replace(/_/g, ' ').toUpperCase()}
                       </th>
@@ -158,9 +158,9 @@ const TableAndUserId: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tableData.map((row, index) => (
+                  {tableData.map((row:any, index:any) => (
                     <tr key={index} className="hover:bg-blue-50">
-                      {headers.map((header) => (
+                      {headers.map((header:any) => (
                         <td key={header} className="border border-gray-300 px-4 py-2">
                           {row[header]}
                         </td>

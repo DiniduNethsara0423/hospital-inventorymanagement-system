@@ -26,13 +26,13 @@ interface ItemsProps {
 }
 
 const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsChange }) => {
-  const [items, setItems] = useState<InventoryItem[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [items, setItems]:any = useState<InventoryItem[]>([]);
+  const [categories, setCategories]:any = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deleteItemBarcode, setDeleteItemBarcode] = useState<string | null>(null);
-  const [editItem, setEditItem] = useState<Partial<InventoryItem> | null>(null);
+  const [deleteItemBarcode, setDeleteItemBarcode]:any = useState<string | null>(null);
+  const [editItem, setEditItem]:any = useState<Partial<InventoryItem> | null>(null);
 
   const [totalItems, setTotalItems] = useState(0); // For total items count
   const [current, setCurrent] = useState(currentPage); // Current page state
@@ -40,7 +40,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
 
 
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [selectedItem, setSelectedItem]:any = useState<InventoryItem | null>(null);
   const barcodeRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -93,7 +93,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
 
     try {
       await deleteItem(deleteItemBarcode);
-      setItems((prev) => prev.filter((item) => item.item_barcode !== deleteItemBarcode));
+      setItems((prev:any) => prev.filter((item:any) => item.item_barcode !== deleteItemBarcode));
       setIsDeleteModalOpen(false);
       setDeleteItemBarcode(null);
     } catch (error) {
@@ -120,7 +120,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
     if (!editItem || !editItem.item_barcode) return;
 
     try {
-      const selectedCategory = categories.find((cat) => cat.category_name === editItem.category_name);
+      const selectedCategory = categories.find((cat:any) => cat.category_name === editItem.category_name);
       if (!selectedCategory) {
         console.error("Invalid category selected");
         return;
@@ -132,8 +132,8 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
         category_id: selectedCategory.id,
       });
 
-      setItems((prev) =>
-        prev.map((item) =>
+      setItems((prev:any) =>
+        prev.map((item:any) =>
           item.item_barcode === editItem.item_barcode
             ? {
                 ...item,
@@ -232,7 +232,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => (
+            {items.map((item:any) => (
               <tr
                 key={item.item_barcode}
                 className="hover:bg-blue-50 cursor-pointer"
@@ -299,7 +299,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
                 type="text"
                 className="w-full border px-3 py-2 rounded"
                 value={editItem?.item_name || ""}
-                onChange={(e) => setEditItem((prev) => ({ ...prev, item_name: e.target.value }))}
+                onChange={(e) => setEditItem((prev:any) => ({ ...prev, item_name: e.target.value }))}
               />
             </div>
             <div className="mb-4">
@@ -309,7 +309,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
                 className="w-full border px-3 py-2 rounded"
                 value={editItem?.lower_quantity || ""}
                 onChange={(e) =>
-                  setEditItem((prev) => ({ ...prev, lower_quantity: parseInt(e.target.value, 10) }))
+                  setEditItem((prev:any) => ({ ...prev, lower_quantity: parseInt(e.target.value, 10) }))
                 }
               />
             </div>
@@ -319,11 +319,11 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
                 className="w-full border px-3 py-2 rounded"
                 value={editItem?.category_name || ""}
                 onChange={(e) =>
-                  setEditItem((prev) => ({ ...prev, category_name: e.target.value }))
+                  setEditItem((prev:any) => ({ ...prev, category_name: e.target.value }))
                 }
               >
                 <option value="">Select Category</option>
-                {categories.map((category) => (
+                {categories.map((category:any) => (
                   <option key={category.id} value={category.category_name}>
                     {category.category_name}
                   </option>

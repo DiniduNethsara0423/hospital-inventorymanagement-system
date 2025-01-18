@@ -152,7 +152,7 @@ const RegisterUserPopUp: React.FC = () => {
                                 type="text"
                                 maxLength={1}
                                 value={digit}
-                                ref={(el) => (otpRefs.current[index] = el)}
+                                ref={(el:any) => (otpRefs.current[index] = el)}
                                 onChange={(e) => handleOtpChange(e.target.value, index)}
                                 className="w-12 h-12 border rounded text-center text-lg"
                             />

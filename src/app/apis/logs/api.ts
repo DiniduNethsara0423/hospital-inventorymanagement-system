@@ -43,7 +43,9 @@ export const getLogsByTableNameAndUserId = async (
   page: string = "1",
   limit: string = "5",
   table_name: string,
-  id: string
+  id: string,
+  currentPage: any,
+  pageSize: any
 ) => {
   const url = `${process.env.NEXT_PUBLIC_GET_LOGS_BY_ACTION}?page=${page}&limit=${limit}&table_name=${encodeURIComponent(table_name)}&id=${encodeURIComponent(id)}`;
   console.log(url);

@@ -12,7 +12,8 @@ import {
   LucideUsers,
   LucidePlus,
   LucideSearch,
-  LucideBook
+  LucideBook,
+  Icon
 } from 'lucide-react';
 import Link from 'next/link';
 import SearchBar from './SearchBar';
@@ -104,7 +105,7 @@ const SidebarNavbar = () => {
   );
 };
 
-const SidebarItem = ({ href, Icon, label }) => (
+const SidebarItem = ({ href, Icon, label }:any) => (
   <li>
     <Link
       href={href}

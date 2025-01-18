@@ -4,9 +4,9 @@ import { LucideSearch, X } from 'lucide-react';
 import { fetchItemByBarcode } from '@/app/apis/add-items/api';
 
 const SearchBar = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [itemDetails, setItemDetails] = useState(null);
-  const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery]:any = useState('');
+  const [itemDetails, setItemDetails]:any = useState(null);
+  const [error, setError]:any = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSearch = async () => {
@@ -20,7 +20,7 @@ const SearchBar = () => {
       const item = await fetchItemByBarcode(searchQuery);
       setItemDetails(item);
       setIsModalOpen(true); // Open the modal with the item details
-    } catch (err) {
+    } catch (err:any) {
       setItemDetails(null);
       setError(err.message);
     }

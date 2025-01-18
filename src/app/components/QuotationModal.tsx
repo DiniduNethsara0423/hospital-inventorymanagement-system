@@ -64,7 +64,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
   // Fetch PDFs linked to the quotation
   const loadQuotationPDFs = useCallback(async () => {
     try {
-      const data = await fetchQuotationPDFs(selectedQuotation.id);
+      const data:any = await fetchQuotationPDFs(selectedQuotation.id);
       setUploadedPDFs(data || []);
     } catch (error) {
       console.error("Error fetching quotation PDFs:", error);

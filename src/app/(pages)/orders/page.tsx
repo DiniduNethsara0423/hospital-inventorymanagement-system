@@ -8,7 +8,7 @@ import debounce from 'lodash.debounce';
 import { Trash2 } from "lucide-react";
 
 const OrdersPage = () => {
-  const [newInvoice, setNewInvoice] = useState({
+  const [newInvoice, setNewInvoice]:any = useState({
     dateRange: null,
     quotationId: "QUOT001",
     purchaseId: 1,
@@ -123,7 +123,7 @@ const OrdersPage = () => {
   const handleGenerateInvoiceId = async () => {
     try {
       const invoiceId = await generateInvoiceId();
-      setNewInvoice((prevState) => ({
+      setNewInvoice((prevState:any) => ({
         ...prevState,
         invoiceId: invoiceId,
       }));
@@ -162,7 +162,7 @@ const OrdersPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Select Date Range</label>
             <div
               className="border border-gray-300 px-4 py-2 rounded-lg text-sm cursor-pointer bg-white"
-              onClick={() => setShowDatePicker((prev) => !prev)}
+              onClick={() => setShowDatePicker((prev:any) => !prev)}
             >
               {newInvoice.dateRange
                 ? `${newInvoice.dateRange.startDate.toLocaleDateString()} - ${newInvoice.dateRange.endDate.toLocaleDateString()}`
@@ -215,7 +215,7 @@ const OrdersPage = () => {
                 value={newInvoice.purchaseId}
                 onChange={(e) => setNewInvoice({ ...newInvoice, purchaseId: Number(e.target.value) })}
               >
-                {purchases.map((purchase) => (
+                {purchases.map((purchase:any) => (
                   <option key={purchase.id} value={purchase.id}>
                     {purchase.id}
                   </option>
@@ -330,7 +330,7 @@ const OrdersPage = () => {
       {/* Pagination */}
       <div className="flex justify-center items-center mt-6 space-x-4">
         <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          onClick={() => setCurrentPage((prev:any) => Math.max(prev - 1, 1))}
           className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
             } transition`}
           disabled={currentPage === 1}
@@ -341,7 +341,7 @@ const OrdersPage = () => {
           Page {currentPage} of {totalPages}
         </span>
         <button
-          onClick={() => setCurrentPage((prev) => (currentPage < totalPages ? prev + 1 : prev))}
+          onClick={() => setCurrentPage((prev:any) => (currentPage < totalPages ? prev + 1 : prev))}
           className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
             } transition`}
           disabled={currentPage === totalPages}

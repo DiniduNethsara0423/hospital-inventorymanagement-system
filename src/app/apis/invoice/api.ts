@@ -59,7 +59,7 @@ export const uploadInvoicePDF = async (invoiceId:any, pdfFile:any) => {
 //   }
 // };
 
-export const fetchQuotations = async (page, pageSize) => {
+export const fetchQuotations = async (page:any, pageSize:any) => {
   const url:any = process.env.NEXT_PUBLIC_GET_ALL_QUOtATIONS
   try {
     const response = await fetch(`${url}?page=${page}&pageSize=${pageSize}`);

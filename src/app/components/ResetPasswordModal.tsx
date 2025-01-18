@@ -9,6 +9,7 @@ import {
 interface ResetPasswordModalProps {
   isOpen: boolean;
   onClose: () => void;
+  email:any
 }
 
 const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({

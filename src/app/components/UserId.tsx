@@ -74,7 +74,7 @@ const UserId: React.FC = () => {
         <tbody>
           {logs.map((log, index) => (
             <tr key={index} className="hover:bg-blue-50">
-              {Object.values(log).map((value, i) => (
+              {Object.values(log).map((value:any, i) => (
                 <td key={i} className="border border-gray-300 px-4 py-2">
                   {value !== null ? value.toString() : "N/A"}
                 </td>

@@ -12,12 +12,7 @@ const API = axios.create({
 });
 
 // Add Purchase Request
-export const addPurchaseRequest = async (data: {
-  purchase_request_id: number;
-  description: string;
-  total_value: number;
-  pdf_path: string;
-}) => {
+export const addPurchaseRequest = async (data:any) => {
   try {
     const response = await API.post(
       process.env.NEXT_PUBLIC_ADD_PURCHASE_REQUEST!,

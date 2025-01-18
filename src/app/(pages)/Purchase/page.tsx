@@ -6,9 +6,9 @@ import { QuotationList } from "@/app/components/QuotationList";
 import { QuotationModal } from "@/app/components/QuotationModal"; 
 
 const PurchaseOrders: React.FC = () => {
-  const [quotations, setQuotations] = useState<Quotation[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedQuotation, setSelectedQuotation] = useState<Quotation | null>(null);
+  const [quotations, setQuotations]:any = useState([]);
+  const [searchQuery, setSearchQuery]:any = useState("");
+  const [selectedQuotation, setSelectedQuotation]:any = useState(null);
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

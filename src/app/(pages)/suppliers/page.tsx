@@ -14,7 +14,7 @@ type Supplier = {
 };
 
 export default function SuppliersPage() {
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [suppliers, setSuppliers]:any = useState<Supplier[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form, setForm] = useState<Partial<Supplier>>({});
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -77,7 +77,7 @@ export default function SuppliersPage() {
 
   const handleSubmit = async () => {
     try {
-      const supplierData = {
+      const supplierData:any = {
         vendor_id: form.id, // Use the ID
         vendor_name: form.vendorName || "",
         email: form.email || "",
@@ -90,8 +90,8 @@ export default function SuppliersPage() {
       if (editingId) {
         // Update existing supplier
         await updateVendor(editingId, supplierData);
-        setSuppliers((prev) =>
-          prev.map((supplier) =>
+        setSuppliers((prev:any) =>
+          prev.map((supplier:any) =>
             supplier.id === editingId ? { ...supplier, ...supplierData } : supplier
           )
         );
@@ -103,7 +103,7 @@ export default function SuppliersPage() {
   
       closeModal();
       fetchSuppliers(currentPage,pageSize)
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error saving supplier:", error);
       alert(error.message || "Failed to save supplier.");
     }
@@ -117,7 +117,7 @@ export default function SuppliersPage() {
       await deleteVendor(id);
   
       // Remove supplier from state if the deletion was successful
-      setSuppliers(suppliers.filter((supplier) => supplier.id !== id));
+      setSuppliers(suppliers.filter((supplier:any) => supplier.id !== id));
       alert("Supplier deleted successfully");
     } catch (error) {
       alert("Failed to delete supplier.");

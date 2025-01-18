@@ -16,7 +16,7 @@ const AddItemToDepartment = () => {
   const [pageSize, setPageSize] = useState(10);
   const [itemDetails, setItemDetails] = useState([]);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData]:any = useState({
     barcode: "",
     itemDetailId: itemDetails, // Mock ID, replace with dropdown later
     departmentId: departments, // Mock ID, replace with dropdown later

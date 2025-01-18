@@ -132,3 +132,14 @@ export const requestPasswordReset = async (email: string) => {
     const response = await axios.patch(`http://localhost:3100/auth/complete-updating-password`, { email, password });
     return response.data;
   };
+
+
+export const fetchAllUsers = async () => {
+  try {
+    const response = await axios.get(`http://localhost:3100/auth/get-all-users`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw error;
+  }
+};

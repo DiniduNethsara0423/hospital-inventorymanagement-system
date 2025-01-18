@@ -80,7 +80,7 @@ export const getAllItemDetails = async (page: number, pageSize: number) => {
   return response.data;
 };
 
-export const deleteItemDetail = async (id, removingQty) => {
+export const deleteItemDetail = async (id:any, removingQty:any) => {
   const response = await axios.post(`http://localhost:3100/items/remove-item-detail/${id}`, {
     removing_qty: removingQty,
   });
@@ -88,7 +88,7 @@ export const deleteItemDetail = async (id, removingQty) => {
 };
 
 // Update item detail
-export const updateItemDetail = async (id, updateData) => {
+export const updateItemDetail = async (id:any, updateData:any) => {
   const response = await axios.patch(`http://localhost:3100/items/item-details/${id}`, updateData);
   return response.data;
 };
