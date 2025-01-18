@@ -35,8 +35,7 @@ export const QuotationForm: React.FC<QuotationFormProps> = ({ setQuotations }) =
 
       // Make the API call
       const response = await addPurchaseRequest(purchaseRequestPayload);
-      console.log("Quotation added successfully:", response);
-
+     
       // Update state
       const newQuotation: Quotation = {
         id: Date.now(),
@@ -47,6 +46,7 @@ export const QuotationForm: React.FC<QuotationFormProps> = ({ setQuotations }) =
 
       setQuotations((prev) => [...prev, newQuotation]);
       alert("Quotation added successfully!");
+      window.location.reload();
 
       // Clear form inputs
       setNewDescription("");

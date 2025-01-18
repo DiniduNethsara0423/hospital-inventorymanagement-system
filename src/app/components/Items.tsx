@@ -26,13 +26,13 @@ interface ItemsProps {
 }
 
 const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsChange }) => {
-  const [items, setItems]:any = useState<InventoryItem[]>([]);
-  const [categories, setCategories]:any = useState<Category[]>([]);
+  const [items, setItems]: any = useState<InventoryItem[]>([]);
+  const [categories, setCategories]: any = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deleteItemBarcode, setDeleteItemBarcode]:any = useState<string | null>(null);
-  const [editItem, setEditItem]:any = useState<Partial<InventoryItem> | null>(null);
+  const [deleteItemBarcode, setDeleteItemBarcode]: any = useState<string | null>(null);
+  const [editItem, setEditItem]: any = useState<Partial<InventoryItem> | null>(null);
 
   const [totalItems, setTotalItems] = useState(0); // For total items count
   const [current, setCurrent] = useState(currentPage); // Current page state
@@ -40,7 +40,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
 
 
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem]:any = useState<InventoryItem | null>(null);
+  const [selectedItem, setSelectedItem]: any = useState<InventoryItem | null>(null);
   const barcodeRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -80,7 +80,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
 
   const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setPageSize(parseInt(event.target.value, 10));
-    setCurrent(1); 
+    setCurrent(1);
   };
 
   const confirmDelete = (barcode: string) => {
@@ -93,7 +93,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
 
     try {
       await deleteItem(deleteItemBarcode);
-      setItems((prev:any) => prev.filter((item:any) => item.item_barcode !== deleteItemBarcode));
+      setItems((prev: any) => prev.filter((item: any) => item.item_barcode !== deleteItemBarcode));
       setIsDeleteModalOpen(false);
       setDeleteItemBarcode(null);
     } catch (error) {
@@ -120,7 +120,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
     if (!editItem || !editItem.item_barcode) return;
 
     try {
-      const selectedCategory = categories.find((cat:any) => cat.category_name === editItem.category_name);
+      const selectedCategory = categories.find((cat: any) => cat.category_name === editItem.category_name);
       if (!selectedCategory) {
         console.error("Invalid category selected");
         return;
@@ -132,15 +132,15 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
         category_id: selectedCategory.id,
       });
 
-      setItems((prev:any) =>
-        prev.map((item:any) =>
+      setItems((prev: any) =>
+        prev.map((item: any) =>
           item.item_barcode === editItem.item_barcode
             ? {
-                ...item,
-                item_name: editItem.item_name!,
-                lower_quantity: editItem.lower_quantity!,
-                category_name: selectedCategory.category_name,
-              }
+              ...item,
+              item_name: editItem.item_name!,
+              lower_quantity: editItem.lower_quantity!,
+              category_name: selectedCategory.category_name,
+            }
             : item
         )
       );
@@ -155,7 +155,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
     setSelectedItem(item);
     setIsDetailsModalOpen(true);
   };
-  
+
 
   const handleDownloadBarcode = () => {
     if (barcodeRef.current) {
@@ -183,18 +183,18 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
       });
     }
   };
-  
+
   useEffect(() => {
     if (isDetailsModalOpen) {
       generateBarcode();
     }
   }, [isDetailsModalOpen, selectedItem]);
-  
+
 
   return (
     <div>
 
-<div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4">
         <div>
           <label htmlFor="pageSize" className="mr-2 text-gray-700">
             Items per page:
@@ -214,7 +214,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
         <p className="text-gray-700">Total Items: {totalItems}</p>
       </div>
 
-      
+
       {isLoading ? (
         <p className="text-center text-gray-700 font-medium">Loading items...</p>
       ) : (
@@ -232,7 +232,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
             </tr>
           </thead>
           <tbody>
-            {items.map((item:any) => (
+            {items.map((item: any) => (
               <tr
                 key={item.item_barcode}
                 className="hover:bg-blue-50 cursor-pointer"
@@ -247,13 +247,19 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
                 <td className="border px-4 py-3 text-center">
                   <button
                     className="text-blue-600 hover:text-blue-800 mr-2"
-                    onClick={() => handleEditClick(item)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent row click
+                      handleEditClick(item);
+                    }}
                   >
                     <Edit size={20} />
                   </button>
                   <button
                     className="text-red-600 hover:text-red-800"
-                    onClick={() => confirmDelete(item.item_barcode)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent row click
+                      confirmDelete(item.item_barcode);
+                    }}
                   >
                     <Trash2 size={20} />
                   </button>
@@ -299,7 +305,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
                 type="text"
                 className="w-full border px-3 py-2 rounded"
                 value={editItem?.item_name || ""}
-                onChange={(e) => setEditItem((prev:any) => ({ ...prev, item_name: e.target.value }))}
+                onChange={(e) => setEditItem((prev: any) => ({ ...prev, item_name: e.target.value }))}
               />
             </div>
             <div className="mb-4">
@@ -309,7 +315,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
                 className="w-full border px-3 py-2 rounded"
                 value={editItem?.lower_quantity || ""}
                 onChange={(e) =>
-                  setEditItem((prev:any) => ({ ...prev, lower_quantity: parseInt(e.target.value, 10) }))
+                  setEditItem((prev: any) => ({ ...prev, lower_quantity: parseInt(e.target.value, 10) }))
                 }
               />
             </div>
@@ -319,11 +325,11 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
                 className="w-full border px-3 py-2 rounded"
                 value={editItem?.category_name || ""}
                 onChange={(e) =>
-                  setEditItem((prev:any) => ({ ...prev, category_name: e.target.value }))
+                  setEditItem((prev: any) => ({ ...prev, category_name: e.target.value }))
                 }
               >
                 <option value="">Select Category</option>
-                {categories.map((category:any) => (
+                {categories.map((category: any) => (
                   <option key={category.id} value={category.category_name}>
                     {category.category_name}
                   </option>
@@ -347,7 +353,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
           </div>
         </div>
       )}
-      
+
       <div className="flex justify-between items-center mt-4">
         <button
           className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
@@ -377,78 +383,78 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
       </div>
 
       {isDetailsModalOpen && selectedItem && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg w-11/12 max-w-lg">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-          Item Details
-        </h2>
-        <button
-          onClick={() => setIsDetailsModalOpen(false)}
-          className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-300"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg w-11/12 max-w-lg">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                Item Details
+              </h2>
+              <button
+                onClick={() => setIsDetailsModalOpen(false)}
+                className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-300"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-      {/* Details */}
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <span className="font-medium text-gray-600 dark:text-gray-400">Name:</span>
-          <span className="text-gray-800 dark:text-gray-200">{selectedItem.item_name}</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="font-medium text-gray-600 dark:text-gray-400">Barcode:</span>
-          <span className="text-gray-800 dark:text-gray-200">{selectedItem.item_barcode}</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="font-medium text-gray-600 dark:text-gray-400">Category:</span>
-          <span className="text-gray-800 dark:text-gray-200">{selectedItem.category_name}</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="font-medium text-gray-600 dark:text-gray-400">Available Qty:</span>
-          <span className="text-gray-800 dark:text-gray-200">{selectedItem.available_qty}</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="font-medium text-gray-600 dark:text-gray-400">Currently Using Qty:</span>
-          <span className="text-gray-800 dark:text-gray-200">
-            {selectedItem.currently_using_qty ?? "N/A"}
-          </span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="font-medium text-gray-600 dark:text-gray-400">Lower Qty:</span>
-          <span className="text-gray-800 dark:text-gray-200">{selectedItem.lower_quantity}</span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="font-medium text-gray-600 dark:text-gray-400">Total Qty:</span>
-          <span className="text-gray-800 dark:text-gray-200">{selectedItem.qty}</span>
-        </div>
-      </div>
+            {/* Details */}
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-600 dark:text-gray-400">Name:</span>
+                <span className="text-gray-800 dark:text-gray-200">{selectedItem.item_name}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-600 dark:text-gray-400">Barcode:</span>
+                <span className="text-gray-800 dark:text-gray-200">{selectedItem.item_barcode}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-600 dark:text-gray-400">Category:</span>
+                <span className="text-gray-800 dark:text-gray-200">{selectedItem.category_name}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-600 dark:text-gray-400">Available Qty:</span>
+                <span className="text-gray-800 dark:text-gray-200">{selectedItem.available_qty}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-600 dark:text-gray-400">Currently Using Qty:</span>
+                <span className="text-gray-800 dark:text-gray-200">
+                  {selectedItem.currently_using_qty ?? "N/A"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-600 dark:text-gray-400">Lower Qty:</span>
+                <span className="text-gray-800 dark:text-gray-200">{selectedItem.lower_quantity}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-600 dark:text-gray-400">Total Qty:</span>
+                <span className="text-gray-800 dark:text-gray-200">{selectedItem.qty}</span>
+              </div>
+            </div>
 
-      {/* Barcode Canvas */}
-      <div className="mt-6">
-        <canvas ref={barcodeRef} className="border p-2 bg-gray-50 rounded w-auto  " />
-      </div>
+            {/* Barcode Canvas */}
+            <div className="mt-6">
+              <canvas ref={barcodeRef} className="border p-2 bg-gray-50 rounded w-auto  " />
+            </div>
 
-      {/* Action Buttons */}
-      <div className="mt-6 flex justify-end space-x-4">
-        <button
-          className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900"
-          onClick={handleDownloadBarcode}
-        >
-          Download Barcode
-        </button>
-        <button
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-          onClick={() => setIsDetailsModalOpen(false)}
-        >
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+            {/* Action Buttons */}
+            <div className="mt-6 flex justify-end space-x-4">
+              <button
+                className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900"
+                onClick={handleDownloadBarcode}
+              >
+                Download Barcode
+              </button>
+              <button
+                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+                onClick={() => setIsDetailsModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -64,7 +64,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
   // Fetch PDFs linked to the quotation
   const loadQuotationPDFs = useCallback(async () => {
     try {
-      const data:any = await fetchQuotationPDFs(selectedQuotation.id);
+      const data: any = await fetchQuotationPDFs(selectedQuotation.id);
       setUploadedPDFs(data || []);
     } catch (error) {
       console.error("Error fetching quotation PDFs:", error);
@@ -90,7 +90,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
       total_value: parseFloat(totalValue),
       purchase_request_id: selectedQuotation.id,
       pdf_path: "fake-path.pdf", // Fake path
-      approve_status: approveStatus, // Use selected approve status
+      approve_status: "pending", // Use selected approve status
       created_by: 1, // Hardcoded created_by
     };
 
@@ -268,61 +268,55 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
             />
           </div>
           {/* Approve Status */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Approval Status
-            </label>
-            <div className="flex items-center space-x-4 mt-2">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name="approve_status"
-                  value="pending"
-                  checked={approveStatus === "pending"}
-                  onChange={(e) => setApproveStatus(e.target.value)}
-                />
-                <span>Pending</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name="approve_status"
-                  value="approved"
-                  checked={approveStatus === "approved"}
-                  onChange={(e) => setApproveStatus(e.target.value)}
-                />
-                <span>Approved</span>
-              </label>
-            </div>
-          </div>
+          
         </div>
 
 
-        {/* Upload PDFs */}
-        <div>
-          <label
-            htmlFor="upload-pdf"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Upload PDF
-          </label>
-          <input
-            id="upload-pdf"
-            type="file"
-            accept="application/pdf"
-            onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
-            className="block w-full border rounded-md px-4 py-2"
-          />
-        </div>
+        <div className="space-y-4">
+  <div className="flex items-center space-x-4">
+    <label
+      htmlFor="upload-pdf"
+      className="block text-sm font-medium text-gray-800"
+    >
+      Upload PDF
+    </label>
+    <div className="relative">
+      <input
+        id="upload-pdf"
+        type="file"
+        accept="application/pdf"
+        onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
+        className="hidden"
+      />
+      <label
+        htmlFor="upload-pdf"
+        className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 cursor-pointer hover:bg-gray-100 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+      >
+        Select File
+      </label>
+    </div>
+  </div>
 
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className={`bg-blue-600 text-white px-4 py-2 rounded ${loading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-        >
-          Submit Quotation
-        </button>
+  {/* Show the selected file */}
+  {pdfFile && (
+    <div className="flex items-center space-x-2 text-sm text-gray-600">
+      <span>Selected File:</span>
+      <span className="font-medium text-gray-800">{pdfFile.name}</span>
+    </div>
+  )}
+
+  <button
+    onClick={handleSubmit}
+    disabled={loading}
+    className={`px-4 py-2 rounded-md border bg-gray-700 text-sm font-medium text-white ${loading
+      ? "bg-gray-200 text-gray-800 cursor-not-allowed"
+      : "bg-gray-100 text-gray-900 hover:bg-gray-800"
+      }`}
+  >
+    Submit Quotation
+  </button>
+</div>
+
 
         <div className="space-y-4 mt-8">
           <h3 className="text-lg font-semibold">Uploaded Quotations</h3>
@@ -352,9 +346,9 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
           <button
             onClick={handlePurchase}
             disabled={isPurchaseCompleted || !selectedPDF || loading}
-            className={`bg-green-600 text-white px-4 py-2 rounded ${isPurchaseCompleted || !selectedPDF || loading
-                ? "opacity-50 cursor-not-allowed"
-                : ""
+            className={`bg-gray-900 text-white px-4 py-2 rounded ${isPurchaseCompleted || !selectedPDF || loading
+              ? "opacity-50 cursor-not-allowed"
+              : ""
               }`}
           >
             Confirm Purchase

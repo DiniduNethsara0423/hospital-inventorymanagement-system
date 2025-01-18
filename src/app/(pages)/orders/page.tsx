@@ -110,6 +110,9 @@ const OrdersPage = () => {
 
       if (newInvoice.invoicePdf) {
         await uploadInvoicePDF(invoice_id, newInvoice.invoicePdf);
+        const { results, count } = await fetchInvoices(currentPage, 7);
+        setFilteredInvoices(results);
+        setTotalPages(Math.ceil(count[0]["COUNT(*)"] / 7));
         alert("Invoice created and PDF uploaded successfully!");
       } else {
         alert("Invoice created successfully!");
@@ -296,7 +299,7 @@ const OrdersPage = () => {
             {filteredInvoices.map((invoice: any) => (
               <tr key={invoice.invoice_id} className="border-t hover:bg-gray-100">
                 <td className="px-6 py-3">{invoice.quotation_id}</td>
-                <td className="px-6 py-3">{invoice.invoice_id_by_shop || "N/A"}</td>
+                <td className="px-6 py-3">{invoice.invoice_id || "N/A"}</td>
                 <td className="px-6 py-3">{invoice.purchase_id}</td>
                 <td className="px-6 py-3">{invoice.vendors_id}</td>
                 <td className="px-6 py-3">{invoice.total_value || "0"}</td>

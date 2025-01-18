@@ -23,6 +23,11 @@ export const QuotationList: React.FC<QuotationListProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [quotationToDelete, setQuotationToDelete] = useState<string | null>(
+    null
+  );
+
   const ITEMS_PER_PAGE = 5;
 
   const fetchQuotations = async (page: number) => {
@@ -45,13 +50,22 @@ export const QuotationList: React.FC<QuotationListProps> = ({
     }
   };
 
-  const deleteQuotation = async (quotationId: string) => {
+  const handleDeleteClick = (quotationId: string) => {
+    setQuotationToDelete(quotationId);
+    setShowModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!quotationToDelete) return;
+
     try {
       setIsLoading(true);
-      await deletePurchaseRequest(quotationId); // Call the API to delete the quotation
+      await deletePurchaseRequest(quotationToDelete);
       setQuotations((prevQuotations) =>
-        prevQuotations.filter((quotation) => quotation.id !== quotationId)
+        prevQuotations.filter((quotation) => quotation.id !== quotationToDelete)
       );
+      setShowModal(false);
+      setQuotationToDelete(null);
     } catch (err) {
       console.error("Failed to delete quotation:", err);
       setError("Failed to delete quotation. Please try again.");
@@ -94,8 +108,8 @@ export const QuotationList: React.FC<QuotationListProps> = ({
             </div>
             <button
               onClick={(e) => {
-                e.stopPropagation(); // Prevent triggering the parent click handler
-                deleteQuotation(quotation.id);
+                e.stopPropagation();
+                handleDeleteClick(quotation.id);
               }}
               className="px-4 py-2 rounded-md font-bold text-sm bg-red-500 text-white hover:bg-red-600"
             >
@@ -121,6 +135,34 @@ export const QuotationList: React.FC<QuotationListProps> = ({
           Next
         </button>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white w-full max-w-md p-6 rounded-md shadow-lg relative">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">
+              Confirm Deletion
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this quotation?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
