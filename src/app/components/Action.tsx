@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getLogsByAction } from "@/app/apis/logs/api"; // Update with the correct path to your API function
 
 const Action: React.FC = () => {
+  const [userId, setUserId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(2);
   const [action, setAction] = useState<string>("");
@@ -14,8 +15,7 @@ const Action: React.FC = () => {
         setLoading(true);
         try {
           const data = await getLogsByAction(currentPage.toString(), pageSize.toString(), action);
-          const selectedLogs = data[`${action.toLowerCase()}Logs`] || [];
-          setLogs(selectedLogs);
+          setLogs(data.logs || []);
         } catch (error) {
           console.error("Error fetching logs:", error);
           alert("Failed to fetch logs. Please try again later.");
@@ -42,12 +42,9 @@ const Action: React.FC = () => {
     setCurrentPage(1); // Reset to the first page when action changes
   };
 
-  // Extract headers dynamically
-  const headers = logs.length > 0 ? Object.keys(logs[0]) : [];
-
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-semibold mb-4">Action Logs</h1>
+      <h1 className="text-2xl font-semibold mb-4">Action</h1>
 
       <div className="mb-4 flex items-center gap-4">
         <label htmlFor="action" className="font-medium">
@@ -60,18 +57,9 @@ const Action: React.FC = () => {
           className="px-4 py-2 border rounded"
         >
           <option value="">-- Select Action --</option>
-          <option value="category">Category</option>
-          <option value="department">Department</option>
-          <option value="invoices">Invoices</option>
-          <option value="itemDepartments">Item Departments</option>
-          <option value="itemDetails">Item Details</option>
-          <option value="items">Items</option>
-          <option value="purchaseRequest">Purchase Request</option>
-          <option value="purchases">Purchases</option>
-          <option value="quotations">Quotations</option>
-          <option value="roles">Roles</option>
-          <option value="users">Users</option>
-          <option value="vendors">Vendors</option>
+          <option value="INSERT">INSERT</option>
+          <option value="UPDATE">UPDATE</option>
+          <option value="DELETE">DELETE</option>
         </select>
       </div>
 
@@ -93,31 +81,25 @@ const Action: React.FC = () => {
 
       {loading ? (
         <p>Loading logs...</p>
-      ) : logs.length > 0 ? (
+      ) : (
         <table className="table-auto w-full border-collapse border border-gray-300">
           <thead>
             <tr>
-              {headers.map((header) => (
-                <th key={header} className="border border-gray-300 px-4 py-2 capitalize">
-                  {header.replace(/([A-Z])/g, " $1")}
-                </th>
-              ))}
+              <th className="border border-gray-300 px-4 py-2">ID</th>
+              <th className="border border-gray-300 px-4 py-2">Action</th>
+              <th className="border border-gray-300 px-4 py-2">Timestamp</th>
             </tr>
           </thead>
           <tbody>
             {logs.map((log, index) => (
               <tr key={index} className="hover:bg-blue-50">
-                {headers.map((header) => (
-                  <td key={header} className="border border-gray-300 px-4 py-2">
-                    {log[header] !== undefined ? log[header] : "N/A"}
-                  </td>
-                ))}
+                <td className="border border-gray-300 px-4 py-2">{log.id}</td>
+                <td className="border border-gray-300 px-4 py-2">{log.action}</td>
+                <td className="border border-gray-300 px-4 py-2">{log.timestamp}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      ) : (
-        <p>No logs available for the selected action.</p>
       )}
 
       <div className="mt-4 flex items-center justify-between">
