@@ -1,23 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 import dynamic from "next/dynamic";
 
 // Dynamically import components
-const ByTable = dynamic(() => import("../../components/ByTable"));//done
-const TableAndUserId = dynamic(() => import("../../components/TableAndUserId"));//done
-const Action = dynamic(() => import("../../components/Action"));//done
-const UserId = dynamic(() => import("../../components/UserId"));// done
-const TableAndDate = dynamic(() => import("../../components/TableAndDate"));//done
+const ByTable = dynamic(() => import("../../components/ByTable")); // done
+const TableAndUserId = dynamic(() => import("../../components/TableAndUserId")); // done
+const Action = dynamic(() => import("../../components/Action")); // done
+const UserId = dynamic(() => import("../../components/UserId")); // done
+const TableAndDate = dynamic(() => import("../../components/TableAndDate")); // done
 const DateComponent = dynamic(() => import("../../components/Date")); // Renamed to avoid conflict with `Date`
-
-interface Log {
-  id: number;
-  user: string;
-  action: string;
-  timestamp: string;
-}
 
 const Page: React.FC = () => {
   const [currentComponent, setCurrentComponent] = useState<string>("ByTable");
@@ -30,7 +22,7 @@ const Page: React.FC = () => {
     { name: "By Table And Date", key: "TableAndDate" },
     { name: "By Date", key: "DateComponent" },
   ];
- 
+
   const renderComponent = () => {
     switch (currentComponent) {
       case "ByTable":
@@ -50,16 +42,19 @@ const Page: React.FC = () => {
     }
   };
 
-  
-
   return (
-    <div className="p-6 min-h-screen">
+    <div className="p-6 min-h-screen bg-white">
+      {/* Navigation */}
       <ul className="flex flex-wrap gap-4 mb-6 justify-center">
         {navigationItems.map((item) => (
           <li key={item.key}>
             <button
               onClick={() => setCurrentComponent(item.key)}
-              className="px-3 py-2 text-gray-700 hover:text-gray-800 font-bold text-lg"
+              className={`px-5 py-3 text-lg rounded-lg transition-all duration-200 ${
+                currentComponent === item.key
+                  ? " decoration-4"
+                  : "text-gray-900 hover:bg-gray-100"
+              }`}
             >
               {item.name}
             </button>
@@ -67,9 +62,8 @@ const Page: React.FC = () => {
         ))}
       </ul>
 
-      <div className="mb-6">{renderComponent()}</div>
-
-      
+      {/* Component Content */}
+      <div className="bg-white">{renderComponent()}</div>
     </div>
   );
 };

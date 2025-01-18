@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getLogsByAction } from "@/app/apis/logs/api"; // Update with the correct path to your API function
 
-const Action: React.FC = () => { 
+const Action: React.FC = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(2);
@@ -14,7 +14,11 @@ const Action: React.FC = () => {
       if (action) {
         setLoading(true);
         try {
-          const data = await getLogsByAction(currentPage.toString(), pageSize.toString(), action);
+          const data = await getLogsByAction(
+            currentPage.toString(),
+            pageSize.toString(),
+            action
+          );
           setLogs(data.logs || []);
         } catch (error) {
           console.error("Error fetching logs:", error);
@@ -43,68 +47,92 @@ const Action: React.FC = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-semibold mb-4">Action</h1>
+    <div className="p-6  min-h-screen">
+      <h1 className="text-2xl font-semibold text-gray-800 mb-6">
+        Action Logs Viewer
+      </h1>
 
-      <div className="mb-4 flex items-center gap-4">
-        <label htmlFor="action" className="font-medium">
-          Select Action:
-        </label>
-        <select
-          id="action"
-          value={action}
-          onChange={handleActionChange}
-          className="px-4 py-2 border rounded"
-        >
-          <option value="">-- Select Action --</option>
-          <option value="INSERT">INSERT</option>
-          <option value="UPDATE">UPDATE</option>
-          <option value="DELETE">DELETE</option>
-        </select>
+      {/* Action Selector */}
+      <div className="mb-6 flex flex-col md:flex-row gap-4">
+        <div>
+          <label htmlFor="action" className="font-medium text-gray-700 block mb-1">
+            Select Action:
+          </label>
+          <select
+            id="action"
+            value={action}
+            onChange={handleActionChange}
+            className="px-4 py-2 border rounded w-full md:w-64 bg-white"
+          >
+            <option value="">-- Select Action --</option>
+            <option value="INSERT">INSERT</option>
+            <option value="UPDATE">UPDATE</option>
+            <option value="DELETE">DELETE</option>
+          </select>
+        </div>
+
+        {/* Page Size Selector */}
+        <div>
+          <label htmlFor="pageSize" className="font-medium text-gray-700 block mb-1">
+            Rows Per Page:
+          </label>
+          <select
+            id="pageSize"
+            value={pageSize}
+            onChange={handlePageSizeChange}
+            className="px-4 py-2 border rounded w-full md:w-64 bg-white"
+          >
+            <option value={2}>2</option>
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+          </select>
+        </div>
       </div>
 
-      <div className="mb-4 flex items-center gap-4">
-        <label htmlFor="pageSize" className="font-medium">
-          Page Size:
-        </label>
-        <select
-          id="pageSize"
-          value={pageSize}
-          onChange={handlePageSizeChange}
-          className="px-4 py-2 border rounded"
-        >
-          <option value={2}>2</option>
-          <option value={5}>5</option>
-          <option value={10}>10</option>
-        </select>
-      </div>
-
+      {/* Table */}
       {loading ? (
-        <p>Loading logs...</p>
+        <p className="text-blue-600 font-medium">Loading logs...</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="table-auto w-full border-collapse border border-gray-300">
-          <thead>
-            <tr>
-              <th className="border border-gray-300 px-4 py-2">ID</th>
-              <th className="border border-gray-300 px-4 py-2">Action</th>
-              <th className="border border-gray-300 px-4 py-2">Timestamp</th>
-            </tr>
-          </thead>
-          <tbody>
-            {logs.map((log, index) => (
-              <tr key={index} className="hover:bg-blue-50">
-                <td className="border border-gray-300 px-4 py-2">{log.id}</td>
-                <td className="border border-gray-300 px-4 py-2">{log.action}</td>
-                <td className="border border-gray-300 px-4 py-2">{log.timestamp}</td>
+          <table className="table-auto w-full border-collapse shadow-md">
+            <thead>
+              <tr className="bg-indigo-100 text-gray-700">
+                <th className=" px-4 py-2 text-left rounded-tl">ID</th>
+                <th className="border px-4 py-2 text-left">Action</th>
+                <th className=" px-4 py-2 text-left rounded-tr">Timestamp</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {logs.length > 0 ? (
+                logs.map((log, index) => (
+                  <tr
+                    key={index}
+                    className={`${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    } hover:bg-blue-50`}
+                  >
+                    <td className="border border-gray-300 px-4 py-2">{log.id}</td>
+                    <td className="border border-gray-300 px-4 py-2">{log.action}</td>
+                    <td className="border border-gray-300 px-4 py-2">{log.timestamp}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={3}
+                    className="text-center py-4 text-gray-500 font-medium"
+                  >
+                    No logs available for the selected action.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       )}
 
-      <div className="mt-4 flex items-center justify-between">
+      {/* Pagination */}
+      <div className="mt-6 flex justify-between items-center">
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1 || loading}
@@ -112,7 +140,7 @@ const Action: React.FC = () => {
         >
           Previous
         </button>
-        <span>
+        <span className="font-medium text-gray-700">
           Page {currentPage}
         </span>
         <button

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getAllUsers } from "@/app/apis/get-all-users/api";
 import { getLogsByUserId } from "@/app/apis/logs/api";
- 
+
 interface User {
   id: number;
   name: string;
@@ -59,13 +59,13 @@ const UserId: React.FC = () => {
   };
 
   const renderLogsTable = (logs: any[], logType: string) => (
-    <div className="overflow-x-auto">
-      <h2 className="text-xl font-semibold mb-2 capitalize">{logType}</h2>
-      <table className="table-auto w-full border-collapse border border-gray-300">
+    <div className="overflow-x-auto mt-6 ">
+      <h2 className="text-lg font-semibold mb-2 capitalize text-gray-700">{logType}</h2>
+      <table className="table-auto w-full border border-gray-200 rounded-md bg-white text-sm">
         <thead>
-          <tr>
+          <tr className="bg-indigo-100 text-left">
             {Object.keys(logs[0]).map((key) => (
-              <th key={key} className="border border-gray-300 px-4 py-2">
+              <th key={key} className="border border-gray-200 px-4 py-2 text-gray-600">
                 {key.replace(/_/g, " ").toUpperCase()}
               </th>
             ))}
@@ -73,9 +73,12 @@ const UserId: React.FC = () => {
         </thead>
         <tbody>
           {logs.map((log, index) => (
-            <tr key={index} className="hover:bg-blue-50">
-              {Object.values(log).map((value:any, i) => (
-                <td key={i} className="border border-gray-300 px-4 py-2">
+            <tr
+              key={index}
+              className="hover:bg-gray-50 text-gray-700"
+            >
+              {Object.values(log).map((value: any, i) => (
+                <td key={i} className="border border-gray-200 px-4 py-2">
                   {value !== null ? value.toString() : "N/A"}
                 </td>
               ))}
@@ -87,22 +90,22 @@ const UserId: React.FC = () => {
   );
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-semibold mb-4">User Logs</h1>
+    <div className="p-8 bg-white min-h-screen">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">User Logs</h1>
 
-      {loading && <p>Loading...</p>}
+      {loading && <p className="text-gray-600">Loading...</p>}
       {error && <p className="text-red-500">Error: {error}</p>}
 
       {!loading && !error && (
-        <div className="mb-4">
-          <label htmlFor="userDropdown" className="block font-medium mb-1">
+        <div className="mb-6">
+          <label htmlFor="userDropdown" className="block text-gray-700 font-medium mb-2">
             Select User:
           </label>
           <select
             id="userDropdown"
             value={userId || ""}
             onChange={handleUserChange}
-            className="px-4 py-2 border rounded w-full"
+            className="px-4 py-2 border border-gray-300 rounded-md w-full text-gray-700 bg-white focus:outline-none focus:ring focus:ring-gray-300"
           >
             <option value="" disabled>
               -- Select a User --
@@ -121,7 +124,7 @@ const UserId: React.FC = () => {
           logEntries.length > 0 ? renderLogsTable(logEntries, logType) : null
         )
       ) : (
-        <p className="text-center py-4">No logs available.</p>
+        <p className="text-center text-gray-500 py-4">No logs available.</p>
       )}
     </div>
   );
