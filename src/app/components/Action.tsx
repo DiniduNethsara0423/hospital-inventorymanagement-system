@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getLogsByAction } from "@/app/apis/logs/api"; // Update with the correct path to your API function
 
-const Action: React.FC = () => {
+const Action: React.FC = () => { 
   const [userId, setUserId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(2);
@@ -82,7 +82,8 @@ const Action: React.FC = () => {
       {loading ? (
         <p>Loading logs...</p>
       ) : (
-        <table className="table-auto w-full border-collapse border border-gray-300">
+        <div className="overflow-x-auto">
+          <table className="table-auto w-full border-collapse border border-gray-300">
           <thead>
             <tr>
               <th className="border border-gray-300 px-4 py-2">ID</th>
@@ -100,6 +101,7 @@ const Action: React.FC = () => {
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       <div className="mt-4 flex items-center justify-between">

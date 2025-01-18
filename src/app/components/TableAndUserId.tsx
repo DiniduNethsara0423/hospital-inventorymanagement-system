@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getAllUsers } from '@/app/apis/get-all-users/api';
 import { getLogsByTableNameAndUserId } from '@/app/apis/logs/api';
 
-const TableAndUserId: React.FC = () => {
+const TableAndUserId: React.FC = () => { 
   const [userId, setUserId]:any = useState<number | null>(null);
   const [selectedTable, setSelectedTable]:any = useState('');
   const [users, setUsers] = useState<{ id: number; name: string }[]>([]);
@@ -146,7 +146,7 @@ const TableAndUserId: React.FC = () => {
         {!loading && !error && tableData.length === 0 && <p>No logs available for the selected table and user.</p>}
         {!loading && !error && tableData.length > 0 && (
           <>
-            <div className="overflow-auto">
+            <div className="overflow-x-auto">
               <table className="table-auto w-full border-collapse border border-gray-300">
                 <thead>
                   <tr>

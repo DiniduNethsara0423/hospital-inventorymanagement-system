@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getAllUsers } from "@/app/apis/get-all-users/api";
 import { getLogsByUserId } from "@/app/apis/logs/api";
-
+ 
 interface User {
   id: number;
   name: string;
@@ -59,7 +59,7 @@ const UserId: React.FC = () => {
   };
 
   const renderLogsTable = (logs: any[], logType: string) => (
-    <div className="mb-6">
+    <div className="overflow-x-auto">
       <h2 className="text-xl font-semibold mb-2 capitalize">{logType}</h2>
       <table className="table-auto w-full border-collapse border border-gray-300">
         <thead>

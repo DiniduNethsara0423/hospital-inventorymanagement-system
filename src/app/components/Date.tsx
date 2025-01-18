@@ -5,7 +5,7 @@ const DatePage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [selectedDate, setSelectedDate] = useState('');
-  const [logs, setLogs]:any = useState<any[]>([]);
+  const [logs, setLogs]: any = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
 
   // Fetch logs from the API
@@ -42,9 +42,9 @@ const DatePage: React.FC = () => {
 
   // Render dynamic table rows based on the logs
   const renderTableRows = () => {
-    return logs.map((log:any, index:any) => (
+    return logs.map((log: any, index: any) => (
       <tr key={index} className="hover:bg-blue-50">
-        {Object.values(log).map((value:any, i:any) => (
+        {Object.values(log).map((value: any, i: any) => (
           <td key={i} className="border border-gray-300 px-4 py-2">
             {value}
           </td>
@@ -82,31 +82,33 @@ const DatePage: React.FC = () => {
       </div>
 
       {/* Table */}
-      <table className="table-auto w-full border-collapse border border-gray-300">
-        <thead>
-  <tr>
-    {logs?.length > 0
-      ? Object.keys(logs[0]).map((key) => (
-          <th key={key} className="border border-gray-300 px-4 py-2">
-            {key.replace(/([A-Z])/g, ' $1').toUpperCase()}
-          </th>
-        ))
-      : null}
-  </tr>
-</thead>
-
-        <tbody>
-          {Array.isArray(logs) && logs.length > 0 ? (
-            renderTableRows() // Render rows dynamically based on logs
-          ) : (
+      <div className='overflow-x-auto'>
+        <table className="table-auto w-full border-collapse border border-gray-300">
+          <thead>
             <tr>
-              <td colSpan={10} className="text-center py-4">
-                No logs found for the selected date.
-              </td>
+              {logs?.length > 0
+                ? Object.keys(logs[0]).map((key) => (
+                  <th key={key} className="border border-gray-300 px-4 py-2">
+                    {key.replace(/([A-Z])/g, ' $1').toUpperCase()}
+                  </th>
+                ))
+                : null}
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {Array.isArray(logs) && logs.length > 0 ? (
+              renderTableRows() // Render rows dynamically based on logs
+            ) : (
+              <tr>
+                <td colSpan={10} className="text-center py-4">
+                  No logs found for the selected date.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination Controls */}
       <div className="flex justify-between items-center mt-4">

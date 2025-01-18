@@ -126,34 +126,34 @@ const Page: React.FC = () => {
         <p className="text-center text-red-500">{error}</p>
       ) : (
         <div className="p-6 bg-gray-100 min-h-screen">
-  <h1 className="text-2xl font-semibold mb-4">Logs Viewer</h1>
-  <div className="overflow-x-auto">
-    <table className="table-auto w-full border-collapse border border-gray-300">
-      <thead>
-        <tr>
-          {columns.map((column) => (
-            <th key={column} className="border border-gray-300 px-4 py-2">
-              {column}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((row) => (
-          <tr key={row.id} className="hover:bg-blue-50">
-            {columns.map((column) => (
-              <td key={column} className="border border-gray-300 px-4 py-2">
-                {row[column] !== null && row[column] !== undefined
-                  ? row[column]
-                  : '-'}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-</div>
+          <h1 className="text-2xl font-semibold mb-4">Logs Viewer</h1>
+          <div className="overflow-x-auto">
+            <table className="table-auto w-full border-collapse border border-gray-300">
+              <thead>
+                <tr>
+                  {columns.map((column) => (
+                    <th key={column} className="border border-gray-300 px-4 py-2">
+                      {column}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((row) => (
+                  <tr key={row.id} className="hover:bg-blue-50">
+                    {columns.map((column) => (
+                      <td key={column} className="border border-gray-300 px-4 py-2">
+                        {row[column] !== null && row[column] !== undefined
+                          ? row[column]
+                          : '-'}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
       )}
     </div>

@@ -101,30 +101,32 @@ const TableAndDate: React.FC = () => {
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : logs.length > 0 ? (
-        <table className="table-auto w-full border-collapse border border-gray-300">
-          <thead>
-            <tr>
-              {/* Dynamically create table headers based on log data keys */}
-              {Object.keys(logs[0]).map((key) => (
-                <th key={key} className="border border-gray-300 px-4 py-2">
-                  {key.replace(/_/g, " ").toUpperCase()}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {logs.map((log, index) => (
-              <tr key={index} className="hover:bg-blue-50">
-                {/* Dynamically create table rows based on log data values */}
-                {Object.values(log).map((value:any, idx) => (
-                  <td key={idx} className="border border-gray-300 px-4 py-2">
-                    {value}
-                  </td>
+        <div className='overflow-x-auto'>
+          <table className="table-auto w-full border-collapse border border-gray-300">
+            <thead>
+              <tr>
+                {/* Dynamically create table headers based on log data keys */}
+                {Object.keys(logs[0]).map((key) => (
+                  <th key={key} className="border border-gray-300 px-4 py-2">
+                    {key.replace(/_/g, " ").toUpperCase()}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {logs.map((log, index) => (
+                <tr key={index} className="hover:bg-blue-50">
+                  {/* Dynamically create table rows based on log data values */}
+                  {Object.values(log).map((value: any, idx) => (
+                    <td key={idx} className="border border-gray-300 px-4 py-2">
+                      {value}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <p>No logs found.</p>
       )}
@@ -153,11 +155,10 @@ const TableAndDate: React.FC = () => {
             <button
               key={index + 1}
               onClick={() => handlePageChange(index + 1)}
-              className={`px-3 py-1 rounded ${
-                currentPage === index + 1
+              className={`px-3 py-1 rounded ${currentPage === index + 1
                   ? "bg-blue-500 text-white"
                   : "bg-gray-200 hover:bg-gray-300"
-              }`}
+                }`}
             >
               {index + 1}
             </button>
