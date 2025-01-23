@@ -1,11 +1,11 @@
-import api from "@/app/lib/axios";
+import api from "../api";
 
 interface DepartmentRequest {
   name: string;
 }
 
 export const postDepartment = async (data: DepartmentRequest) => {
-  const url = process.env.NEXT_PUBLIC_ADD_DEPARTMENT || "http://localhost:3100/departments/add-department";
+  const url:any = process.env.NEXT_PUBLIC_ADD_DEPARTMENT;
   console.log(url);
   try {
     const response = await api.post(url, data);
