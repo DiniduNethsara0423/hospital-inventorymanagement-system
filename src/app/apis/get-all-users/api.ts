@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from "../api";
 
 export const getAllUsers = async () => {
   const url = process.env.NEXT_PUBLIC_GET_ALL_USERS || ''; 
@@ -6,7 +6,7 @@ export const getAllUsers = async () => {
     throw new Error("URL is not defined");
   }
   try {
-    const response = await axios.get(url);
+    const response = await api.get(url);
     console.log(response.data);
     return response.data;
   } catch (error: any) {
