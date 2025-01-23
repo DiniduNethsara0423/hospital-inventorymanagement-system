@@ -1,4 +1,4 @@
-import api from "@/app/lib/axios";
+import api from "../api";
 
 export const getDepartments = async (page = 1, pageSize = 5) => {
   const url = `${process.env.NEXT_PUBLIC_GET_ALL_DEPARTMENT}?page=${page}&pageSize=${pageSize}`;
@@ -23,7 +23,7 @@ export const getDepartmentById = async (id: number) => {
 };
 
 export const postDepartment = async (data:any) => {
-    const url = process.env.NEXT_PUBLIC_ADD_DEPARTMENT || "http://localhost:3100/departments/add-department";
+    const url:any = process.env.NEXT_PUBLIC_ADD_DEPARTMENT;
     console.log(url);
     try {
       const response = await api.post(url, data);
@@ -95,9 +95,10 @@ export const getAssignedItems = async (page: number, pageSize: number) => {
 };
 
 export const removeItemFromDepartment = async (id:any, payload:any) => {
+  const url:any = process.env.NEXT_PUBLIC_REMOVE_ITEMS_FROM_DEPARTMENT
   try {
     const response = await api.post(
-      `http://localhost:3100/items/item-departments/remove/${id}`,
+      `${url}${id}`,
       payload
     );
     return response.data;
