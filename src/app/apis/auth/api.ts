@@ -1,25 +1,4 @@
-// import axios from "axios";
 
-// export const signUp = async (data: { username: string; email: string; password: string; role_id: number }) => {
-//     const url:any = process.env.NEXT_PUBLIC_REGISTER_USER
-//     try {
-//         const response = await axios.post(url, data);
-//         console.log(response.data)
-//         return response.data;
-//     } catch (error: any) {
-//         throw new Error(error.response?.data?.message || 'Something went wrong');
-//     }
-// };
-
-// export const login = async (credentials: { username: string; password: string }) => {
-//     const url:any = process.env.NEXT_PUBLIC_LOGIN_USER;
-//     try {
-//       const response = await axios.post(`${url}`, credentials);
-//       return response.data;
-//     } catch (error: any) {
-//       throw error.response?.data || { message: 'An error occurred' };
-//     }
-//   };
 
 import axios from 'axios';
 import api from '../api';
@@ -42,7 +21,6 @@ export const login = async (credentials: { username: string; password: string })
     }
   };
   
-
 
 const handleApiError = (error: any) => {
     if (axios.isAxiosError(error)) {
@@ -80,7 +58,7 @@ const handleApiError = (error: any) => {
 export const initiateRegistration = async (email: string, password: string, username: string, role_Id: number) => {
   const url:any = process.env.NEXT_PUBLIC_USER_INITIAL_REGISTRATION
     try {
-        const response = await axios.post(`${url}`, {
+        const response = await api.post(`${url}`, {
             email,
             password,
             username,
@@ -98,7 +76,7 @@ export const initiateRegistration = async (email: string, password: string, user
 export const verifyOtp = async (email: string, otp: string) => {
   const url:any = process.env.NEXT_PUBLIC_OTP_VERIFY
     try {
-        const response = await axios.post(`${url}`, {
+        const response = await api.post(`${url}`, {
             email,
             otp,
         });
@@ -114,7 +92,7 @@ export const verifyOtp = async (email: string, otp: string) => {
 export const completeRegistration = async (email: string) => {
   const url:any = process.env.NEXT_PUBLIC_USER_REGISTRATION_COMPLETE
     try {
-        const response = await axios.post(`${url}`, {
+        const response = await api.post(`${url}`, {
             email,
         });
         return {
@@ -131,7 +109,7 @@ export const completeRegistration = async (email: string) => {
 
 
 export const requestPasswordReset = async (email: string) => {
-    const response = await axios.post(`http://localhost:3100/auth/update-password`, { email });
+    const response = await api.post(`${process.env.NEXT_PUBLIC_REQUEST_UPDATE_PASSWORD}`, { email });
     return response.data;
   };
   
@@ -141,32 +119,17 @@ export const requestPasswordReset = async (email: string) => {
 //   };
   
   export const updatePassword = async (email: string, password: string) => {
-    const response = await axios.patch(`http://localhost:3100/auth/complete-updating-password`, { email, password });
+    const response = await api.patch(`${process.env.NEXT_PUBLIC_UPDATE_PASSWORD}`, { email, password });
     return response.data;
   };
 
 
 export const fetchAllUsers = async () => {
   try {
-    const response = await axios.get(`http://localhost:3100/auth/get-all-users`);
+    const response = await api.get(`${process.env.NEXT_PUBLIC_GET_ALL_USERS}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching users:", error);
     throw error;
   }
 };
-
-
-export const assignPermission = async (payload: {
-    roleId: number | null;
-    permissionId: number | null;
-    validUntil: string | null;
-  }) => {
-    try {
-      const response = await api.post("http://localhost:3100/permissions/assign", payload);
-      return response;
-    } catch (error) {
-      console.error("Error in assigning permission:", error);
-      throw error;
-    }
-  };
