@@ -1,8 +1,8 @@
-import api from "@/app/lib/axios"; 
+import api from "@/app/apis/api"; 
 
 
 export const postCategory = async (data: { category_name: string }) => {
-  const url = process.env.NEXT_PUBLIC_ADD_CATEGORY || "http://localhost:3100/category/add";
+  const url:any = process.env.NEXT_PUBLIC_ADD_CATEGORY ;
   console.log(url);
   try {
     const response = await api.post(url, data);
@@ -31,7 +31,7 @@ export const getCategory = async (page = 1, pageSize = 5) => {
 };
 
 export const updateCategory = async (data: { id: number; category_name: string }) => {
-  const url = `/category/update/${data.id}`; // Adjust this based on your backend
+  const url = `${process.env.NEXT_PUBLIC_UPDATE_CATEGORY}${data.id}`; // Adjust this based on your backend
   try {
     console.log("Updating category with ID:", data.id, "and name:", data.category_name); // Debug
     const response = await api.patch(url, { category_name: data.category_name });
@@ -45,7 +45,7 @@ export const updateCategory = async (data: { id: number; category_name: string }
 
 export const deleteCategory = async (id: number) => {
   try {
-    const response = await api.delete(`/category/remove/${id}`);
+    const response = await api.delete(`${process.env.NEXT_PUBLIC_DELETE_CATEGORY}${id}`);
     return response.data;
   } catch (error: any) {
     console.error("Error deleting category:", error.response?.data || error.message);

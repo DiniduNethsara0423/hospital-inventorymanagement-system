@@ -21,16 +21,28 @@
 //     }
 //   };
 
-  export const login = async (credentials: { username: string; password: string }) => {
-    const url:any = process.env.NEXT_PUBLIC_LOGIN_USER;
+import axios from 'axios';
+import api from '../api';
 
-    const response = await axios.post(`${url}`, credentials);
-    return { ...response.data, status: response.status }; // Include status in the returned object
+export const login = async (credentials: { username: string; password: string }) => {
+    const url: any = process.env.NEXT_PUBLIC_LOGIN_USER;
+  
+    try {
+      const response = await api.post(`${url}`, credentials);
+      const token = response.data.access_token;
+      console.log(response.data.access_token);
+  
+      localStorage.setItem('jwtToken', token);
+  
+      console.log('Login successful!');
+      return { token, status: response.status }; // Return the token and status
+    } catch (error: any) {
+      console.error('Login failed:', error);
+      throw new Error(error.response?.data?.message || 'Login failed'); // Throw a detailed error
+    }
   };
   
 
-
-import axios from 'axios';
 
 const handleApiError = (error: any) => {
     if (axios.isAxiosError(error)) {
@@ -143,3 +155,18 @@ export const fetchAllUsers = async () => {
     throw error;
   }
 };
+
+
+export const assignPermission = async (payload: {
+    roleId: number | null;
+    permissionId: number | null;
+    validUntil: string | null;
+  }) => {
+    try {
+      const response = await api.post("http://localhost:3100/permissions/assign", payload);
+      return response;
+    } catch (error) {
+      console.error("Error in assigning permission:", error);
+      throw error;
+    }
+  };

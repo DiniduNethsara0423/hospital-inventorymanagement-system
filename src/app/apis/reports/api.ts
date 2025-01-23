@@ -1,11 +1,11 @@
-import axios from "axios";
+import api from "../api";
 
 const API_BASE_URL = "http://localhost:3100";
 
 // Function to fetch and download the report based on the date range
 export const downloadReport = async (startDate: string, endDate: string) => {
   try {
-    const response = await axios.get(
+    const response = await api.get(
       `${API_BASE_URL}/report/item-details`,
       {
         params: { startDate, endDate },
@@ -35,6 +35,6 @@ export const downloadReport = async (startDate: string, endDate: string) => {
 };
 
 export const fetchInventoryData = async () => {
-  const response = await axios.get(`${API_BASE_URL}/report/get-items`);
+  const response = await api.get(`${API_BASE_URL}/report/get-items`);
   return response.data;
 };

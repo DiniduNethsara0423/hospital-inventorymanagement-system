@@ -23,12 +23,12 @@ function LoginPage() {
     event.preventDefault();
     setError('');
     setIsLoading(true);
-
+  
     try {
-      const response = await login(formData);
-
+      const response:any = await login(formData);
+  
       if (response.token && (response.status === 200 || response.status === 201)) {
-        localStorage.setItem('token', response.token);
+  
         router.push('/dashboard');
       } else {
         setError('Unexpected response from the server. Please try again.');
@@ -39,6 +39,7 @@ function LoginPage() {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
