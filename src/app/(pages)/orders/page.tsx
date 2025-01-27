@@ -6,6 +6,7 @@ import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import debounce from 'lodash.debounce';
 import { Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const OrdersPage = () => {
   const [newInvoice, setNewInvoice]:any = useState({
@@ -30,6 +31,15 @@ const OrdersPage = () => {
   const [purchases, setPurchases]: any = useState([]); // Store loaded purchases
   const [purchasePage, setPurchasePage]: any = useState(1); // Current page
   const [hasMorePurchases, setHasMorePurchases]: any = useState(true); // Tracks if more data exists
+
+  const router = useRouter();
+  
+    useEffect(() => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        router.push('/login');
+      }
+    }, [router]);
 
   useEffect(() => {
     const getInvoices = async () => {

@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 
 interface InventoryItem {
   name: string;
@@ -13,6 +14,15 @@ const page: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState(50);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
+  const router = useRouter();
+  
+    useEffect(() => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        router.push('/login');
+      }
+    }, [router]);
 
   // Sample inventory data
   const inventoryData: InventoryItem[] = Array(500)

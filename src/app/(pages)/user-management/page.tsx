@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Plus, Search } from "lucide-react";
 import RegistrationSteps from "@/app/components/RegisterUserPopUp";
 import { fetchAllUsers, assignPermission } from "@/app/apis/auth/api"; // Importing APIs
+import { useRouter } from "next/navigation";
 
 const UserManagement: React.FC = () => {
   const [users, setUsers]: any = useState([]);
@@ -18,6 +19,15 @@ const UserManagement: React.FC = () => {
   const [roleId, setRoleId] = useState<number | null>(null);
   const [permissionId, setPermissionId] = useState<number | null>(null);
   const [validUntil, setValidUntil] = useState<string | null>(null);
+
+  const router = useRouter();
+  
+    useEffect(() => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        router.push('/login');
+      }
+    }, [router]);
 
   const roles = [
     { id: 1, name: "Superadmin" },
@@ -67,7 +77,7 @@ const UserManagement: React.FC = () => {
       const payload = {
         roleId,
         permissionId,
-        validUntil: null, // Set to null for now
+        validUntil,
       };
 
       const response = await assignPermission(payload);

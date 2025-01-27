@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 
 // Dynamically import components
 const ByTable = dynamic(() => import("../../components/ByTable")); // done
@@ -13,6 +14,15 @@ const DateComponent = dynamic(() => import("../../components/Date")); // Renamed
 
 const Page: React.FC = () => {
   const [currentComponent, setCurrentComponent] = useState<string>("ByTable");
+
+  const router = useRouter();
+  
+    useEffect(() => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        router.push('/login');
+      }
+    }, [router]);
 
   const navigationItems = [
     { name: "By Table", key: "ByTable" },

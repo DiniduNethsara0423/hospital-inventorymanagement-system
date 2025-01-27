@@ -23,6 +23,13 @@ function DepartmentsPage() {
   const [totalItems, setTotalItems] = useState(0);
 
   const router = useRouter();
+  
+    useEffect(() => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        router.push('/login');
+      }
+    }, [router]);
 
   const fetchDepartments = async () => {
     setLoading(true);

@@ -1,7 +1,7 @@
 
 
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Items from "@/app/components/Items";
 import ItemDetails from "@/app/components/ItemDetails";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,14 @@ const ItemsPage: React.FC = () => {
   const [totalItems, setTotalItems] = useState(0);
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  
+    useEffect(() => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        router.push('/login');
+      }
+    }, [router]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

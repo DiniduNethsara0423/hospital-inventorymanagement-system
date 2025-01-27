@@ -5,6 +5,7 @@ import JsBarcode from "jsbarcode"; // Barcode generation library
 import { addItemToDepartment, getAssignedItems, getDepartments } from "@/app/apis/department/api";
 import { getAllItemDetails, getBarcode } from "@/app/apis/inventory/api"; // Update the path as needed
 import Barcode from "@/app/components/Barcode";
+import { useRouter } from "next/navigation";
 
 
 const AddItemToDepartment = () => {
@@ -22,6 +23,15 @@ const AddItemToDepartment = () => {
     departmentId: departments, // Mock ID, replace with dropdown later
     qty: 0,
   });
+
+  const router = useRouter();
+  
+    useEffect(() => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        router.push('/login');
+      }
+    }, [router]);
 
   const fetchAssignedItems = async () => {
     try {

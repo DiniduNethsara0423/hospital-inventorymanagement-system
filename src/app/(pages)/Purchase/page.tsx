@@ -1,14 +1,24 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { QuotationForm } from "@/app/components/QuotationForm"; 
 import { QuotationList } from "@/app/components/QuotationList"; 
 import { QuotationModal } from "@/app/components/QuotationModal"; 
+import { useRouter } from "next/navigation";
 
 const PurchaseOrders: React.FC = () => {
   const [quotations, setQuotations]:any = useState([]);
   const [searchQuery, setSearchQuery]:any = useState("");
   const [selectedQuotation, setSelectedQuotation]:any = useState(null);
+
+  const router = useRouter();
+  
+    useEffect(() => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        router.push('/login');
+      }
+    }, [router]);
 
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

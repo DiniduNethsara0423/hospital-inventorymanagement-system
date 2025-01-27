@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { getAllCategories, getSuggestions, addNewItem } from "@/app/apis/inventory/api";
 import Barcode from "react-barcode";
+import { useRouter } from "next/navigation";
 
 const AddItemForm = () => {
   const [categories, setCategories] = useState([]);
@@ -15,10 +16,18 @@ const AddItemForm = () => {
     price: "",
     invoice_id: "",
     vendor_id: "", // New field added
-    created_by: 101, // Update with required default value
   });
   const [suggestions, setSuggestions] = useState([]);
   const [isExistingItem, setIsExistingItem] = useState(false);
+
+  const router = useRouter();
+  
+    useEffect(() => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        router.push('/login');
+      }
+    }, [router]);
 
   useEffect(() => {
     const fetchCategories = async () => {

@@ -91,7 +91,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
       purchase_request_id: selectedQuotation.id,
       pdf_path: "fake-path.pdf", // Fake path
       approve_status: "pending", // Use selected approve status
-      created_by: 1, // Hardcoded created_by
+  
     };
 
     try {

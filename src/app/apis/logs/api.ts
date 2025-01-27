@@ -47,7 +47,7 @@ export const getLogsByTableNameAndUserId = async (
   currentPage: any,
   pageSize: any
 ) => {
-  const url = `${process.env.NEXT_PUBLIC_GET_LOGS_BY_ACTION}?page=${page}&limit=${limit}&table_name=${encodeURIComponent(table_name)}&id=${encodeURIComponent(id)}`;
+  const url = `${process.env.NEXT_PUBLIC_GET_LOGS_BY_TABLENAME_AND_USER_ID}?page=${page}&limit=${limit}&table_name=${encodeURIComponent(table_name)}&id=${encodeURIComponent(id)}`;
   console.log(url);
   try {
     const response = await api.get(url);
@@ -91,7 +91,7 @@ export const getLogsByDate = async (
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_GET_ALL_LOGS_BY_DATE;
-  const url = `${baseUrl}/${date}?page=${page}&limit=${limit}`;
+  const url = `${baseUrl}${date}?page=${page}&limit=${limit}`;
 
   console.log("Request URL:", url);
 
@@ -121,7 +121,7 @@ export const getLogsByTableAndDate = async (
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_GET_LOGS_BY_TABLE_NAME_AND_DATE;
-  const url = `${baseUrl}/${date}?page=${page}&limit=${limit}&table_name=${encodeURIComponent(tableName)}`;
+  const url = `${baseUrl}${date}?page=${page}&limit=${limit}&table_name=${encodeURIComponent(tableName)}`;
 
   console.log("Request URL:", url);
 

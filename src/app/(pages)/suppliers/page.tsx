@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { deleteVendor, getVendorId, getVendors, postVendor, updateVendor } from "@/app/apis/supplier/api"; // Import API methods
 import { Plus, Edit, Trash2, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type Supplier = {
   id: string; // Use vendor_id as string
@@ -20,6 +21,15 @@ export default function SuppliersPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const router = useRouter();
+  
+    useEffect(() => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        router.push('/login');
+      }
+    }, [router]);
 
   const pageSize = 10;
 
@@ -84,7 +94,6 @@ export default function SuppliersPage() {
         shop_name: form.shopName || "",
         shop_address: form.shopAddress || "",
         telephone_number: form.telephoneNumber || "",
-        created_by: 1, // Adjust as necessary
       };
   
       if (editingId) {

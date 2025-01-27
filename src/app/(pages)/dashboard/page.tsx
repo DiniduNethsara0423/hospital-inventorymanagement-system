@@ -1,12 +1,23 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Box, TrendingUp, DollarSign, Truck, CheckCircle, AlertTriangle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function InventoryPage() {
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+      router.push('/login');
+    }
+  }, [router]);
+  
   const purchasesData = {
     labels: ['Delivering', 'Delivered', 'Returns', 'Overdue Shipping'],
     datasets: [

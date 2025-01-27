@@ -133,3 +133,18 @@ export const fetchAllUsers = async () => {
     throw error;
   }
 };
+
+
+export const assignPermission = async (payload: {
+    roleId: number | null;
+    permissionId: number | null;
+    validUntil: string | null;
+  }) => {
+    try {
+      const response = await api.post("http://localhost:3100/permissions/assign", payload);
+      return response;
+    } catch (error) {
+      console.error("Error in assigning permission:", error);
+      throw error;
+    }
+  };

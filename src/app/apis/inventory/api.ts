@@ -1,16 +1,18 @@
 import axios from "axios";
+import api from "../api";
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_GET_ALL_ITEMS, // Ensure this is defined in `.env.development`
 });
 
 export const getAllItems = async (page: number, pageSize: number) => {
+  const url:any = process.env.NEXT_PUBLIC_GET_ALL_ITEMS
   try {
-    const response = await apiClient.get(`/items`, {
+    const response = await api.get(url, {
       params: { page, pageSize },
     });
     return response.data;
-  } catch (error) {
+  } catch (error:any) {
     console.error("Error fetching items:", error);
     throw error;
   }
@@ -18,10 +20,11 @@ export const getAllItems = async (page: number, pageSize: number) => {
 
 // Fetch all categories
 export const getAllCategories = async () => {
+  const url:any = process.env.NEXT_PUBLIC_GET_ALL_CATEGORIES
     try {
-      const response = await apiClient.get("/category/all");
+      const response = await api.get(url);
       return response.data;
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error fetching categories:", error);
       throw error;
     }
@@ -29,8 +32,9 @@ export const getAllCategories = async () => {
   
   // Fetch suggestions based on name and category ID
   export const getSuggestions = async (name: string, categoryId: number) => {
+    const url:any = process.env.NEXT_PUBLIC_GET_ITEM_SUGGESIONS
     try {
-      const response = await apiClient.get("/items/filter-existing", {
+      const response = await apiClient.get(url, {
         params: { name, categoryId },
       });
       return response.data;
@@ -42,8 +46,9 @@ export const getAllCategories = async () => {
   
   // Add a new item
   export const addNewItem = async (itemData: any) => {
+    const url:any = process.env.NEXT_PUBLIC_ADD_ITEMS
     try {
-      const response = await apiClient.post("/items/add-items", itemData);
+      const response = await api.post(url, itemData);
       return response.data;
     } catch (error) {
       console.error("Error adding item:", error);
@@ -76,7 +81,7 @@ export const deleteItem = async (id:any)=>{
 }
 
 export const getAllItemDetails = async (page: number, pageSize: number) => {
-  const response = await apiClient.get(`/items/item-details/get-all-item-details?page=${page}&pageSize=${pageSize}`);
+  const response = await apiClient.get(`/item-details/get-all-item-details?page=${page}&pageSize=${pageSize}`);
   return response.data;
 };
 
@@ -107,3 +112,4 @@ export const getBarcode = async () => {
   const response = await axios.get("http://localhost:3100/items/get-item-department-barcode/barcode");
   return response;
 };
+

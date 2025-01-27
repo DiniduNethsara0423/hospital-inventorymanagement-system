@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { FiEdit, FiTrash } from "react-icons/fi";
 import { getCategory, postCategory, updateCategory, deleteCategory } from "@/app/apis/add-category/api";
 import { Search, Edit, Trash2, Plus, ChevronLeft, ChevronRight } from "lucide-react"; // Lucide React icons
+import { useRouter } from "next/navigation";
 interface Category {
   id: number;
   category_name: string;
@@ -17,6 +18,15 @@ const CategoriesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [totalCategories, setTotalCategories] = useState<number>(0);
   const [newCategory, setNewCategory] = useState({ category_name: "" });
+
+  const router = useRouter();
+  
+    useEffect(() => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        router.push('/login');
+      }
+    }, [router]);
 
   const fetchCategories = async () => {
     try {

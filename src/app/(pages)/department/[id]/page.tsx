@@ -27,6 +27,13 @@ const DepartmentDetailPage = ({ params }:any ) => {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [removingQty, setRemovingQty] = useState(0);
   const [reason, setReason] = useState("");
+  
+    useEffect(() => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        router.push('/login');
+      }
+    }, [router]);
 
   const fetchDepartmentDetails = async () => {
     setLoading(true);

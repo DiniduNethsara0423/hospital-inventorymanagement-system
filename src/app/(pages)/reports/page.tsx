@@ -5,6 +5,7 @@ import { DateRangePicker } from "react-date-range";
 import { downloadReport, fetchInventoryData } from "@/app/apis/reports/api"; // Adjust path
 import "react-date-range/dist/styles.css"; // Main style file for DateRangePicker
 import "react-date-range/dist/theme/default.css"; // Default theme
+import { useRouter } from "next/navigation";
 
 interface InventoryItem {
   barcode: string;
@@ -28,6 +29,15 @@ const Page: React.FC = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [inventoryData, setInventoryData] = useState<InventoryItem[]>([]);
+
+  const router = useRouter();
+  
+    useEffect(() => {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        router.push('/login');
+      }
+    }, [router]);
 
   const handleDateRangeSelect = (ranges: any) => {
     const { startDate, endDate } = ranges.selection;
