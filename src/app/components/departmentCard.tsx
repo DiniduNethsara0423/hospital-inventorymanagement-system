@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import departmentImg from "@/app/images/department.jpg";
+import departmentImg from "@/app/images/departmentImg.jpg";
 
 interface DepartmentCardProps {
   department: { id: number; name: string; imageUrl?: string };

@@ -9,14 +9,11 @@ export const login = async (credentials: { username: string; password: string })
     try {
       const response = await api.post(`${url}`, credentials);
       const token = response.data.access_token;
-      console.log(response.data.access_token);
   
       localStorage.setItem('jwtToken', token);
   
-      console.log('Login successful!');
       return { token, status: response.status }; // Return the token and status
     } catch (error: any) {
-      console.error('Login failed:', error);
       throw new Error(error.response?.data?.message || 'Login failed'); // Throw a detailed error
     }
   };

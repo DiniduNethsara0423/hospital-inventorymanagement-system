@@ -84,7 +84,7 @@ export const QuotationList: React.FC<QuotationListProps> = ({
 
   return (
     <div className="col-span-2 bg-white p-6 rounded-lg border">
-      <h2 className="text-xl font-bold text-blue-900 mb-4">Quotations</h2>
+      <h2 className="text-xl font-bold text-gray-900 mb-4">Quotations</h2>
 
       {error && <p className="text-red-500">{error}</p>}
       {isLoading ? (
@@ -99,7 +99,7 @@ export const QuotationList: React.FC<QuotationListProps> = ({
             onClick={() => setSelectedQuotation(quotation)}
           >
             <div>
-              <h3 className="font-bold text-lg text-blue-800">
+              <h3 className="font-bold text-lg text-blue-900">
                 {quotation.name}
               </h3>
               <p className="text-gray-600">

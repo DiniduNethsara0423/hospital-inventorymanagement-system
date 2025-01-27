@@ -34,7 +34,7 @@ function LoginPage() {
         setError('Unexpected response from the server. Please try again.');
       }
     } catch (err: any) {
-      setError(err.message || 'Invalid login credentials');
+      setError('Invalid login credentials');
     } finally {
       setIsLoading(false);
     }

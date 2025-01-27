@@ -61,7 +61,7 @@ export const QuotationForm: React.FC<QuotationFormProps> = ({ setQuotations }) =
 
   return (
     <div className="bg-white p-6 rounded-lg border">
-      <h2 className="text-xl font-bold text-blue-900 mb-4">Add Purchase Requests</h2>
+      <h2 className="text-xl font-bold text-gray-900 mb-4">Add Purchase Requests</h2>
       <textarea
         placeholder="Detailed Description"
         value={newDescription}
@@ -79,7 +79,7 @@ export const QuotationForm: React.FC<QuotationFormProps> = ({ setQuotations }) =
       />
       <button
         onClick={handleAddQuotation}
-        className={`w-full bg-blue-500 text-white py-3 rounded-lg font-bold hover:bg-blue-600 ${
+        className={`w-full bg-gray-700 text-white py-3 rounded-lg font-bold hover:bg-gray-800 ${
           isLoading ? "opacity-50 cursor-not-allowed" : ""
         }`}
         disabled={isLoading}

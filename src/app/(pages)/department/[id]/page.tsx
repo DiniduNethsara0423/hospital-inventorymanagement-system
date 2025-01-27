@@ -2,22 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { updateDepartment, deleteDepartment, getDepartmentById, removeItemFromDepartment,  } from "@/app/apis/department/api";
+import { updateDepartment, deleteDepartment, getDepartmentById, removeItemFromDepartment, } from "@/app/apis/department/api";
 import { Trash2, Edit } from "lucide-react";
 import React from "react";
 
-// type DepartmentDetailPageProps = {
-//   params: {
-//     id: string;
-//   };
-// };
+const DepartmentDetailPage = ({ params }: any) => {
 
-const DepartmentDetailPage = ({ params }:any ) => {
-  // const id = parseInt(params.id, 10); 
-  
   const [name, setName] = useState("Sample Department");
   const [isEditing, setIsEditing] = useState(false);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<any[]>([]);
   const router = useRouter();
@@ -27,13 +19,13 @@ const DepartmentDetailPage = ({ params }:any ) => {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [removingQty, setRemovingQty] = useState(0);
   const [reason, setReason] = useState("");
-  
-    useEffect(() => {
-      const token = localStorage.getItem('jwtToken');
-      if (!token) {
-        router.push('/login');
-      }
-    }, [router]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+      router.push('/login');
+    }
+  }, [router]);
 
   const fetchDepartmentDetails = async () => {
     setLoading(true);
@@ -132,18 +124,19 @@ const DepartmentDetailPage = ({ params }:any ) => {
       {/* Top Buttons */}
       <div className="flex justify-end space-x-4 mb-8">
         <button
-          className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-500"
+          className="text-blue-600 hover:text-blue-500"
           onClick={() => setIsEditing(true)}
         >
-          Edit
+          <Edit size={24} />
         </button>
         <button
-          className="bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-500"
+          className="text-red-500 hover:text-red-600"
           onClick={handleDelete}
         >
-          Delete
+          <Trash2 size={24} />
         </button>
       </div>
+
 
       {/* Main Content */}
       <div className="bg-white rounded-lg p-6">
@@ -193,25 +186,37 @@ const DepartmentDetailPage = ({ params }:any ) => {
             </tr>
           </thead>
           <tbody>
-            {items.map((item, index) => (
-              <tr key={index} className="border-t hover:bg-gray-100">
-                <td className="border px-4 py-2">{item.ITEM_DEPARTMENT_BARCODE}</td>
-                <td className="border px-4 py-2">{item.ITEM_NAME}</td>
-                <td className="border px-4 py-2">{item.QTY}</td>
-                <td className="border px-4 py-2 flex space-x-4">
-                  <button
-                    className="text-red-500 hover:text-red-700"
-                    onClick={() => {
-                      setSelectedItem(item);
-                      setIsModalOpen(true);
-                    }}
-                  >
-                    <Trash2 size={20} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+  {items.length === 0 ? (
+    <tr>
+      <td
+        colSpan={4}
+        className="text-center py-4 text-gray-500 italic"
+      >
+        No data to show
+      </td>
+    </tr>
+  ) : (
+    items.map((item, index) => (
+      <tr key={index} className="border-t hover:bg-gray-100">
+        <td className="border px-4 py-2">{item.ITEM_DEPARTMENT_BARCODE}</td>
+        <td className="border px-4 py-2">{item.ITEM_NAME}</td>
+        <td className="border px-4 py-2">{item.QTY}</td>
+        <td className="border px-4 py-2 flex space-x-4">
+          <button
+            className="text-red-500 hover:text-red-700"
+            onClick={() => {
+              setSelectedItem(item);
+              setIsModalOpen(true);
+            }}
+          >
+            <Trash2 size={20} />
+          </button>
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
+
         </table>
       </div>
 
@@ -229,7 +234,7 @@ const DepartmentDetailPage = ({ params }:any ) => {
                 type="number"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1"
                 value={removingQty}
-                onChange={(e) => setRemovingQty(parseInt(e.target.value) )}
+                onChange={(e) => setRemovingQty(parseInt(e.target.value))}
                 min={1}
               />
             </label>

@@ -31,6 +31,8 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [quotationList, setQuotationList] = useState<any[]>([]);
   const [isPurchaseCompleted, setIsPurchaseCompleted] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+
 
 
   // Generate Purchase Request ID
@@ -72,7 +74,6 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
   }, [selectedQuotation.id]);
 
 
-  const [approveStatus, setApproveStatus] = useState("pending"); // State for approval status
 
   const handleSubmit = async () => {
     if (!selectedSupplier || !totalValue || !pdfFile) {
@@ -91,7 +92,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
       purchase_request_id: selectedQuotation.id,
       pdf_path: "fake-path.pdf", // Fake path
       approve_status: "pending", // Use selected approve status
-  
+
     };
 
     try {
@@ -268,79 +269,88 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
             />
           </div>
           {/* Approve Status */}
-          
+
         </div>
 
 
         <div className="space-y-4">
-  <div className="flex items-center space-x-4">
-    <label
-      htmlFor="upload-pdf"
-      className="block text-sm font-medium text-gray-800"
-    >
-      Upload PDF
-    </label>
-    <div className="relative">
-      <input
-        id="upload-pdf"
-        type="file"
-        accept="application/pdf"
-        onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
-        className="hidden"
-      />
-      <label
-        htmlFor="upload-pdf"
-        className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 cursor-pointer hover:bg-gray-100 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
-      >
-        Select File
-      </label>
-    </div>
-  </div>
+          <div className="flex items-center space-x-4">
+            <label
+              htmlFor="upload-pdf"
+              className="block text-sm font-medium text-gray-800"
+            >
+              Upload PDF
+            </label>
+            <div className="relative">
+              <input
+                id="upload-pdf"
+                type="file"
+                accept="application/pdf"
+                onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
+                className="hidden"
+              />
+              <label
+                htmlFor="upload-pdf"
+                className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 cursor-pointer hover:bg-gray-100 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+              >
+                Select File
+              </label>
+            </div>
+          </div>
 
-  {/* Show the selected file */}
-  {pdfFile && (
-    <div className="flex items-center space-x-2 text-sm text-gray-600">
-      <span>Selected File:</span>
-      <span className="font-medium text-gray-800">{pdfFile.name}</span>
-    </div>
-  )}
+          {/* Show the selected file */}
+          {pdfFile && (
+            <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <span>Selected File:</span>
+              <span className="font-medium text-gray-800">{pdfFile.name}</span>
+            </div>
+          )}
 
-  <button
-    onClick={handleSubmit}
-    disabled={loading}
-    className={`px-4 py-2 rounded-md border bg-gray-700 text-sm font-medium text-white ${loading
-      ? "bg-gray-200 text-gray-800 cursor-not-allowed"
-      : "bg-gray-100 text-gray-900 hover:bg-gray-800"
-      }`}
-  >
-    Submit Quotation
-  </button>
-</div>
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className={`px-4 py-2 rounded-md border bg-gray-700 text-sm font-medium text-white ${loading
+              ? "bg-gray-200 text-gray-800 cursor-not-allowed"
+              : "bg-gray-100 text-gray-900 hover:bg-gray-800"
+              }`}
+          >
+            Submit Quotation
+          </button>
+        </div>
 
 
         <div className="space-y-4 mt-8">
           <h3 className="text-lg font-semibold">Uploaded Quotations</h3>
           <ul className="space-y-2">
-            {quotationList.map((quotation) => (
-              <li
-                key={quotation.quotation_id}
-                className={`flex items-center justify-between p-2 border ${selectedPDF === quotation.quotation_id ? "bg-blue-50" : ""
-                  }`}
-              >
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="selected-pdf"
-                    checked={selectedPDF === quotation.quotation_id}
-                    onChange={() => setSelectedPDF(quotation.quotation_id)}
-                  />
-                  <span>{quotation.pdf_path}</span>
-                </label>
-                {quotation.approve_status === "approved" && (
-                  <CheckCircle className="text-green-500" />
-                )}
-              </li>
-            ))}
+            <ul className="space-y-2">
+              {quotationList.map((quotation) => (
+                <li
+                  key={quotation.quotation_id}
+                  className={`flex items-center justify-between p-2 border ${selectedPDF === quotation.quotation_id ? "bg-blue-50" : ""
+                    }`}
+                >
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="selected-pdf"
+                      checked={selectedPDF === quotation.quotation_id}
+                      onChange={() => setSelectedPDF(quotation.quotation_id)}
+                    />
+                    <span>{quotation.pdf_path}</span>
+                  </label>
+                  {quotation.approve_status === "approved" && (
+                    <CheckCircle className="text-green-500" />
+                  )}
+                  <button
+                    onClick={() => setPdfPreviewUrl(quotation.pdf_path)}
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    View
+                  </button>
+                </li>
+              ))}
+            </ul>
+
           </ul>
 
           <button
@@ -359,6 +369,25 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
               A purchase has already been confirmed for this request.
             </p>
           )}
+
+          {pdfPreviewUrl && (
+            <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg w-full max-w-4xl p-4 relative">
+                <button
+                  onClick={() => setPdfPreviewUrl(null)}
+                  className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+                >
+                  <X />
+                </button>
+                <iframe
+                  src={pdfPreviewUrl}
+                  className="w-full h-[600px] border rounded"
+                  title="PDF Preview"
+                ></iframe>
+              </div>
+            </div>
+          )}
+
 
         </div>
       </div>
