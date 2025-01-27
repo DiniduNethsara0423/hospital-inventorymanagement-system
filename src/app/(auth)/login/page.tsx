@@ -127,14 +127,6 @@ function LoginPage() {
             </div>
           </form>
 
-          <div className="text-center mt-4">
-            <p className="text-sm text-gray-600">
-              Don’t have an account?{' '}
-              <Link href="./signup" className="text-[#1837DB] hover:underline">
-                Create an account
-              </Link>
-            </p>
-          </div>
         </div>
       </div>
 
