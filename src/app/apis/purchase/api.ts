@@ -1,20 +1,9 @@
-import axios from "axios";
+import api from "../api";
 
-// Set up the base URL from the environment variable
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-// Create an Axios instance with default configurations
-const API = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-// Add Purchase Request
 export const addPurchaseRequest = async (data:any) => {
   try {
-    const response = await API.post(
+    const response = await api.post(
       process.env.NEXT_PUBLIC_ADD_PURCHASE_REQUEST!,
       data
     );
@@ -35,7 +24,7 @@ export const addPurchaseRequest = async (data:any) => {
 export const getPurchaseRequest = async (page = 1, limit = 10) => {
   const url = `${process.env.NEXT_PUBLIC_GET_ALL_PURCHASE_REQUEST}?page=${page}&limit=${limit}`;
   try {
-    const response = await API.get(url);
+    const response = await api.get(url);
     console.log(response.data);
     return response.data;
   } catch (error: any) {
@@ -49,8 +38,9 @@ export const getPurchaseRequest = async (page = 1, limit = 10) => {
 
 
 export const fetchSuppliers = async (page: number, pageSize: number) => {
+  const url:any = process.env.NEXT_PUBLIC_GET_VENDOR
   try {
-    const response = await axios.get(`http://localhost:3100/vendors`, {
+    const response = await api.get(url, {
       params: { page, pageSize },
     });
 
@@ -66,8 +56,9 @@ export const fetchSuppliers = async (page: number, pageSize: number) => {
 };
 
 export const addQuotation = async (data: any) => {
+  const url:any = process.env.NEXT_PUBLIC_ADD_QUOTATION
     try {
-      const response = await axios.post("http://localhost:3100/quotation", data);
+      const response = await api.post(url, data);
       return response.data;
     } catch (error) {
       console.error("Error adding quotation:", error);
@@ -81,7 +72,7 @@ export const addQuotation = async (data: any) => {
     formData.append("file", pdfFile);
   
     try {
-      const response = await axios.patch(
+      const response = await api.patch(
         `${process.env.NEXT_PUBLIC_ADD_PDF_TO_INVOICE}?fType=quotation&id=${quotationId}`,
         formData,
         {
@@ -103,8 +94,9 @@ export const addQuotation = async (data: any) => {
 
 
   export const fetchQuotationsByPurchaseRequestId = async (purchaseRequestId: string) => {
+    const url:any = process.env.NEXT_PUBLIC_GET_QUOTATIONS_BY_PR_ID
     try {
-      const response = await axios.get(`http://localhost:3100/quotation/get-quotations-by-pr-id/${purchaseRequestId}`);
+      const response = await api.get(`${url}${purchaseRequestId}`);
       return response.data; // Assuming the API returns the data in the response body
     } catch (error) {
       console.error("Error fetching quotations by purchase request ID:", error);
@@ -119,21 +111,24 @@ export const addQuotation = async (data: any) => {
     pdf_path: string;
     quotation_id: string;
   }) => {
-    const response = await axios.post("http://localhost:3100/purchases", purchaseData);
+    const url:any = process.env.NEXT_PUBLIC_GET_ALL_PURCHASES
+    const response = await api.post(url, purchaseData);
     return response.data;
   };
 
 
   // Delete a purchase request
 export const deletePurchaseRequest = async (requestId: string) => {
-  const response = await axios.delete(`http://localhost:3100/purchase-orders/${requestId}`);
+  const url:any = process.env.NEXT_PUBLIC_DELETE_PURCHASE_REQUESTS
+  const response = await api.delete(`${url}${requestId}`);
   return response.data; // Assuming API responds with some acknowledgment or updated data
 };
 
 export const updateQuotationStatus = async (quotationId: string, data: any) => {
+  const url:any = process.env.NEXT_PUBLIC_UPDATE_QUOTATION_STATUS
   try {
-    const response = await axios.patch(
-      `http://localhost:3100/quotation/update/${quotationId}`,
+    const response = await api.patch(
+      `${url}${quotationId}`,
       data
     );
     return response.data;

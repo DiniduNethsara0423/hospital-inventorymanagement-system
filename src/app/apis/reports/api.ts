@@ -4,9 +4,10 @@ const API_BASE_URL = "http://localhost:3100";
 
 // Function to fetch and download the report based on the date range
 export const downloadReport = async (startDate: string, endDate: string) => {
+  const apiurl:any = process.env.NEXT_PUBLIC_DOWNLOAD_REPORTS
   try {
     const response = await api.get(
-      `${API_BASE_URL}/report/item-details`,
+      `${apiurl}`,
       {
         params: { startDate, endDate },
         responseType: "blob", // Ensures we handle file download
@@ -35,6 +36,7 @@ export const downloadReport = async (startDate: string, endDate: string) => {
 };
 
 export const fetchInventoryData = async () => {
-  const response = await api.get(`${API_BASE_URL}/report/get-items`);
+  const url:any = process.env.NEXT_PUBLIC_GET_REPORTS
+  const response = await api.get(`${url}`);
   return response.data;
 };
