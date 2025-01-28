@@ -1,8 +1,8 @@
 import api from "../api";
-const BASE_URL = "http://localhost:3100";
 
 export const getVendors = async (page: number, pageSize: number) => {
-  const response = await api.get(`${BASE_URL}/vendors`, {
+  const url:any = process.env.NEXT_PUBLIC_GET_VENDOR
+  const response = await api.get(`${url}`, {
     params: { page, pageSize },
   });
   return response.data;
@@ -16,23 +16,32 @@ export const postVendor = async (vendor: {
   telephone_number?: string;
   email?: string;
 }) => {
-  const response = await api.post(`${BASE_URL}/vendors`, vendor);
+
+  const url:any = process.env.NEXT_PUBLIC_ADD_VENDOR
+  const response = await api.post(`${url}`, vendor);
   return response.data;
 };
 
 
 export const getVendorId = async () => {
-  const response = await api.get(`${BASE_URL}/vendors/vendorId/get`);
-  return response.data; // Assuming the response contains { vendorId: "generated_id" }
+
+  const url: any = process.env.NEXT_PUBLIC_GET_VENDOR_ID
+  console.log(url)
+
+  const response = await api.get(`${url}`);
+  return response.data;
 };
 
 export const updateVendor = (vendorId: string, updatedData: any) => {
-  return api.patch(`${BASE_URL}/vendors/${vendorId}`, updatedData);
+  const url: any = process.env.NEXT_PUBLIC_UPDATE_VENDOR
+
+  return api.patch(`${url}${vendorId}`, updatedData);
 };
 
 export const deleteVendor = async (vendorId: string) => {
+  const url: any = process.env.NEXT_PUBLIC_DELETE_VENDOR
   try {
-    const response = await api.post(`${BASE_URL}/vendors/${vendorId}`);
+    const response = await api.post(`${url}${vendorId}`);
     return response.data; // or any response that the API returns
   } catch (error) {
     console.error("Error deleting vendor:", error);
