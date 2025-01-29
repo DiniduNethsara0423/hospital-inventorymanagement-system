@@ -380,7 +380,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
                   <X />
                 </button>
                 <iframe
-                  src={pdfPreviewUrl}
+                  src={`http://localhost:3100/${pdfPreviewUrl}`}
                   className="w-full h-[600px] border rounded"
                   title="PDF Preview"
                 ></iframe>
