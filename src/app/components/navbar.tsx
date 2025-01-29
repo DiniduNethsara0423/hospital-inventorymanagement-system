@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   LucideHome,
   LucideBox,
@@ -13,7 +13,8 @@ import {
   LucidePlus,
   LucideSearch,
   LucideBook,
-  CirclePlus
+  CirclePlus,
+  UserRound
   
 } from 'lucide-react';
 import Link from 'next/link';
@@ -21,14 +22,40 @@ import SearchBar from './SearchBar';
 import { useRouter } from 'next/navigation';
 
 const SidebarNavbar = () => {
+  const router = useRouter()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const router = useRouter();
+  const [roleId, setRoleId] = useState<number | null>(null);
 
-  const handleLogout = () => {
-    localStorage.removeItem('jwtToken');
-    
-    router.push('/login');
-  };
+  useEffect(() => {
+    const token = localStorage.getItem('jwtToken');
+    if (token) {
+      const decoded = parseJwt(token);
+      if (decoded && decoded.roleId) {
+        setRoleId(decoded.roleId); // Set role ID from decoded token
+      } else {
+        console.error('Failed to extract roleId from token');
+      }
+    }
+  }, []);
+
+  console.log(roleId)
+  // Define which items to show based on roleId
+  const navItems = [
+    { href: '/dashboard', Icon: LucideHome, label: 'Dashboard' },
+    { href: '/inventory', Icon: LucideBox, label: 'Inventory' },
+    ...(roleId !== 3 ? [{ href: '/reports', Icon: LucideClipboardList, label: 'Reports' }] : []),
+    { href: '/purchase', Icon: LucideShoppingCart, label: 'Quatations' },
+    { href: '/suppliers', Icon: LucideTruck, label: 'Suppliers' },
+    { href: '/orders', Icon: LucideClipboardList, label: 'Invoice' },
+    { href: '/department', Icon: LucideBuilding, label: 'Department' },
+    ...(roleId === 1 ? [{ href: '/user-management', Icon: LucideUsers, label: 'User Management' }] : []),
+    { href: '/add-to-department', Icon: CirclePlus, label: 'Add Items to Department' },
+  ];
+
+  const bottomNavItems = [
+    { href: '/settings', Icon: LucideSettings, label: 'Categories' },
+    ...(roleId !== 3 ? [{ href: '/logs', Icon: LucideBook, label: 'Logs' }] : []),
+  ];
 
   return (
     <div className="flex">
@@ -41,21 +68,16 @@ const SidebarNavbar = () => {
         <div className="flex flex-col justify-between h-full px-3 pb-4 overflow-y-auto">
           {/* Top Section */}
           <ul className="space-y-2 font-medium mt-6">
-            <SidebarItem href="/dashboard" Icon={LucideHome} label="Dashboard" />
-            <SidebarItem href="/inventory" Icon={LucideBox} label="Inventory" />
-            <SidebarItem href="/reports" Icon={LucideClipboardList} label="Reports" />
-            <SidebarItem href="/purchase" Icon={LucideShoppingCart} label="Quatations" />
-            <SidebarItem href="/suppliers" Icon={LucideTruck} label="Suppliers" />
-            <SidebarItem href="/orders" Icon={LucideClipboardList} label="Invoice" />
-            <SidebarItem href="/department" Icon={LucideBuilding} label="Department" />
-            <SidebarItem href="/user-management" Icon={LucideUsers} label="User Management" />
-            <SidebarItem href="/add-to-department" Icon={CirclePlus} label="Add Items to Department" />
+            {navItems.map(({ href, Icon, label }) => (
+              <SidebarItem key={href} href={href} Icon={Icon} label={label} />
+            ))}
           </ul>
 
           {/* Bottom Section */}
           <ul className="space-y-2 font-medium">
-            <SidebarItem href="/settings" Icon={LucideSettings} label="Categories" />
-            <SidebarItem href="/logs" Icon={LucideBook} label="Logs" />
+            {bottomNavItems.map(({ href, Icon, label }) => (
+              <SidebarItem key={href} href={href} Icon={Icon} label={label} />
+            ))}
           </ul>
         </div>
       </aside>
@@ -73,26 +95,25 @@ const SidebarNavbar = () => {
           <h1 className="text-xl font-semibold text-gray-900 ">Hospital Inventory</h1>
 
           {/* Search Bar */}
-          <SearchBar/>
+          <SearchBar />
 
           {/* Profile Section */}
-          <div className="">
-       
           <button
-              onClick={handleLogout}
-              className="block px-4 py-2 text-gray-700 hover:text-gray-800 hover:bg-gray-200 rounded-lg font-semibold"
-            >
-              Log Out
-            </button>
-         
-          </div>
+            onClick={() => {
+              localStorage.removeItem('jwtToken');
+              router.push('/login');
+            }}
+            className="block px-4 py-2 text-gray-700 hover:text-gray-800 hover:bg-gray-200 rounded-lg font-semibold"
+          >
+            Log Out
+          </button>
         </div>
       </nav>
     </div>
   );
 };
 
-const SidebarItem = ({ href, Icon, label }:any) => (
+const SidebarItem = ({ href, Icon, label }: any) => (
   <li>
     <Link
       href={href}
@@ -105,3 +126,20 @@ const SidebarItem = ({ href, Icon, label }:any) => (
 );
 
 export default SidebarNavbar;
+
+function parseJwt(token: string) {
+  try {
+    const base64Url = token.split('.')[1]; // Get the payload part
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // Decode Base64
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((char) => '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Invalid token:', error);
+    return null;
+  }
+}

@@ -1,10 +1,9 @@
-import axios from "axios";
-
+import api from "../api";
 const API_BASE_URL = process.env.NEXT_PUBLIC_GET_ALL_INVOICES;
 
 export const fetchInvoices = async (page: number, limit: number) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}?page=${page}&limit=${limit}`);
+    const response = await api.get(`${API_BASE_URL}?page=${page}&limit=${limit}`);
     return response.data; 
   } catch (error) {
     console.error("Error fetching invoices:", error);
@@ -15,7 +14,7 @@ export const fetchInvoices = async (page: number, limit: number) => {
 export const createInvoice = async (invoiceData:any) => {
   const url:any = process.env.NEXT_PUBLIC_ADD_INVOICES
   try {
-    const response = await axios.post(`${url}`, invoiceData);
+    const response = await api.post(`${url}`, invoiceData);
     return response.data;
   } catch (error) {
     console.error("Error creating invoice:", error);
@@ -29,7 +28,7 @@ export const uploadInvoicePDF = async (invoiceId:any, pdfFile:any) => {
   formData.append("file", pdfFile);
 
   try {
-    const response = await axios.patch(
+    const response = await api.patch(
       `${url}?fType=invoice&id=${invoiceId}`,
       formData,
       {
@@ -61,23 +60,19 @@ export const uploadInvoicePDF = async (invoiceId:any, pdfFile:any) => {
 
 export const fetchQuotations = async (page:any, pageSize:any) => {
   const url:any = process.env.NEXT_PUBLIC_GET_ALL_QUOtATIONS
-  try {
-    const response = await fetch(`${url}?page=${page}&pageSize=${pageSize}`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json(); // Parse JSON response
-    return data; // Ensure you return the parsed data
-  } catch (error) {
-    console.error("Error fetching quotations:", error);
-    throw error; // Rethrow the error so it can be caught in the component
+    try {
+    const response = await api.get(`${url}?page=${page}&pageSize=${pageSize}`);
+    return response.data; 
+  } catch (error: any) {
+    console.error("Error fetching quotations:", error?.response || error);
+    throw error; 
   }
 };
 
 export const fetchPurchases = async (page: number, pageSize: number) => {
   const url:any = process.env.NEXT_PUBLIC_GET_ALL_PURCHASES
   try {
-    const response = await axios.get(`${url}?page=${page}&pageSize=${pageSize}`);
+    const response = await api.get(`${url}?page=${page}&pageSize=${pageSize}`);
     return response.data; // Ensure the response returns `{ rows, count }`
   } catch (error) {
     console.error("Failed to fetch purchases:", error);
@@ -88,7 +83,7 @@ export const fetchPurchases = async (page: number, pageSize: number) => {
 export const generateInvoiceId = async (): Promise<string> => {
   const url:any = process.env.NEXT_PUBLIC_GENERATE_INVOICE_ID
   try {
-    const response = await axios.get(`${url}`);
+    const response = await api.get(`${url}`);
     return response.data; 
   } catch (error) {
     console.error("Failed to generate invoice ID:", error);
@@ -97,8 +92,9 @@ export const generateInvoiceId = async (): Promise<string> => {
 };
 
 export const deleteInvoice = async (invoiceId: string) => {
+  const url:any = process.env.NEXT_PUBLIC_ADD_INVOICES
   try {
-    const response = await axios.post(`http://localhost:3100/invoices/${invoiceId}`);
+    const response = await api.post(`${url}${invoiceId}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting invoice:", error);

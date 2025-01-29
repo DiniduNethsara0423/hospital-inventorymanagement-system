@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { getAllItemDetails, deleteItemDetail, updateItemDetail } from "@/app/apis/inventory/api";
 import { Edit, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import Notificationpop from "./Notificationpop";
 
 interface ItemDetails {
   id: number;
@@ -19,7 +20,9 @@ interface ItemDetailsProps {
   currentPage: number;
   itemsPerPage: number;
   onTotalItemsChange: (total: number) => void;
-}
+}`
+
+`
 
 const ItemDetails: React.FC<ItemDetailsProps> = ({ currentPage, itemsPerPage, onTotalItemsChange }) => {
   const [itemDetails, setItemDetails]:any = useState<ItemDetails[]>([]);
@@ -30,6 +33,10 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ currentPage, itemsPerPage, on
   const [totalItems, setTotalItems] = useState(0); // For total items count
     const [current, setCurrent] = useState(currentPage); // Current page state
     const [pageSize, setPageSize] = useState(itemsPerPage); // Page size state
+
+    const [notification, setNotification] = useState<string | null>(null);
+const [notificationType, setNotificationType] = useState<"success" | "warning" | null>(null);
+
 
   useEffect(() => {
     const fetchItemDetails = async () => {
@@ -85,44 +92,70 @@ const ItemDetails: React.FC<ItemDetailsProps> = ({ currentPage, itemsPerPage, on
   
   const handleUpdate = async () => {
     if (!editingItem) return;
-
+  
     const { price, removed_qty = 0 } = editingItem;
-
+  
     if (removed_qty <= 0 || removed_qty > editingItem.qty) {
-      alert("Invalid removed quantity entered.");
+      setNotification("Invalid removed quantity entered.");
+      setNotificationType("warning");
       return;
     }
-
+  
     const updatedQty = editingItem.qty - removed_qty;
-
+  
     const updatedData = {
       ...editingItem,
       price: parseFloat(price),
       removed_qty,
       qty: updatedQty,
     };
-
+  
     // Remove unwanted fields
     const { maintance_date, created_at, updated_at, ...dataToSend } = updatedData;
-
+  
     try {
-      await updateItemDetail(editingItem.id, dataToSend);
-      setItemDetails((prev:any) =>
-        prev.map((item:any) => (item.id === editingItem.id ? { ...item, ...dataToSend } : item))
+      const response = await updateItemDetail(editingItem.id, dataToSend);
+  
+      if (response.msg && response.msg.startsWith("Low Stock Alert")) {
+        setNotification(response.msg);
+        setNotificationType("warning");
+      } else {
+        setNotification("Item updated successfully!");
+        setNotificationType("success");
+      }
+  
+      setItemDetails((prev: any) =>
+        prev.map((item: any) => (item.id === editingItem.id ? { ...item, ...dataToSend } : item))
       );
       setEditingItem(null);
       setIsModalOpen(false);
+  
+      // Clear the notification after 5 seconds
+      setTimeout(() => {
+        setNotification(null);
+        setNotificationType(null);
+      }, 5000);
     } catch (error) {
       console.error("Failed to update item detail:", error);
+      setNotification("Failed to update item detail.");
+      setNotificationType("warning");
     }
   };
+  
 
   
 
   return (
     <div>
 
+
+
 <div className="flex justify-between items-center mb-4">
+
+{notification && notificationType && (
+  <Notificationpop message={notification} type={notificationType} />
+)}
+
         <div>
           <label htmlFor="pageSize" className="mr-2 text-gray-700">
             Items per page:

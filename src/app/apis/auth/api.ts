@@ -1,5 +1,3 @@
-
-
 import axios from 'axios';
 import api from '../api';
 
@@ -137,8 +135,9 @@ export const assignPermission = async (payload: {
     permissionId: number | null;
     validUntil: string | null;
   }) => {
+    const url:any = process.env.NEXT_PUBLIC_ASSIGN_PERMISSIONS
     try {
-      const response = await api.post("http://localhost:3100/permissions/assign", payload);
+      const response = await api.post(url, payload);
       return response;
     } catch (error) {
       console.error("Error in assigning permission:", error);

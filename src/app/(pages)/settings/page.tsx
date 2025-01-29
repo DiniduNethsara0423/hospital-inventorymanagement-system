@@ -36,10 +36,10 @@ const CategoriesPage = () => {
         setFilteredCategories(response.data || []);
         setTotalCategories(response.total || 0);
       } else {
-        console.error("Invalid API response:", response);
+        console.error(response.message);
       }
-    } catch (error) {
-      console.error("Error fetching categories:", error);
+    } catch (error:any) {
+      alert(error.message);
     }
   };
 
@@ -68,7 +68,7 @@ const CategoriesPage = () => {
       setNewCategory({ category_name: "" });
       fetchCategories();
     } catch (error: any) {
-      console.error("Error adding category:", error.message);
+      alert(error.message);
     }
   };
 
@@ -82,7 +82,7 @@ const CategoriesPage = () => {
         setSelectedCategory(null);
         fetchCategories();
       } catch (error: any) {
-        console.error("Error updating category:", error.message);
+        alert(error.message);
       }
     }
   };
@@ -90,10 +90,10 @@ const CategoriesPage = () => {
     try {
       console.log(`Attempting to delete category with ID: ${id}`); // Add logging
       await deleteCategory(id);
-      console.log("Category deleted successfully");
+      alert("Category deleted successfully");
       fetchCategories();
     } catch (error: any) {
-      console.error("Error deleting category:", error.response?.data || error.message);
+      alert(error.message);
     }
   };
 

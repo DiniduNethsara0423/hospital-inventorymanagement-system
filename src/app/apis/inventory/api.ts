@@ -34,7 +34,7 @@ export const getAllCategories = async () => {
   export const getSuggestions = async (name: string, categoryId: number) => {
     const url:any = process.env.NEXT_PUBLIC_GET_ITEM_SUGGESIONS
     try {
-      const response = await apiClient.get(url, {
+      const response = await api.get(url, {
         params: { name, categoryId },
       });
       return response.data;
@@ -59,8 +59,9 @@ export const getAllCategories = async () => {
 
 
 export const createNewItem = async (data: Record<string, any>) => {
+  const url:any = process.env.NEXT_PUBLIC_ADD_ITEMS
   try {
-    const response = await apiClient.post("/items/add-items", data);
+    const response = await api.post(url, data);
     return response.data;
   } catch (error) {
     console.error("Error creating new item:", error);
@@ -70,9 +71,9 @@ export const createNewItem = async (data: Record<string, any>) => {
 
 
 export const deleteItem = async (id:any)=>{
-
+const url:any = process.env.NEXT_PUBLIC_DELETE_ITEMS
   try {
-    const response = await apiClient.post(`/items/delete/${id}`);
+    const response = await api.post(`${url}${id}`);
     return response.data;
   } catch (error) {
     console.error("Error deleteing item:", error);
@@ -81,12 +82,14 @@ export const deleteItem = async (id:any)=>{
 }
 
 export const getAllItemDetails = async (page: number, pageSize: number) => {
-  const response = await apiClient.get(`/item-details/get-all-item-details?page=${page}&pageSize=${pageSize}`);
+  const url:any = process.env.NEXT_PUBLIC_GET_ALLITEM_DETAILS
+  const response = await api.get(`${url}?page=${page}&pageSize=${pageSize}`);
   return response.data;
 };
 
 export const deleteItemDetail = async (id:any, removingQty:any) => {
-  const response = await axios.post(`http://localhost:3100/items/remove-item-detail/${id}`, {
+  const url:any = process.env.NEXT_PUBLIC_DELETE_ITEM_DETAILS
+  const response = await api.post(`${url}${id}`, {
     removing_qty: removingQty,
   });
   return response.data;
@@ -94,13 +97,15 @@ export const deleteItemDetail = async (id:any, removingQty:any) => {
 
 // Update item detail
 export const updateItemDetail = async (id:any, updateData:any) => {
-  const response = await axios.patch(`http://localhost:3100/items/item-details/${id}`, updateData);
+  const url:any = process.env.NEXT_PUBLIC_UPDATE_ITEM_DETAILS
+  const response = await api.patch(`${url}${id}`, updateData);
   return response.data;
 };
 
 export const updateItem = async (barcode: string, updatedData: { name: string; lower_quantity: number; category_id: number }) => {
+  const url:any = process.env.NEXT_PUBLIC_GET_ALL_ITEMS
   try {
-    const response = await axios.patch(`http://localhost:3100/items/${barcode}`, updatedData);
+    const response = await api.patch(`${url}/${barcode}`, updatedData);
     return response.data;
   } catch (error) {
     console.error("Error updating item:", error);
@@ -109,7 +114,8 @@ export const updateItem = async (barcode: string, updatedData: { name: string; l
 };
 
 export const getBarcode = async () => {
-  const response = await axios.get("http://localhost:3100/items/get-item-department-barcode/barcode");
+  const url:any = process.env.NEXT_PUBLIC_GENERATE_ITEM_DEPARTMENT_BARCODE
+  const response = await api.get(url);
   return response;
 };
 

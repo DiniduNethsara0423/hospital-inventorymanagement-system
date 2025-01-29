@@ -47,11 +47,11 @@ export const getLogsByTableNameAndUserId = async (
   currentPage: any,
   pageSize: any
 ) => {
-  const url = `${process.env.NEXT_PUBLIC_GET_LOGS_BY_TABLENAME_AND_USER_ID}?page=${page}&limit=${limit}&table_name=${encodeURIComponent(table_name)}&id=${encodeURIComponent(id)}`;
+  const url = `${process.env.NEXT_PUBLIC_GET_LOGS_BY_TABLENAME_AND_USER_ID}${id}?page=${page}&limit=${limit}&table_name=${encodeURIComponent(table_name)}`;
   console.log(url);
   try {
     const response = await api.get(url);
-    console.log(response);
+    console.log(response.data);
     return response.data; // Expected format: { data: Log[], total: number }
   } catch (error: any) {
     console.error("Error fetching logs by table name and user ID:", error);

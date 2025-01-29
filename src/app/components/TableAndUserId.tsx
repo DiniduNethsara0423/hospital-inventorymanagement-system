@@ -45,7 +45,7 @@ const TableAndUserId: React.FC = () => {
             currentPage,
             pageSize
           );
-          const logs = data[selectedTable] || [];
+          const logs = data|| [];
           setTableData(logs);
 
           if (logs.length > 0) {
@@ -104,18 +104,18 @@ const TableAndUserId: React.FC = () => {
             -- Select a Table --
           </option>
           <option value="" disabled>-- Select a Table --</option>
-          <option value="categoryLogs">Category Logs</option>
-          <option value="departmentLogs">Department Logs</option>
-          <option value="invoicesLogs">Invoices Logs</option>
-          <option value="itemDepartmentsLogs">Item Departments Logs</option>
-          <option value="itemDetailsLogs">Item Details Logs</option>
-          <option value="itemsLogs">Items Logs</option>
-          <option value="purchaseRequestLogs">Purchase Request Logs</option>
-          <option value="purchasesLogs">Purchases Logs</option>
-          <option value="quotationsLogs">Quotations Logs</option>
-          <option value="rolesLogs">Roles Logs</option>
-          <option value="usersLogs">Users Logs</option>
-          <option value="vendorsLogs">Vendors Logs</option>
+          <option value="category_log">Category Logs</option>
+          <option value="department_log">Department Logs</option>
+          <option value="invoices_log">Invoices Logs</option>
+          <option value="item_departments_log">Item Departments Logs</option>
+          <option value="item_details_log">Item Details Logs</option>
+          <option value="items_log">Items Logs</option>
+          <option value="purchase_request_log">Purchase Request Logs</option>
+          <option value="purchases_log">Purchases Logs</option>
+          <option value="quotations_log">Quotations Logs</option>
+          <option value="roles_log">Roles Logs</option>
+          <option value="users_log">Users Logs</option>
+          <option value="vendors_log">Vendors Logs</option>
         </select>
       </div>
 
@@ -158,11 +158,11 @@ const TableAndUserId: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="table-auto w-full border-collapse border border-gray-300">
                 <thead>
-                  <tr>
+                  <tr className="bg-indigo-100">
                     {headers.map((header: any) => (
                       <th
                         key={header}
-                        className="border border-gray-300 px-4 py-2 bg-blue-500 text-white"
+                        className="border border-gray-300 px-4 py-2 text-left font-semibold "
                       >
                         {header.replace(/_/g, " ").toUpperCase()}
                       </th>
