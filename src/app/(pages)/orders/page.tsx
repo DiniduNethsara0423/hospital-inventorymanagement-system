@@ -9,7 +9,7 @@ import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const OrdersPage = () => {
-  const [newInvoice, setNewInvoice]:any = useState({
+  const [newInvoice, setNewInvoice]: any = useState({
     dateRange: null,
     quotationId: "QUOT001",
     purchaseId: 1,
@@ -33,13 +33,13 @@ const OrdersPage = () => {
   const [hasMorePurchases, setHasMorePurchases]: any = useState(true); // Tracks if more data exists
 
   const router = useRouter();
-  
-    useEffect(() => {
-      const token = localStorage.getItem('jwtToken');
-      if (!token) {
-        router.push('/login');
-      }
-    }, [router]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+      router.push('/login');
+    }
+  }, [router]);
 
   useEffect(() => {
     const getInvoices = async () => {
@@ -136,7 +136,7 @@ const OrdersPage = () => {
   const handleGenerateInvoiceId = async () => {
     try {
       const invoiceId = await generateInvoiceId();
-      setNewInvoice((prevState:any) => ({
+      setNewInvoice((prevState: any) => ({
         ...prevState,
         invoiceId: invoiceId,
       }));
@@ -164,6 +164,24 @@ const OrdersPage = () => {
     }
   };
 
+  const viewPdf = (base64String: string) => {
+    // Convert base64 string to a Blob
+    const byteCharacters = atob(base64String);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: "application/pdf" });
+
+    // Create a Blob URL
+    const blobUrl = URL.createObjectURL(blob);
+
+    // Open PDF in a new tab
+    window.open(blobUrl, "_blank");
+  };
+
+
 
   return (
     <div className="p-6 w-full mx-auto mt-10">
@@ -175,7 +193,7 @@ const OrdersPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Select Date Range</label>
             <div
               className="border border-gray-300 px-4 py-2 rounded-lg text-sm cursor-pointer bg-white"
-              onClick={() => setShowDatePicker((prev:any) => !prev)}
+              onClick={() => setShowDatePicker((prev: any) => !prev)}
             >
               {newInvoice.dateRange
                 ? `${newInvoice.dateRange.startDate.toLocaleDateString()} - ${newInvoice.dateRange.endDate.toLocaleDateString()}`
@@ -228,7 +246,7 @@ const OrdersPage = () => {
                 value={newInvoice.purchaseId}
                 onChange={(e) => setNewInvoice({ ...newInvoice, purchaseId: Number(e.target.value) })}
               >
-                {purchases.map((purchase:any) => (
+                {purchases.map((purchase: any) => (
                   <option key={purchase.id} value={purchase.id}>
                     {purchase.id}
                   </option>
@@ -314,17 +332,18 @@ const OrdersPage = () => {
                 <td className="px-6 py-3">{invoice.vendors_id}</td>
                 <td className="px-6 py-3">{invoice.total_value || "0"}</td>
                 <td className="px-6 py-3">
-                  <a
-                    href={`http://localhost:3100/${invoice.pdf_path}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    View PDF
-                  </a>
-
-
+                  {invoice.base64Pdf ? (
+                    <button
+                      onClick={() => viewPdf(invoice.base64Pdf)}
+                      className="text-blue-600 hover:underline"
+                    >
+                      View PDF
+                    </button>
+                  ) : (
+                    <span className="text-gray-500">No PDF</span>
+                  )}
                 </td>
+
 
                 <td className="text-center">
                   <button
@@ -343,7 +362,7 @@ const OrdersPage = () => {
       {/* Pagination */}
       <div className="flex justify-center items-center mt-6 space-x-4">
         <button
-          onClick={() => setCurrentPage((prev:any) => Math.max(prev - 1, 1))}
+          onClick={() => setCurrentPage((prev: any) => Math.max(prev - 1, 1))}
           className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
             } transition`}
           disabled={currentPage === 1}
@@ -354,7 +373,7 @@ const OrdersPage = () => {
           Page {currentPage} of {totalPages}
         </span>
         <button
-          onClick={() => setCurrentPage((prev:any) => (currentPage < totalPages ? prev + 1 : prev))}
+          onClick={() => setCurrentPage((prev: any) => (currentPage < totalPages ? prev + 1 : prev))}
           className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
             } transition`}
           disabled={currentPage === totalPages}

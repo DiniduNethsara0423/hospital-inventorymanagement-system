@@ -20,7 +20,7 @@ const DatePage: React.FC = () => {
         pageSize.toString(),
         selectedDate
       );
-      setLogs(data.logs || []);
+      setLogs(data || []);
       setTotalPages(Math.ceil(data.total / pageSize));
     } catch (error) {
       console.error("Error fetching logs:", error);

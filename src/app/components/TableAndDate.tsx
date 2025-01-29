@@ -30,13 +30,14 @@ const TableAndDate: React.FC = () => {
         selectedDate,
         selectedTable
       );
-      setLogs(data.logs || []);
+      setLogs(data || []);
     } catch (err: any) {
       setError(err.message || "Failed to fetch logs.");
     } finally {
       setLoading(false);
     }
   };
+  console.log(logs)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -105,9 +106,9 @@ const TableAndDate: React.FC = () => {
           <p className="text-center text-red-500">{error}</p>
         ) : logs.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="table-auto w-full border-collapse border border-gray-300 shadow-sm">
+            <table className="table-auto w-full border-collapse border border-gray-300">
               <thead>
-                <tr className="bg-gray-100">
+                <tr className="bg-indigo-100">
                   {Object.keys(logs[0]).map((key) => (
                     <th key={key} className="border border-gray-300 px-4 py-2 text-left font-semibold">
                       {key.replace(/_/g, " ").toUpperCase()}

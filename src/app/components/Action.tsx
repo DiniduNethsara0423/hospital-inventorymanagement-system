@@ -19,7 +19,7 @@ const Action: React.FC = () => {
             pageSize.toString(),
             action
           );
-          setLogs(data.logs || []);
+          setLogs(data || []);
         } catch (error) {
           console.error("Error fetching logs:", error);
           alert("Failed to fetch logs. Please try again later.");
