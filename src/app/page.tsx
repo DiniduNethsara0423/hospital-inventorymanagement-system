@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import Image from 'next/image';
-import loginImg from '@/app/images/login.jpg';
+import loginImg from '@/app/images/logini.jpg';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { login } from '@/app/apis/auth/api';
@@ -119,7 +119,7 @@ function LoginPage() {
             <div>
               <button
                 type="submit"
-                className="bg-[#003BD1] text-white py-3 px-4 rounded-lg w-full shadow-md hover:bg-blue-700"
+                className="bg-gray-800 text-white py-3 px-4 rounded-lg w-full shadow-md hover:bg-gray-900"
                 disabled={isLoading}
               >
                 {isLoading ? 'Logging in...' : 'Login'}

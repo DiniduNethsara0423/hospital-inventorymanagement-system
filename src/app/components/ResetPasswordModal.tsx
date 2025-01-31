@@ -112,7 +112,7 @@ const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
               <button
                 onClick={handleRequestOtp}
                 disabled={isLoading}
-                className="bg-blue-600 text-white py-2 px-4 rounded w-full hover:bg-blue-700"
+                className="bg-gray-700 text-white py-2 px-4 rounded w-full hover:bg-gray-800"
               >
                 {isLoading ? "Requesting OTP..." : "Send OTP"}
               </button>
@@ -134,7 +134,7 @@ const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
               <button
                 onClick={handleVerifyOtp}
                 disabled={isLoading}
-                className="bg-blue-600 text-white py-2 px-4 rounded w-full hover:bg-blue-700"
+                className="bg-gray-700 text-white py-2 px-4 rounded w-full hover:bg-gray-800"
               >
                 {isLoading ? "Verifying OTP..." : "Verify OTP"}
               </button>
@@ -178,7 +178,7 @@ const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({
               <button
                 onClick={handleUpdatePassword}
                 disabled={isLoading}
-                className="bg-blue-600 text-white py-2 px-4 rounded w-full hover:bg-blue-700"
+                className="bg-gray-800 text-white py-2 px-4 rounded w-full hover:bg-gray-900"
               >
                 {isLoading ? "Updating Password..." : "Update Password"}
               </button>
