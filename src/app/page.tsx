@@ -57,7 +57,7 @@ function LoginPage() {
       <div className="flex flex-col justify-center items-center bg-white p-10 md:w-1/2 w-full">
         <div className="w-full max-w-md">
           <div className="text-center mb-6">
-            <h2 className="text-3xl font-bold">Hospital Management System</h2>
+            <h2 className="text-3xl font-bold">Inventory Management System</h2>
             <p className="text-gray-600">Welcome back! Please log in.</p>
           </div>
 
