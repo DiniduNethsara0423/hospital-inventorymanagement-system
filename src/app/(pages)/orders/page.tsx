@@ -181,7 +181,19 @@ const OrdersPage = () => {
     window.open(blobUrl, "_blank");
   };
   
-
+  const handlePurchaseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedPurchaseId = Number(e.target.value);
+    const relatedPurchase = purchases.find((p: any) => p.id === selectedPurchaseId);
+  
+    if (relatedPurchase) {
+      setNewInvoice((prev: any) => ({
+        ...prev,
+        purchaseId: selectedPurchaseId,
+        quotationId: relatedPurchase.quotation_id, // Auto-set Quotation ID
+      }));
+    }
+  };
+  
 
   return (
     <div className="p-6 w-full mx-auto mt-10">
@@ -211,49 +223,36 @@ const OrdersPage = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Quotation ID</label>
-            <div
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm overflow-y-auto"
-              style={{ maxHeight: "200px" }}
-              onScroll={handleQuotationScroll}
-            >
-              <select
-                className="w-full text-sm bg-white"
-                value={newInvoice.quotationId}
-                onChange={(e) => setNewInvoice({ ...newInvoice, quotationId: e.target.value })}
-              >
-                <option value="" disabled>Select Quotation</option>
-                {quotations.map((quotation: any) => (
-                  <option key={quotation.quotation_id} value={quotation.quotation_id}>
-                    {quotation.quotation_id}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {isLoadingQuotations && (
-              <p className="text-gray-500 text-sm mt-2">Loading more quotations...</p>
-            )}
-          </div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">Purchase ID</label>
+  <div
+    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm overflow-auto max-h-40"
+    onScroll={handlePurchasesScroll}
+  >
+    <select
+      className="w-full"
+      value={newInvoice.purchaseId}
+      onChange={handlePurchaseChange}  // Change event handler to fetch related Quotation ID
+    >
+      <option value="" disabled>Select Purchase</option>
+      {purchases.map((purchase:any) => (
+        <option key={purchase.id} value={purchase.id}>
+          {purchase.id}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Purchase ID</label>
-            <div
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm overflow-auto max-h-40"
-              onScroll={handlePurchasesScroll}
-            >
-              <select
-                className="w-full"
-                value={newInvoice.purchaseId}
-                onChange={(e) => setNewInvoice({ ...newInvoice, purchaseId: Number(e.target.value) })}
-              >
-                {purchases.map((purchase:any) => (
-                  <option key={purchase.id} value={purchase.id}>
-                    {purchase.id}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+{/* Move Quotation ID selector here and disable it */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">Quotation ID</label>
+  <input
+    type="text"
+    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm bg-gray-100"
+    value={newInvoice.quotationId}
+    readOnly // Make it non-editable
+  />
+</div>
 
 
           <div>

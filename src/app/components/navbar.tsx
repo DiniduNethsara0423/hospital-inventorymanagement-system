@@ -14,7 +14,9 @@ import {
   LucideSearch,
   LucideBook,
   CirclePlus,
-  UserRound
+  UserRound,
+  Layers2,
+  Album
   
 } from 'lucide-react';
 import Link from 'next/link';
@@ -46,14 +48,15 @@ const SidebarNavbar = () => {
     ...(roleId !== 3 ? [{ href: '/reports', Icon: LucideClipboardList, label: 'Reports' }] : []),
     { href: '/purchase', Icon: LucideShoppingCart, label: 'Quatations' },
     { href: '/suppliers', Icon: LucideTruck, label: 'Suppliers' },
-    { href: '/orders', Icon: LucideClipboardList, label: 'Invoice' },
+    { href: '/orders', Icon: Album, label: 'Invoice' },
     { href: '/department', Icon: LucideBuilding, label: 'Department' },
     ...(roleId === 1 ? [{ href: '/user-management', Icon: LucideUsers, label: 'User Management' }] : []),
     { href: '/add-to-department', Icon: CirclePlus, label: 'Add Items to Department' },
+    { href: '/settings', Icon: Layers2, label: 'Categories' },
   ];
 
   const bottomNavItems = [
-    { href: '/settings', Icon: LucideSettings, label: 'Categories' },
+    // { href: '/settings', Icon: LucideSettings, label: 'Categories' },
     ...(roleId !== 3 ? [{ href: '/logs', Icon: LucideBook, label: 'Logs' }] : []),
   ];
 
