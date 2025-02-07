@@ -9,7 +9,7 @@ import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const OrdersPage = () => {
-  const [newInvoice, setNewInvoice]:any = useState({
+  const [newInvoice, setNewInvoice]: any = useState({
     dateRange: null,
     quotationId: "QUOT001",
     purchaseId: 1,
@@ -33,13 +33,13 @@ const OrdersPage = () => {
   const [hasMorePurchases, setHasMorePurchases]: any = useState(true); // Tracks if more data exists
 
   const router = useRouter();
-  
-    useEffect(() => {
-      const token = localStorage.getItem('jwtToken');
-      if (!token) {
-        router.push('/login');
-      }
-    }, [router]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+      router.push('/login');
+    }
+  }, [router]);
 
   useEffect(() => {
     const getInvoices = async () => {
@@ -127,8 +127,8 @@ const OrdersPage = () => {
 
         setNewInvoice({
           dateRange: null,
-          quotationId: "QUOT001",
-          purchaseId: 1,
+          quotationId: "", // Clear quotation ID
+          purchaseId: "", // Clear purchase ID (important)
           invoiceId: "",
           invoicePdf: null,
         });
@@ -144,7 +144,7 @@ const OrdersPage = () => {
   const handleGenerateInvoiceId = async () => {
     try {
       const invoiceId = await generateInvoiceId();
-      setNewInvoice((prevState:any) => ({
+      setNewInvoice((prevState: any) => ({
         ...prevState,
         invoiceId: invoiceId,
       }));
@@ -179,18 +179,18 @@ const OrdersPage = () => {
     }
     const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], { type: "application/pdf" });
-  
+
     // Create a Blob URL
     const blobUrl = URL.createObjectURL(blob);
-  
+
     // Open PDF in a new tab
     window.open(blobUrl, "_blank");
   };
-  
+
   const handlePurchaseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedPurchaseId = Number(e.target.value);
     const relatedPurchase = purchases.find((p: any) => p.id === selectedPurchaseId);
-  
+
     if (relatedPurchase) {
       setNewInvoice((prev: any) => ({
         ...prev,
@@ -199,7 +199,7 @@ const OrdersPage = () => {
       }));
     }
   };
-  
+
 
   return (
     <div className="p-6 w-full mx-auto mt-10">
@@ -211,7 +211,7 @@ const OrdersPage = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Select Date Range</label>
             <div
               className="border border-gray-300 px-4 py-2 rounded-lg text-sm cursor-pointer bg-white"
-              onClick={() => setShowDatePicker((prev:any) => !prev)}
+              onClick={() => setShowDatePicker((prev: any) => !prev)}
             >
               {newInvoice.dateRange
                 ? `${newInvoice.dateRange.startDate.toLocaleDateString()} - ${newInvoice.dateRange.endDate.toLocaleDateString()}`
@@ -229,36 +229,37 @@ const OrdersPage = () => {
           </div>
 
           <div>
-  <label className="block text-sm font-medium text-gray-700 mb-1">Purchase ID</label>
-  <div
-    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm overflow-auto max-h-40"
-    onScroll={handlePurchasesScroll}
-  >
-    <select
-      className="w-full"
-      value={newInvoice.purchaseId}
-      onChange={handlePurchaseChange}  // Change event handler to fetch related Quotation ID
-    >
-      <option value="" disabled>Select Purchase</option>
-      {purchases.map((purchase:any) => (
-        <option key={purchase.id} value={purchase.id}>
-          {purchase.id}
-        </option>
-      ))}
-    </select>
-  </div>
-</div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Purchase ID</label>
+            <div
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm overflow-auto max-h-40"
+              onScroll={handlePurchasesScroll}
+            >
+              <select
+  className="w-full"
+  value={newInvoice.purchaseId || ""}  
+  onChange={handlePurchaseChange}
+>
+  <option value="" disabled>Select Purchase</option> 
+  {purchases.map((purchase: any) => (
+    <option key={purchase.id} value={purchase.id}>
+      {purchase.id}
+    </option>
+  ))}
+</select>
 
-{/* Move Quotation ID selector here and disable it */}
-<div>
-  <label className="block text-sm font-medium text-gray-700 mb-1">Quotation ID</label>
-  <input
-    type="text"
-    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm bg-gray-100"
-    value={newInvoice.quotationId}
-    readOnly // Make it non-editable
-  />
-</div>
+            </div>
+          </div>
+
+          {/* Move Quotation ID selector here and disable it */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Quotation ID</label>
+            <input
+              type="text"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm bg-gray-100"
+              value={newInvoice.quotationId}
+              readOnly // Make it non-editable
+            />
+          </div>
 
 
           <div>
@@ -366,7 +367,7 @@ const OrdersPage = () => {
       {/* Pagination */}
       <div className="flex justify-center items-center mt-6 space-x-4">
         <button
-          onClick={() => setCurrentPage((prev:any) => Math.max(prev - 1, 1))}
+          onClick={() => setCurrentPage((prev: any) => Math.max(prev - 1, 1))}
           className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
             } transition`}
           disabled={currentPage === 1}
@@ -377,7 +378,7 @@ const OrdersPage = () => {
           Page {currentPage} of {totalPages}
         </span>
         <button
-          onClick={() => setCurrentPage((prev:any) => (currentPage < totalPages ? prev + 1 : prev))}
+          onClick={() => setCurrentPage((prev: any) => (currentPage < totalPages ? prev + 1 : prev))}
           className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"
             } transition`}
           disabled={currentPage === totalPages}
