@@ -96,3 +96,17 @@ export const removeItemFromDepartment = async (id:any, payload:any) => {
     throw new Error(error.response?.data?.message || "Failed to remove item.");
   }
 };
+
+export const getItemsForDepartmentAddition = async (iName: string, barcode: string) => {
+  const url:any= process.env.NEXT_PUBLIC_GET_ITEM_DETAILS_SUGGETIONS
+  try {
+    const response = await api.get(`${url}`, {
+      params: { iName, barcode },
+    });
+    console.log(response.data)
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching suggested items:", error);
+    throw error;
+  }
+};
