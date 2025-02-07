@@ -119,3 +119,25 @@ export const getBarcode = async () => {
   return response;
 };
 
+
+export const getInvoiceSuggestions = async (query: string) => {
+  const url:any = process.env.NEXT_PUBLIC_GET_INVOICE_SUGGESTIONS
+  try {
+    const response = await api.get(`${url}=${query}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching invoice suggestions:", error);
+    return [];
+  }
+};
+
+export const deleteUser = async (userId: number) => {
+  const url:any = process.env.NEXT_PUBLIC_DELETE_USER
+  try {
+    const response = await api.post(`${url}${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    throw error;
+  }
+};  

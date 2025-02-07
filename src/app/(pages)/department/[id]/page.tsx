@@ -11,7 +11,7 @@ const DepartmentDetailPage = () => {
   const params = useParams(); // Properly unwrap params
   const departmentId = Number(params?.id); // Ensure it's a number
 
-  const [name, setName] = useState("Sample Department");
+  const [name, setName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<any[]>([]);

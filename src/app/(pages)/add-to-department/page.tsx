@@ -23,16 +23,16 @@ const AddItemToDepartment = () => {
     departmentId: "", // Same here
     qty: 0,
   });
-  
+
 
   const router = useRouter();
-  
-    useEffect(() => {
-      const token = localStorage.getItem('jwtToken');
-      if (!token) {
-        router.push('/login');
-      }
-    }, [router]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+      router.push('/login');
+    }
+  }, [router]);
 
   const fetchAssignedItems = async () => {
     try {
@@ -124,8 +124,8 @@ const AddItemToDepartment = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
-  
+
+
     try {
       await addItemToDepartment(
         formData.barcode,
@@ -145,7 +145,7 @@ const AddItemToDepartment = () => {
       alert("Failed to add item to department. Please try again.");
     }
   };
-  
+
   const handlePageChange = (page: any) => {
     setCurrentPage(page);
     fetchAssignedItems();
@@ -175,28 +175,28 @@ const AddItemToDepartment = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Barcode and Item Detail ID */}
             <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="barcode" className="block text-sm font-medium text-gray-700">
-                Barcode
-              </label>
-              <div className="flex gap-2 mt-1">
-                <input
-                  id="barcode"
-                  name="barcode"
-                  type="text"
-                  value={formData.barcode}
-                  readOnly
-                  className="flex-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={handleGenerateBarcode}
-                  className="px-4 py-2 bg-gray-800 text-white rounded-md shadow hover:bg-gray-900 focus:outline-none"
-                >
-                  Generate
-                </button>
+              <div>
+                <label htmlFor="barcode" className="block text-sm font-medium text-gray-700">
+                  Barcode
+                </label>
+                <div className="flex gap-2 mt-1">
+                  <input
+                    id="barcode"
+                    name="barcode"
+                    type="text"
+                    value={formData.barcode}
+                    readOnly
+                    className="flex-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleGenerateBarcode}
+                    className="px-4 py-2 bg-gray-800 text-white rounded-md shadow hover:bg-gray-900 focus:outline-none"
+                  >
+                    Generate
+                  </button>
+                </div>
               </div>
-            </div>
               <div>
                 <label htmlFor="itemDetailId" className="block text-sm font-medium text-gray-700">
                   Item Detail ID
@@ -234,12 +234,14 @@ const AddItemToDepartment = () => {
                   onChange={handleInputChange}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
                 >
+                  <option value="" disabled>Select a department</option>
                   {departments.map((dept: any) => (
                     <option key={dept.id} value={dept.id}>
                       {dept.name}
                     </option>
                   ))}
                 </select>
+
               </div>
               <div>
                 <label htmlFor="qty" className="block text-sm font-medium text-gray-700">
@@ -301,18 +303,18 @@ const AddItemToDepartment = () => {
               </tr>
             </thead>
             <tbody>
-  {assignedItems.map((item: any) => (
-    <tr key={item.ITEM_DEPARTMENT_BARCODE} className="border-t hover:bg-gray-100">
-      <td className="px-6 py-3">{item.ITEM_DEPARTMENT_BARCODE}</td>
-      <td className="px-6 py-3">
-        <Barcode barcode={item.ITEM_DEPARTMENT_BARCODE} />
-      </td>
-      <td className="px-6 py-3">{item.ITEM_NAME}</td>
-      <td className="px-6 py-3">{item.DEPARTMENT_NAME}</td>
-      <td className="px-6 py-3">{item.QTY}</td>
-    </tr>
-  ))}
-</tbody>
+              {assignedItems.map((item: any) => (
+                <tr key={item.ITEM_DEPARTMENT_BARCODE} className="border-t hover:bg-gray-100">
+                  <td className="px-6 py-3">{item.ITEM_DEPARTMENT_BARCODE}</td>
+                  <td className="px-6 py-3">
+                    <Barcode barcode={item.ITEM_DEPARTMENT_BARCODE} />
+                  </td>
+                  <td className="px-6 py-3">{item.ITEM_NAME}</td>
+                  <td className="px-6 py-3">{item.DEPARTMENT_NAME}</td>
+                  <td className="px-6 py-3">{item.QTY}</td>
+                </tr>
+              ))}
+            </tbody>
 
           </table>
         </div>

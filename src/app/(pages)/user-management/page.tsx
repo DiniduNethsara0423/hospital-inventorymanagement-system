@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Trash2 } from "lucide-react";
 import RegistrationSteps from "@/app/components/RegisterUserPopUp";
 import { fetchAllUsers, assignPermission, revokePermission, getAllPermissionDetails } from "@/app/apis/auth/api"; // Importing APIs
 import { useRouter } from "next/navigation";
+import { deleteUser } from "@/app/apis/inventory/api";
 
 const UserManagement: React.FC = () => {
   const [users, setUsers]: any = useState([]);
@@ -20,7 +21,8 @@ const UserManagement: React.FC = () => {
   const [permissionId, setPermissionId] = useState<number | null>(null);
   const [validUntil, setValidUntil] = useState<string | null>(null);
   const [permissionDetails, setPermissionDetails] = useState([]);
-
+  const [deleteUserId, setDeleteUserId] = useState<number | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -46,6 +48,24 @@ const UserManagement: React.FC = () => {
     setSearch(e.target.value);
   };
 
+  const handleDeleteClick = (userId: number) => {
+    setDeleteUserId(userId);
+    setShowDeleteModal(true);
+  };
+  
+  const confirmDeleteUser = async () => {
+    if (deleteUserId !== null) {
+      try {
+        await deleteUser(deleteUserId);
+        setUsers(users.filter((user: any) => user.id !== deleteUserId));
+        alert("User deleted successfully!");
+      } catch (error) {
+        alert("Failed to delete user.");
+      }
+    }
+    setShowDeleteModal(false);
+  };
+  
   const filteredUsers = users.filter(
     (user: any) =>
       user.username.toLowerCase().includes(search.toLowerCase()) ||
@@ -127,7 +147,7 @@ const UserManagement: React.FC = () => {
       console.error("Failed to fetch permissions:", error);
     }
   };
-  
+
   // Call fetchPermissions on mount
   useEffect(() => {
     fetchPermissions();
@@ -216,6 +236,7 @@ const UserManagement: React.FC = () => {
                     <th className="px-4 py-3 text-gray-800">Username</th>
                     <th className="px-4 py-3 text-gray-800">Email</th>
                     <th className="px-4 py-3 text-gray-800">Role ID</th>
+                    <th className="px-4 py-3 text-gray-800">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -233,6 +254,11 @@ const UserManagement: React.FC = () => {
                         </td>
                         <td className="border px-4 py-3 text-gray-700">
                           {user.role_id}
+                        </td>
+                        <td className="border px-4 py-3 text-gray-700">
+                          <button onClick={() => handleDeleteClick(user.id)} className="text-red-600 hover:text-red-800">
+                            <Trash2/>
+                          </button>
                         </td>
                       </tr>
                     ))
@@ -404,6 +430,21 @@ const UserManagement: React.FC = () => {
         </>
       )}
 
+{showDeleteModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white p-6 rounded-md shadow-lg text-center">
+      <p className="mb-4 text-gray-700">Are you sure you want to delete this user?</p>
+      <div className="flex justify-center space-x-4">
+        <button onClick={confirmDeleteUser} className="bg-red-600 text-white px-4 py-2 rounded">
+          Confirm
+        </button>
+        <button onClick={() => setShowDeleteModal(false)} className="bg-gray-400 text-white px-4 py-2 rounded">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
     </div>
   );

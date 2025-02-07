@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getAllCategories, getSuggestions, addNewItem } from "@/app/apis/inventory/api";
+import { getAllCategories, getSuggestions, addNewItem, getInvoiceSuggestions } from "@/app/apis/inventory/api";
 import Barcode from "react-barcode";
 import { useRouter } from "next/navigation";
 
@@ -21,13 +21,37 @@ const AddItemForm = () => {
   const [isExistingItem, setIsExistingItem] = useState(false);
 
   const router = useRouter();
-  
-    useEffect(() => {
-      const token = localStorage.getItem('jwtToken');
-      if (!token) {
-        router.push('/login');
+
+  const [invoiceSuggestions, setInvoiceSuggestions] = useState<string[]>([]);
+
+  const handleInvoiceInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+
+    if (value.length > 2) {  // Fetch suggestions when input is meaningful
+      try {
+        const suggestionsData = await getInvoiceSuggestions(value);
+        setInvoiceSuggestions(suggestionsData);
+      } catch (error) {
+        console.error("Failed to fetch invoice suggestions:", error);
       }
-    }, [router]);
+    } else {
+      setInvoiceSuggestions([]);
+    }
+  };
+
+  const handleInvoiceSuggestionSelect = (selectedInvoice: string) => {
+    setFormData({ ...formData, invoice_id: selectedInvoice });
+    setInvoiceSuggestions([]);
+  };
+
+
+  useEffect(() => {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+      router.push('/login');
+    }
+  }, [router]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -209,12 +233,12 @@ const AddItemForm = () => {
         </div>
 
         {/* Other Fields */}
-        {[ 
+        {[
           // { id: "vendor_id", label: "Vendor ID" }, // Added vendor_id field
           { id: "total_qty", label: "Total Quantity" },
           { id: "lower_quantity", label: "Lower Quantity" },
           { id: "price", label: "Price" },
-          { id: "invoice_id", label: "Invoice ID" },
+          // { id: "invoice_id", label: "Invoice ID" },
         ].map((field) => (
           <div key={field.id} className="flex flex-col">
             <label htmlFor={field.id} className="text-md font-medium text-gray-700 mb-1">
@@ -229,6 +253,30 @@ const AddItemForm = () => {
             />
           </div>
         ))}
+
+        <div className="relative">
+        <label className="text-md font-medium text-gray-700 mb-1">Invoice ID</label>
+          <input
+            id="invoice_id"
+            type="text"
+            value={formData.invoice_id}
+            onChange={handleInvoiceInputChange}
+            className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:ring-gray-500"
+          />
+          {invoiceSuggestions.length > 0 && (
+            <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto shadow-lg">
+              {invoiceSuggestions.map((suggestion, index) => (
+                <li
+                  key={index}
+                  onClick={() => handleInvoiceSuggestionSelect(suggestion)}
+                  className="p-2 hover:bg-blue-100 cursor-pointer"
+                >
+                  {suggestion}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
         {/* Submit Button */}
         <button
