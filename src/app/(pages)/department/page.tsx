@@ -87,7 +87,6 @@ function DepartmentsPage() {
         await deleteDepartment(id);
         fetchDepartments(); // Refresh the list after deletion
       } catch (error) {
-        console.error("Failed to delete department:", error);
         alert("Error deleting department. Please try again.");
       } finally {
         setLoading(false);

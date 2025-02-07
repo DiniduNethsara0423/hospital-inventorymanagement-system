@@ -30,7 +30,6 @@ export const downloadReport = async (startDate: string, endDate: string) => {
     link.click();
     document.body.removeChild(link);
   } catch (error) {
-    console.error("Failed to download the report:", error);
     throw new Error("Failed to download the report.");
   }
 };

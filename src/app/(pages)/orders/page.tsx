@@ -150,7 +150,6 @@ const OrdersPage = () => {
     if (confirmDelete) {
       try {
         await deleteInvoice(invoiceId);
-        console.log(invoiceId)
         alert("Invoice deleted successfully!");
 
         // Refresh the invoices list after deletion
@@ -158,7 +157,6 @@ const OrdersPage = () => {
         setFilteredInvoices(results);
         setTotalPages(Math.ceil(count[0]["COUNT(*)"] / 7));
       } catch (error) {
-        console.error("Failed to delete invoice:", error);
         alert("Failed to delete invoice. Please try again.");
       }
     }

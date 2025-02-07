@@ -6,17 +6,13 @@ interface DepartmentRequest {
 
 export const postDepartment = async (data: DepartmentRequest) => {
   const url:any = process.env.NEXT_PUBLIC_ADD_DEPARTMENT;
-  console.log(url);
   try {
     const response = await api.post(url, data);
-    console.log("Department added:", response.data);
     return response.data; // Return the created department
   } catch (error: any) {
     if (error.response) {
-      console.error("API Error:", error.response.data);
       throw new Error(error.response.data.message || "Failed to add department.");
     } else {
-      console.error("Unexpected Error:", error.message);
       throw new Error("An unexpected error occurred.");
     }
   }

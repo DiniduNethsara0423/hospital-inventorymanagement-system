@@ -6,7 +6,6 @@ export const fetchInvoices = async (page: number, limit: number) => {
     const response = await api.get(`${API_BASE_URL}?page=${page}&limit=${limit}`);
     return response.data; 
   } catch (error) {
-    console.error("Error fetching invoices:", error);
     throw error;
   }
 };
@@ -17,7 +16,6 @@ export const createInvoice = async (invoiceData:any) => {
     const response = await api.post(`${url}`, invoiceData);
     return response.data;
   } catch (error) {
-    console.error("Error creating invoice:", error);
     throw error;
   }
 };
@@ -39,7 +37,6 @@ export const uploadInvoicePDF = async (invoiceId:any, pdfFile:any) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error uploading invoice PDF:", error);
     throw error;
   }
 };
@@ -50,10 +47,8 @@ export const uploadInvoicePDF = async (invoiceId:any, pdfFile:any) => {
 //     const response = await axios.get(`${url}`, {
 //       params: { page, pageSize },
 //     });
-//     console.log(response.data)
 //     return response.data;
 //   } catch (error) {
-//     console.error("Failed to fetch quotations:", error);
 //     throw error;
 //   }
 // };
@@ -64,7 +59,6 @@ export const fetchQuotations = async (page:any, pageSize:any) => {
     const response = await api.get(`${url}?page=${page}&pageSize=${pageSize}`);
     return response.data; 
   } catch (error: any) {
-    console.error("Error fetching quotations:", error?.response || error);
     throw error; 
   }
 };
@@ -75,7 +69,6 @@ export const fetchPurchases = async (page: number, pageSize: number) => {
     const response = await api.get(`${url}?page=${page}&pageSize=${pageSize}`);
     return response.data; // Ensure the response returns `{ rows, count }`
   } catch (error) {
-    console.error("Failed to fetch purchases:", error);
     throw error;
   }
 };
@@ -86,7 +79,6 @@ export const generateInvoiceId = async (): Promise<string> => {
     const response = await api.get(`${url}`);
     return response.data; 
   } catch (error) {
-    console.error("Failed to generate invoice ID:", error);
     throw error;
   }
 };
@@ -97,7 +89,6 @@ export const deleteInvoice = async (invoiceId: string) => {
     const response = await api.post(`${url}${invoiceId}`);
     return response.data;
   } catch (error) {
-    console.error("Error deleting invoice:", error);
     throw new Error("Failed to delete invoice");
   }
 };

@@ -105,7 +105,6 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
       alert("Quotation and PDF uploaded successfully.");
       setSelectedQuotation(null);
     } catch (error) {
-      console.error("Error submitting quotation or uploading PDF:", error);
       alert("Failed to submit the quotation. Please try again.");
     } finally {
       setLoading(false);
@@ -184,7 +183,6 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
       alert("Purchase created successfully.");
       setSelectedQuotation(null); // Close the modal
     } catch (error) {
-      console.error("Error creating purchase or updating quotation:", error);
       alert("Failed to complete the purchase. Please try again.");
     } finally {
       setLoading(false);

@@ -6,13 +6,10 @@ export const getLogsByTableName = async (
   table_name: string
 ) => {
   const url = `${process.env.NEXT_PUBLIC_GET_LOGS_BY_TABLE_NAME}?page=${page}&limit=${limit}&table_name=${encodeURIComponent(table_name)}`;
-  console.log(url);
   try {
     const response = await api.get(url);
-    console.log(response);
     return response.data; // Expected format: { data: Log[], total: number }
   } catch (error: any) {
-    console.error("Error fetching logs by table name:", error);
     throw new Error(
       error.response?.data?.message || "Failed to fetch logs by table name"
     );
@@ -25,13 +22,10 @@ export const getLogsByUserId = async (
     limit: string = "10"
   ) => {
     const url = `${process.env.NEXT_PUBLIC_GET_LOGS_BY_USER_ID}${userId}?page=${page}&limit=${limit}`;
-    console.log(url);
     try {
       const response = await api.get(url);
-      console.log(response);
       return response.data; // Expected format: { data: Log[], total: number }
     } catch (error: any) {
-      console.error("Error fetching logs by user ID:", error);
       throw new Error(
         error.response?.data?.message || "Failed to fetch logs by user ID"
       );
@@ -48,13 +42,10 @@ export const getLogsByTableNameAndUserId = async (
   pageSize: any
 ) => {
   const url = `${process.env.NEXT_PUBLIC_GET_LOGS_BY_TABLENAME_AND_USER_ID}${id}?page=${page}&limit=${limit}&table_name=${encodeURIComponent(table_name)}`;
-  console.log(url);
   try {
     const response = await api.get(url);
-    console.log(response.data);
     return response.data; // Expected format: { data: Log[], total: number }
   } catch (error: any) {
-    console.error("Error fetching logs by table name and user ID:", error);
     throw new Error(
       error.response?.data?.message || "Failed to fetch logs by table name and user ID"
     );
@@ -69,13 +60,10 @@ export const getLogsByAction = async (
   
 ) => {
   const url = `${process.env.NEXT_PUBLIC_GET_LOGS_BY_ACTION}?page=${page}&limit=${limit}&action=${encodeURIComponent(action)})}`;
-  console.log(url);
   try {
     const response = await api.get(url);
-    console.log(response);
     return response.data; 
   } catch (error: any) {
-    console.error("Error fetching logs by table name and user ID:", error);
     throw new Error(
       error.response?.data?.message || "Failed to fetch logs by table name and user ID"
     );
@@ -93,14 +81,11 @@ export const getLogsByDate = async (
   const baseUrl = process.env.NEXT_PUBLIC_GET_ALL_LOGS_BY_DATE;
   const url = `${baseUrl}${date}?page=${page}&limit=${limit}`;
 
-  console.log("Request URL:", url);
 
   try {
     const response = await api.get(url);
-    console.log("Response:", response);
     return response.data;
   } catch (error: any) {
-    console.error("Error fetching logs:", error);
     throw new Error(
       error.response?.data?.message || "Failed to fetch logs with the specified parameters."
     );
@@ -128,7 +113,6 @@ export const getLogsByTableAndDate = async (
     const response = await api.get(url);
     return response.data;
   } catch (error: any) {
-    console.error("Error fetching logs:", error);
     throw new Error(
       error.response?.data?.message || "Failed to fetch logs with the specified parameters."
     );

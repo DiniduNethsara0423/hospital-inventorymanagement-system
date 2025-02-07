@@ -40,7 +40,6 @@ export default function SuppliersPage() {
   const fetchSuppliers = async (page: number, pageSize: number) => {
     try {
       const { data } = await getVendors(page, pageSize);
-      console.log(data)
       const formattedSuppliers = data.map((vendor: any) => ({
         id: vendor.vendor_id,
         vendorName: vendor.vendor_name,

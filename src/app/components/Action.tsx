@@ -21,7 +21,6 @@ const Action: React.FC = () => {
           );
           setLogs(data || []);
         } catch (error) {
-          console.error("Error fetching logs:", error);
           alert("Failed to fetch logs. Please try again later.");
         } finally {
           setLoading(false);

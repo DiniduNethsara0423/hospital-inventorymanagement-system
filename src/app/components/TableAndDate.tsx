@@ -37,7 +37,6 @@ const TableAndDate: React.FC = () => {
       setLoading(false);
     }
   };
-  console.log(logs)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

@@ -88,7 +88,6 @@ const CategoriesPage = () => {
   };
   const handleDeleteCategory = async (id: number) => {
     try {
-      console.log(`Attempting to delete category with ID: ${id}`); // Add logging
       await deleteCategory(id);
       alert("Category deleted successfully");
       fetchCategories();

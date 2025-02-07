@@ -44,7 +44,6 @@ export const QuotationList: React.FC<QuotationListProps> = ({
       
       setQuotations(transformedData);
     } catch (err) {
-      console.error("Failed to fetch quotations:", err);
       setError("Failed to load quotations. Please try again.");
     } finally {
       setIsLoading(false);
@@ -68,7 +67,6 @@ export const QuotationList: React.FC<QuotationListProps> = ({
       setShowModal(false);
       setQuotationToDelete(null);
     } catch (err) {
-      console.error("Failed to delete quotation:", err);
       setError("Failed to delete quotation. Please try again.");
     } finally {
       setIsLoading(false);

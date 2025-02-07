@@ -26,7 +26,6 @@ export const postVendor = async (vendor: {
 export const getVendorId = async () => {
 
   const url: any = process.env.NEXT_PUBLIC_GET_VENDOR_ID
-  console.log(url)
 
   const response = await api.get(`${url}`);
   return response.data;
@@ -44,7 +43,6 @@ export const deleteVendor = async (vendorId: string) => {
     const response = await api.post(`${url}${vendorId}`);
     return response.data; // or any response that the API returns
   } catch (error) {
-    console.error("Error deleting vendor:", error);
     throw new Error("Failed to delete vendor");
   }
 };

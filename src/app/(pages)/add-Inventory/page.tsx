@@ -120,7 +120,6 @@ const AddItemForm = () => {
       setIsExistingItem(false);
     } catch (error) {
       alert("Failed to add item. Please try again.");
-      console.error("Error submitting form:", error);
     }
   };
 

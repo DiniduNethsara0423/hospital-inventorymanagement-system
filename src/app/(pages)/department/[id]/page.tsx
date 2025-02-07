@@ -83,7 +83,6 @@ const DepartmentDetailPage = () => {
       alert("Department updated successfully.");
       setIsEditing(false);
     } catch (error) {
-      console.error("Error updating department:", error);
       alert("Failed to update department.");
     }
   };
@@ -95,7 +94,6 @@ const DepartmentDetailPage = () => {
         alert("Department deleted successfully.");
         router.back();
       } catch (error) {
-        console.error("Error deleting department:", error);
         alert("Failed to delete department.");
       }
     }
@@ -114,7 +112,6 @@ const DepartmentDetailPage = () => {
       setIsModalOpen(false);
       fetchItemsByDepartment();
     } catch (error) {
-      console.error("Error removing item:", error);
       alert("Failed to remove item.");
     }
   };

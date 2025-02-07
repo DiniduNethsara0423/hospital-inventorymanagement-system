@@ -38,9 +38,7 @@ const AddItemToDepartment = () => {
     try {
       const response = await getAssignedItems(currentPage, pageSize);
       setAssignedItems(response.result);
-      console.log(response);
     } catch (error) {
-      console.error("Error fetching assigned items:", error);
       alert("Failed to fetch assigned items.");
     }
   };
@@ -60,7 +58,6 @@ const AddItemToDepartment = () => {
 
       setItemDetails(allItemDetails);
     } catch (error) {
-      console.error("Error fetching item details:", error);
       alert("Failed to fetch item details.");
     }
   };
@@ -80,7 +77,6 @@ const AddItemToDepartment = () => {
 
       setDepartments(allDepartments);
     } catch (error) {
-      console.error("Error fetching departments:", error);
       alert("Failed to fetch departments.");
     }
   };
@@ -91,7 +87,6 @@ const AddItemToDepartment = () => {
       const response = await getBarcode();
       setFormData({ ...formData, barcode: String(response.data) });
     } catch (error) {
-      console.error("Error fetching barcode:", error);
       alert("Failed to fetch barcode.");
     }
   };
@@ -124,14 +119,12 @@ const AddItemToDepartment = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    console.log(`Updating ${name} to ${value}`); // Debugging
     setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
-    console.log("Submitting formData:", formData); // Debugging
   
     try {
       await addItemToDepartment(

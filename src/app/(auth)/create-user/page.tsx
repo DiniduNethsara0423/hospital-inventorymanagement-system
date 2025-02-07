@@ -20,10 +20,11 @@ const RegistrationSteps: React.FC = () => {
                 setMessage('OTP sent to your email');
                 setStep(2);
             }
-        } catch {
+        } catch (error) {
             setMessage('Error initiating registration');
         }
     };
+    
 
     const handleVerifyOtp = async () => {
         try {
@@ -49,15 +50,29 @@ const RegistrationSteps: React.FC = () => {
         }
     };
 
+    // const handleOtpChange = (value: string, index: number) => {
+    //     const newOtp = [...otp];
+    //     newOtp[index] = value;
+    //     setOtp(newOtp);
+
+    //     if (value && index < otpRefs.current.length - 1) {
+    //         otpRefs.current[index + 1]?.focus();
+    //     }
+    // };
+
     const handleOtpChange = (value: string, index: number) => {
         const newOtp = [...otp];
         newOtp[index] = value;
-        setOtp(newOtp);
-
+        
         if (value && index < otpRefs.current.length - 1) {
             otpRefs.current[index + 1]?.focus();
+        } else if (!value && index > 0) {
+            otpRefs.current[index - 1]?.focus();
         }
+    
+        setOtp(newOtp);
     };
+    
 
     const renderMessage = () => {
         if (!message) return null;

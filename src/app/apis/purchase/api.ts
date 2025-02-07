@@ -7,13 +7,8 @@ export const addPurchaseRequest = async (data:any) => {
       process.env.NEXT_PUBLIC_ADD_PURCHASE_REQUEST!,
       data
     );
-    console.log("addPurchaseRequest Response:", response.data);
     return response.data;
   } catch (error: any) {
-    console.error(
-      "Error in addPurchaseRequest:",
-      error.response?.data || error.message
-    );
     throw new Error(
       error.response?.data?.message || "Failed to add PurchaseRequest."
     );
@@ -25,10 +20,8 @@ export const getPurchaseRequest = async (page = 1, limit = 10) => {
   const url = `${process.env.NEXT_PUBLIC_GET_ALL_PURCHASE_REQUEST}?page=${page}&limit=${limit}`;
   try {
     const response = await api.get(url);
-    console.log(response.data);
     return response.data;
   } catch (error: any) {
-    console.error("Error in getPurchaseRequest:", error.response?.data || error.message);
     throw new Error(
       error.response?.data?.message || "Failed to fetch PurchaseRequest."
     );
@@ -50,7 +43,6 @@ export const fetchSuppliers = async (page: number, pageSize: number) => {
       throw new Error("Failed to fetch vendors");
     }
   } catch (error) {
-    console.error("Error fetching vendors:", error);
     return { data: [], total: 0 };  // Return empty data on error
   }
 };
@@ -61,7 +53,6 @@ export const addQuotation = async (data: any) => {
       const response = await api.post(url, data);
       return response.data;
     } catch (error) {
-      console.error("Error adding quotation:", error);
       throw error;
     }
   };
@@ -83,7 +74,6 @@ export const addQuotation = async (data: any) => {
       );
       return response.data;
     } catch (error) {
-      console.error("Error uploading quotation PDF:", error);
       throw error;
     }
   };
@@ -99,7 +89,6 @@ export const addQuotation = async (data: any) => {
       const response = await api.get(`${url}${purchaseRequestId}`);
       return response.data; // Assuming the API returns the data in the response body
     } catch (error) {
-      console.error("Error fetching quotations by purchase request ID:", error);
       throw error;
     }
   };

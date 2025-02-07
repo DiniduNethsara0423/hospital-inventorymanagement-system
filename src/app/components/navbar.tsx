@@ -40,7 +40,6 @@ const SidebarNavbar = () => {
     }
   }, []);
 
-  console.log(roleId)
   // Define which items to show based on roleId
   const navItems = [
     { href: '/dashboard', Icon: LucideHome, label: 'Dashboard' },

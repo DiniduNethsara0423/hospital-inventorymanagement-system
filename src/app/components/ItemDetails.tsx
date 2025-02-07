@@ -136,7 +136,6 @@ const [notificationType, setNotificationType] = useState<"success" | "warning" |
         setNotificationType(null);
       }, 5000);
     } catch (error) {
-      console.error("Failed to update item detail:", error);
       setNotification("Failed to update item detail.");
       setNotificationType("warning");
     }
