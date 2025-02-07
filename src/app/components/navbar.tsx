@@ -94,7 +94,7 @@ const SidebarNavbar = () => {
             <span className="sr-only">Toggle Sidebar</span>
             <LucideBox className="w-6 h-6" />
           </button>
-          <h1 className="text-xl font-semibold text-gray-900 ">Hospital Inventory</h1>
+          <h1 className="text-xl font-semibold text-gray-900 ">Inventory System</h1>
 
           {/* Search Bar */}
           <SearchBar />

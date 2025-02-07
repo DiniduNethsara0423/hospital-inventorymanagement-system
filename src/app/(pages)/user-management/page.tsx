@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Plus, Search } from "lucide-react";
 import RegistrationSteps from "@/app/components/RegisterUserPopUp";
-import { fetchAllUsers, assignPermission } from "@/app/apis/auth/api"; // Importing APIs
+import { fetchAllUsers, assignPermission, revokePermission, getAllPermissionDetails } from "@/app/apis/auth/api"; // Importing APIs
 import { useRouter } from "next/navigation";
 
 const UserManagement: React.FC = () => {
@@ -19,18 +19,18 @@ const UserManagement: React.FC = () => {
   const [roleId, setRoleId] = useState<number | null>(null);
   const [permissionId, setPermissionId] = useState<number | null>(null);
   const [validUntil, setValidUntil] = useState<string | null>(null);
+  const [permissionDetails, setPermissionDetails] = useState([]);
 
   const router = useRouter();
-  
-    useEffect(() => {
-      const token = localStorage.getItem('jwtToken');
-      if (!token) {
-        router.push('/login');
-      }
-    }, [router]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+      router.push('/login');
+    }
+  }, [router]);
 
   const roles = [
-    { id: 1, name: "Superadmin" },
     { id: 2, name: "Admin" },
     { id: 3, name: "User" },
   ];
@@ -88,6 +88,7 @@ const UserManagement: React.FC = () => {
         setRoleId(null);
         setPermissionId(null);
         setValidUntil(null);
+        fetchPermissions()
       } else {
         alert("Failed to assign permission. Please try again.");
       }
@@ -97,9 +98,42 @@ const UserManagement: React.FC = () => {
     }
   };
 
+  const handleRevokePermission = async () => {
+    try {
+      const payload: any = {
+        roleId,
+        permissionId,
+      };
+
+      await revokePermission(payload);
+      alert("Permission revoked successfully!");
+
+      fetchPermissions();
+
+      // Clear form
+      setRoleId(null);
+      setPermissionId(null);
+    } catch (error) {
+      console.error("Error revoking permission:", error);
+      alert("Failed to revoke permission. Please try again.");
+    }
+  };
+
+  const fetchPermissions = async () => {
+    try {
+      const data = await getAllPermissionDetails();
+      setPermissionDetails(data);
+    } catch (error) {
+      console.error("Failed to fetch permissions:", error);
+    }
+  };
+  
+  // Call fetchPermissions on mount
   useEffect(() => {
+    fetchPermissions();
     fetchUsers();
   }, []);
+
 
   return (
     <div className="p-8 w-full min-h-screen">
@@ -221,7 +255,7 @@ const UserManagement: React.FC = () => {
 
       {activeTab === "permissions" && (
         <>
-        <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-6">
             <h1 className="text-4xl font-bold text-gray-800">Permission Management</h1>
           </div>
           <div className="bg-white rounded-lg p-6 shadow-lg">
@@ -278,7 +312,7 @@ const UserManagement: React.FC = () => {
                 />
               </div>
 
-              <div  className="mb-4 md:mb-0">
+              <div className="mb-4 md:mb-0">
 
               </div>
             </div>
@@ -286,12 +320,91 @@ const UserManagement: React.FC = () => {
             <button
               onClick={handleAssignPermission}
               className="mt-4 flex items-center space-x-2 bg-gray-700 text-white px-6 py-3 rounded-full shadow-lg hover:bg-gray-800 transition"
-                          >
+            >
               Assign Permission
             </button>
           </div>
+
+          <div className="bg-white rounded-lg p-6 shadow-lg mt-6">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">Revoke Permissions</h2>
+
+            <div className="flex flex-col md:flex-row md:space-x-6">
+              <div className="mb-4 md:mb-0">
+                <label className="block mb-2 font-semibold text-gray-600">Role</label>
+                <select
+                  value={roleId ?? ""}
+                  onChange={(e) => setRoleId(Number(e.target.value))}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                >
+                  <option value="">Select Role</option>
+                  {roles.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mb-4 md:mb-0">
+                <label className="block mb-2 font-semibold text-gray-600">Permission</label>
+                <select
+                  value={permissionId ?? ""}
+                  onChange={(e) => setPermissionId(Number(e.target.value))}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                >
+                  <option value="">Select Permission</option>
+                  {permissions.map((perm) => (
+                    <option key={perm.id} value={perm.id}>
+                      {perm.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <button
+              onClick={handleRevokePermission}
+              className="mt-4 flex items-center space-x-2 bg-red-600 text-white px-6 py-3 rounded-full shadow-lg hover:bg-red-700 transition"
+            >
+              Revoke Permission
+            </button>
+          </div>
+
+          {/* Permissions Table */}
+          <div className="bg-white rounded-lg p-6 shadow-lg mt-6">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">Assigned Permissions</h2>
+
+            <div className="overflow-x-auto">
+              <table className="w-full ">
+                <thead>
+                  <tr className="bg-blue-200">
+                    <th className=" px-4 py-2 text-left rounded-tl-lg">ID</th>
+                    <th className=" px-4 py-2 text-left">Role ID</th>
+                    <th className=" px-4 py-2 text-left">Permission ID</th>
+                    <th className=" px-4 py-2 text-left rounded-tr-lg">Valid Until</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {permissionDetails.map((perm: any) => (
+                    <tr key={perm.id} className="hover:bg-gray-100">
+                      <td className="border border-gray-300 px-4 py-2">{perm.id}</td>
+                      <td className="border border-gray-300 px-4 py-2">{perm.role_id}</td>
+                      <td className="border border-gray-300 px-4 py-2">{perm.permission_id}</td>
+                      <td className="border border-gray-300 px-4 py-2">
+                        {perm.valid_to ? perm.valid_to : "No Expiry"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+
         </>
       )}
+
+
     </div>
   );
 };

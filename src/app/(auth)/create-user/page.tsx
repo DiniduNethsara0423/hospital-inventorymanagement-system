@@ -91,6 +91,7 @@ const RegistrationSteps: React.FC = () => {
 
             {step === 1 && (
                 <div>
+                    {renderMessage()}
                     <input
                         type="email"
                         placeholder="Email"

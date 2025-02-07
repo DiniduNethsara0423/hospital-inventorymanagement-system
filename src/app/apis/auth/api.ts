@@ -144,3 +144,28 @@ export const assignPermission = async (payload: {
       throw error;
     }
   };
+
+
+  export const revokePermission = async (payload: { roleId: number; permissionId: number }) => {
+    const url:any = process.env.NEXT_PUBLIC_REVOKE_PERMISSIONS;
+    try {
+      const response = await api.post(url, payload);
+      return response;
+    } catch (error) {
+      console.error("Error in assigning permission:", error);
+      throw error;
+    }
+  };
+
+  export const getAllPermissionDetails = async()=> {
+    const url:any = process.env.NEXT_PUBLIC_GET_PERMISSIONS;
+
+    try{
+      const responce = await api.get(url)
+      console.log(responce.data)
+      return responce.data;
+    }catch (error) {
+      console.error("Error in assigning permission:", error);
+      throw error;
+    }
+  }

@@ -138,7 +138,7 @@ const DatePage: React.FC = () => {
             Previous
           </button>
           <span className="font-medium text-gray-700">
-            Page {currentPage} of {totalPages}
+            Page {currentPage} 
           </span>
           <button
             onClick={() =>

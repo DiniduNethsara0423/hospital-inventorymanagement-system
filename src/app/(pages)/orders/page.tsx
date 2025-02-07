@@ -124,6 +124,14 @@ const OrdersPage = () => {
         setFilteredInvoices(results);
         setTotalPages(Math.ceil(count[0]["COUNT(*)"] / 7));
         alert("Invoice created and PDF uploaded successfully!");
+
+        setNewInvoice({
+          dateRange: null,
+          quotationId: "QUOT001",
+          purchaseId: 1,
+          invoiceId: "",
+          invoicePdf: null,
+        });
       } else {
         alert("Invoice created successfully!");
       }
