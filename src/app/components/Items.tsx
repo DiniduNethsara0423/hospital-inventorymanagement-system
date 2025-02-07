@@ -233,40 +233,42 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
           </thead>
           <tbody>
             {items.map((item: any) => (
-              <tr
-                key={item.item_barcode}
-                className="hover:bg-blue-50 cursor-pointer"
-                onClick={() => handleRowClick(item)}
-              >                <td className="border px-4 py-3 text-gray-700">{item.item_barcode}</td>
-                <td className="border px-4 py-3 text-gray-700">{item.item_name}</td>
-                <td className="border px-4 py-3 text-gray-700">{item.category_name}</td>
-                <td className="border px-4 py-3 text-gray-700">{item.available_qty}</td>
-                <td className="border px-4 py-3 text-gray-700">{item.currently_using_qty ?? "N/A"}</td>
-                <td className="border px-4 py-3 text-gray-700">{item.lower_quantity}</td>
-                <td className="border px-4 py-3 text-gray-700">{item.qty}</td>
-                <td className="border px-4 py-3 text-center">
-                  <button
-                    className="text-blue-600 hover:text-blue-800 mr-2"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent row click
-                      handleEditClick(item);
-                    }}
-                  >
-                    <Edit size={20} />
-                  </button>
-                  <button
-                    className="text-red-600 hover:text-red-800"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent row click
-                      confirmDelete(item.item_barcode);
-                    }}
-                  >
-                    <Trash2 size={20} />
-                  </button>
-                </td>
-              </tr>
+                <tr
+                  key={item.item_barcode}
+                  className="hover:bg-blue-50 cursor-pointer"
+                  onClick={() => handleRowClick(item)}
+                >
+
+                  <td className="border px-4 py-3 text-gray-700">{item.item_barcode}</td>
+                  <td className="border px-4 py-3 text-gray-700">{item.item_name}</td>
+                  <td className="border px-4 py-3 text-gray-700">{item.category_name}</td>
+                  <td className="border px-4 py-3 text-gray-700">{item.available_qty}</td>
+                  <td className="border px-4 py-3 text-gray-700">{item.currently_using_qty ?? "N/A"}</td>
+                  <td className="border px-4 py-3 text-gray-700">{item.lower_quantity}</td>
+                  <td className="border px-4 py-3 text-gray-700">{item.qty}</td>
+                  <td className="border px-4 py-3 text-center">
+                    <button
+                      className="text-blue-600 hover:text-blue-800 mr-2"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent row click
+                        handleEditClick(item);
+                      }}
+                    >
+                      <Edit size={20} />
+                    </button>
+                    <button
+                      className="text-red-600 hover:text-red-800"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent row click
+                        confirmDelete(item.item_barcode);
+                      }}
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  </td>
+                </tr>
             ))}
-          </tbody>
+              </tbody>
         </table>
       )}
 

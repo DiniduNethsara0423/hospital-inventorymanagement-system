@@ -17,12 +17,13 @@ const AddItemToDepartment = () => {
   const [pageSize, setPageSize] = useState(10);
   const [itemDetails, setItemDetails] = useState([]);
 
-  const [formData, setFormData]:any = useState({
+  const [formData, setFormData] = useState({
     barcode: "",
-    itemDetailId: itemDetails, // Mock ID, replace with dropdown later
-    departmentId: departments, // Mock ID, replace with dropdown later
+    itemDetailId: "", // Default should be an empty string or a valid single value
+    departmentId: "", // Same here
     qty: 0,
   });
+  
 
   const router = useRouter();
   
@@ -142,8 +143,8 @@ const AddItemToDepartment = () => {
       alert("Item successfully added to department!");
       setFormData({
         barcode: "",
-        itemDetailId: 1,
-        departmentId: 1,
+        itemDetailId: "",
+        departmentId: "",
         qty: 0,
       });
       fetchAssignedItems(); // Refresh table data
@@ -307,16 +308,19 @@ const AddItemToDepartment = () => {
               </tr>
             </thead>
             <tbody>
-              {assignedItems.map((item: any) => (
-                <tr key={item.ITEM_DEPARTMENT_BARCODE} className="border-t hover:bg-gray-100">
-                  <td className="px-6 py-3">{item.ITEM_DEPARTMENT_BARCODE}</td>
-                  <Barcode barcode={item.ITEM_DEPARTMENT_BARCODE} />
-                  <td className="px-6 py-3">{item.ITEM_NAME}</td>
-                  <td className="px-6 py-3">{item.DEPARTMENT_NAME}</td>
-                  <td className="px-6 py-3">{item.QTY}</td>
-                </tr>
-              ))}
-            </tbody>
+  {assignedItems.map((item: any) => (
+    <tr key={item.ITEM_DEPARTMENT_BARCODE} className="border-t hover:bg-gray-100">
+      <td className="px-6 py-3">{item.ITEM_DEPARTMENT_BARCODE}</td>
+      <td className="px-6 py-3">
+        <Barcode barcode={item.ITEM_DEPARTMENT_BARCODE} />
+      </td>
+      <td className="px-6 py-3">{item.ITEM_NAME}</td>
+      <td className="px-6 py-3">{item.DEPARTMENT_NAME}</td>
+      <td className="px-6 py-3">{item.QTY}</td>
+    </tr>
+  ))}
+</tbody>
+
           </table>
         </div>
       </div>

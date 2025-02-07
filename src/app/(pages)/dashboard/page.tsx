@@ -4,6 +4,9 @@ import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Box, TrendingUp, DollarSign, Truck, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+
+const DoughnutChart = dynamic(() => import('react-chartjs-2').then((mod) => mod.Doughnut), { ssr: false });
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -12,9 +15,11 @@ function InventoryPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem('jwtToken');
-    if (!token) {
-      router.push('/login');
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('jwtToken');
+      if (!token) {
+        router.push('/login');
+      }
     }
   }, [router]);
   
@@ -41,13 +46,16 @@ function InventoryPage() {
   };
 
   const kpiCards = [
-    { label: 'Average Inventory', value: 'LKR 2,500,000', icon: <DollarSign className="text-green-500" /> },
-    { label: 'Inventory Turnover Ratio', value: '2.1', icon: <TrendingUp className="text-blue-500" /> },
-    { label: 'Returns', value: 'LKR 50,000', icon: <AlertTriangle className="text-yellow-500" /> },
-    { label: 'To Be Shipped', value: 'LKR 20,000', icon: <Truck className="text-purple-500" /> },
-    { label: 'Perfect Order Rate', value: '88.8%', icon: <CheckCircle className="text-teal-500" /> },
-    { label: 'To Be Invoiced', value: 'LKR 100,000', icon: <Box className="text-gray-500" /> },
+    { label: 'Average Inventory', value: 'LKR 2,500,000', icon: <DollarSign size={20} className="text-green-500" /> },
+    { label: 'Inventory Turnover Ratio', value: '2.1', icon: <TrendingUp size={20} className="text-blue-500" /> },
+    { label: 'Returns', value: 'LKR 50,000', icon: <AlertTriangle size={20} className="text-yellow-500" /> },
+    { label: 'To Be Shipped', value: 'LKR 20,000', icon: <Truck size={20} className="text-purple-500" /> },
+    { label: 'Perfect Order Rate', value: '88.8%', icon: <CheckCircle size={20} className="text-teal-500" /> },
+    { label: 'To Be Invoiced', value: 'LKR 100,000', icon: <Box size={20} className="text-gray-500" /> },
   ];
+
+
+  
 
   return (
     <div className="p-8 bg-white  min-h-screen font-sans">

@@ -34,13 +34,14 @@ export const QuotationList: React.FC<QuotationListProps> = ({
     setIsLoading(true);
     setError(null);
     try {
-      const data = await getPurchaseRequest(page, ITEMS_PER_PAGE);
-      const transformedData = data.map((item: any) => ({
+      const data = await getPurchaseRequest(page, ITEMS_PER_PAGE) || [];
+      const transformedData = Array.isArray(data) ? data.map((item: any) => ({
         id: item.purchase_request_id,
         name: item.description,
         description: item.description,
         fullPrice: parseFloat(item.total_value),
-      }));
+      })) : [];
+      
       setQuotations(transformedData);
     } catch (err) {
       console.error("Failed to fetch quotations:", err);

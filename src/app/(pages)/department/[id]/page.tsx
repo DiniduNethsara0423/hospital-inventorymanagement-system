@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { updateDepartment, deleteDepartment, getDepartmentById, removeItemFromDepartment, } from "@/app/apis/department/api";
 import { Trash2, Edit } from "lucide-react";
 import React from "react";
 
-const DepartmentDetailPage = ({ params }: any) => {
+const DepartmentDetailPage = () => {
+
+  const params = useParams(); // Properly unwrap params
+  const departmentId = Number(params?.id); // Ensure it's a number
 
   const [name, setName] = useState("Sample Department");
   const [isEditing, setIsEditing] = useState(false);
@@ -14,23 +17,24 @@ const DepartmentDetailPage = ({ params }: any) => {
   const [items, setItems] = useState<any[]>([]);
   const router = useRouter();
 
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [removingQty, setRemovingQty] = useState(0);
   const [reason, setReason] = useState("");
 
+  // Redirect to login if token is missing
   useEffect(() => {
-    const token = localStorage.getItem('jwtToken');
+    const token = localStorage.getItem("jwtToken");
     if (!token) {
-      router.push('/login');
+      router.push("/login");
     }
   }, [router]);
 
   const fetchDepartmentDetails = async () => {
+    if (!departmentId) return; // Ensure departmentId exists
     setLoading(true);
     try {
-      const response = await getDepartmentById(Number(params.id));
+      const response = await getDepartmentById(departmentId);
       if (response) {
         setName(response.name);
       } else {
@@ -44,9 +48,10 @@ const DepartmentDetailPage = ({ params }: any) => {
   };
 
   const fetchItemsByDepartment = async () => {
+    if (!departmentId) return; // Ensure departmentId exists
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:3100/items/items-department/get-details/${params.id}`);
+      const res = await fetch(`http://localhost:3100/items/items-department/get-details/${departmentId}`);
       const data = await res.json();
       if (data) {
         setItems(Array.isArray(data) ? data : [data]);
@@ -60,10 +65,13 @@ const DepartmentDetailPage = ({ params }: any) => {
     }
   };
 
+  // Fetch data when departmentId is available
   useEffect(() => {
-    fetchDepartmentDetails();
-    fetchItemsByDepartment();
-  }, []);
+    if (departmentId) {
+      fetchDepartmentDetails();
+      fetchItemsByDepartment();
+    }
+  }, [departmentId]);
 
   const handleUpdate = async () => {
     if (!name.trim()) {
@@ -71,7 +79,7 @@ const DepartmentDetailPage = ({ params }: any) => {
       return;
     }
     try {
-      await updateDepartment({ id: parseInt(params.id), name });
+      await updateDepartment({ id: departmentId, name });
       alert("Department updated successfully.");
       setIsEditing(false);
     } catch (error) {
@@ -83,7 +91,7 @@ const DepartmentDetailPage = ({ params }: any) => {
   const handleDelete = async () => {
     if (confirm("Are you sure you want to delete this department?")) {
       try {
-        await deleteDepartment(parseInt(params.id));
+        await deleteDepartment(departmentId);
         alert("Department deleted successfully.");
         router.back();
       } catch (error) {
@@ -93,20 +101,12 @@ const DepartmentDetailPage = ({ params }: any) => {
     }
   };
 
-  const handleEditItem = (item: any) => {
-    alert(`Editing item: ${item.ITEM_NAME}`);
-    // Implement edit functionality here
-  };
-
-
   const handleDeleteItem = async () => {
     if (!selectedItem) return;
-
     if (removingQty > selectedItem.QTY) {
       alert("Removing quantity cannot exceed available quantity.");
       return;
     }
-
     try {
       const payload = { qty: removingQty, reason };
       await removeItemFromDepartment(selectedItem.ITEM_DEPARTMENT_BARCODE, payload);
@@ -118,6 +118,7 @@ const DepartmentDetailPage = ({ params }: any) => {
       alert("Failed to remove item.");
     }
   };
+
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen flex flex-col relative">

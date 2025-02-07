@@ -60,20 +60,23 @@ export default function SuppliersPage() {
     if (supplier) {
       setForm(supplier);
       setEditingId(supplier.id);
+      setIsModalOpen(true);
     } else {
+      setEditingId(null);
+      setForm({}); // Clear form initially
+      setIsModalOpen(true);
+  
       try {
-        // Fetch the generated vendor ID from the backend
-        const  vendorId  = await getVendorId();
-        setForm({ id: vendorId }); // Set the generated ID in the form state
+        const vendorId = await getVendorId();
+        setForm((prevForm) => ({ ...prevForm, id: vendorId }));
       } catch (error) {
         console.error("Error generating vendor ID:", error);
         alert("Failed to generate vendor ID.");
-        return;
       }
-      setEditingId(null);
     }
-    setIsModalOpen(true);
   };
+  
+  
   
   const closeModal = () => {
     setIsModalOpen(false);
@@ -194,7 +197,7 @@ export default function SuppliersPage() {
               </tr>
             ) : (
               suppliers.map((supplier:any) => (
-                <tr key={supplier.vendor_id} className="hover:bg-blue-50">
+                <tr key={supplier.id} className="hover:bg-blue-50">
                   <td className="border px-4 py-3 text-gray-700">{supplier.id}</td>
                   <td className="border px-4 py-3 text-gray-700">{supplier.vendorName}</td>
                   <td className="border px-4 py-3 text-gray-700">{supplier.email || "-"}</td>
