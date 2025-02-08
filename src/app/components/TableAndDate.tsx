@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { getLogsByTableAndDate } from "@/app/apis/logs/api";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const TableAndDate: React.FC = () => {
   const [selectedTable, setSelectedTable] = useState("category_log");
@@ -9,6 +10,7 @@ const TableAndDate: React.FC = () => {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [total, setTotal] = useState(0);
 
   const handleTableChange = (table: string) => {
     setSelectedTable(table);
@@ -26,7 +28,8 @@ const TableAndDate: React.FC = () => {
     try {
       const data = await getLogsByTableAndDate(
         currentPage.toString(),
-        pageSize.toString(),
+        // pageSize.toLocaleString(),
+        "1000",
         selectedDate,
         selectedTable
       );
@@ -39,6 +42,7 @@ const TableAndDate: React.FC = () => {
   };
 
   const handlePageChange = (page: number) => {
+    if (page < 1 || page > Math.ceil(total / pageSize)) return;
     setCurrentPage(page);
     fetchLogs();
   };
@@ -51,7 +55,8 @@ const TableAndDate: React.FC = () => {
 
       <div className=" bg-white p-6">
         {/* Dropdown for selecting table */}
-        <div className="mb-6">
+        <div className="flex  justify-between gap-10">
+        <div className="mb-6 w-2/3">
           <label htmlFor="tableSelector" className="block font-semibold text-gray-700 mb-2">
             Select Table:
           </label>
@@ -61,34 +66,36 @@ const TableAndDate: React.FC = () => {
             onChange={(e) => handleTableChange(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="category_log">category_log</option>
-            <option value="department_log">department_log</option>
-            <option value="invoices_log">invoices_log</option>
-            <option value="item_departments_log">item_departments_log</option>
-            <option value="item_details_log">item_details_log</option>
-            <option value="items_log">items_log</option>
-            <option value="purchase_request_log">purchase_request_log</option>
-            <option value="purchases_log">purchases_log</option>
-            <option value="quotations_log">quotations_log</option>
-            <option value="roles_log">roles_log</option>
-            <option value="users_log">users_log</option>
-            <option value="vendors_log">vendors_log</option>
+            <option value="category_log">category log</option>
+            <option value="department_log">department log</option>
+            <option value="invoices_log">invoices log</option>
+            <option value="item_departments_log">item departments log</option>
+            <option value="item_details_log">item details log</option>
+            <option value="items_log">items log</option>
+            <option value="purchase_request_log">purchase_request log</option>
+            <option value="purchases_log">purchases log</option>
+            <option value="quotations_log">quotations log</option>
+            <option value="roles_log">roles log</option>
+            <option value="users_log">users log</option>
+            <option value="vendors_log">vendors log</option>
           </select>
         </div>
 
         {/* Date input and search button */}
-        <div className="mb-4">
+        <div className="mb-4 w-1/2">
           <label htmlFor="date" className="block font-semibold text-gray-700 mb-2">
             Enter Date (yyyy-mm-dd):
           </label>
-          <div className="flex items-center space-x-4">
-            <input
+          <div className="flex items-center space-x-5 w-full">
+           <div className="w-full">
+           <input
               type="date"
               id="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 w-full py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+           </div>
             <button
               onClick={fetchLogs}
               className="px-6 py-2 bg-gray-700 text-white font-medium rounded-md hover:bg-gray-800 transition-colors"
@@ -97,6 +104,7 @@ const TableAndDate: React.FC = () => {
             </button>
           </div>
         </div>
+        </div>
 
         {/* Display logs */}
         {loading ? (
@@ -104,10 +112,10 @@ const TableAndDate: React.FC = () => {
         ) : error ? (
           <p className="text-center text-red-500">{error}</p>
         ) : logs.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="table-auto w-full border-collapse border border-gray-300">
+          <div className="overflow-x-auto rounded-lg bg-white">
+              <table className="table-auto w-full border-collapse text-sm text-gray-800">
               <thead>
-                <tr className="bg-indigo-100">
+                <tr className="bg-blue-200">
                   {Object.keys(logs[0]).map((key) => (
                     <th key={key} className="border border-gray-300 px-4 py-2 text-left font-semibold">
                       {key.replace(/_/g, " ").toUpperCase()}
@@ -153,20 +161,23 @@ const TableAndDate: React.FC = () => {
               <option value={15}>15</option>
             </select>
           </div>
-          <div className="flex space-x-2">
-            {Array.from({ length: Math.ceil(logs.length / pageSize) }, (_, index) => (
-              <button
-                key={index + 1}
-                onClick={() => handlePageChange(index + 1)}
-                className={`px-3 py-1 rounded-lg shadow-sm ${currentPage === index + 1
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 hover:bg-gray-300"
-                  }`}
-              >
-                {index + 1}
-              </button>
-            ))}
-          </div>
+          {/* <div className="flex justify-center items-center mt-6 space-x-4">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"} transition`}
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <span className="mx-2 text-lg">Page {currentPage}</span>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === Math.ceil(total / pageSize)}
+            className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${currentPage === Math.ceil(total / pageSize) ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"} transition`}
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div> */}
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getAllUsers } from "@/app/apis/get-all-users/api";
 import { getLogsByTableNameAndUserId } from "@/app/apis/logs/api";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const TableAndUserId: React.FC = () => {
   const [userId, setUserId] = useState<number | null>(null);
@@ -45,7 +46,7 @@ const TableAndUserId: React.FC = () => {
             currentPage,
             pageSize
           );
-          const logs = data|| [];
+          const logs = data || [];
           setTableData(logs);
 
           if (logs.length > 0) {
@@ -86,68 +87,69 @@ const TableAndUserId: React.FC = () => {
   };
 
   return (
-    <div className="p-6 bg-white min-h-screen">
-      <h1 className="text-2xl font-semibold mb-4 text-gray-800">Dynamic Logs Table</h1>
+    <div className="bg-white min-h-screen">
+      <h1 className="text-2xl font-semibold mb-8 text-center">Dynamic Logs Table</h1>
 
-      {/* Table Selector */}
-      <div className="mb-6">
-        <label htmlFor="tableSelector" className="block font-medium mb-2 text-gray-700">
-          Select Table:
-        </label>
-        <select
-          id="tableSelector"
-          value={selectedTable}
-          onChange={(e) => handleTableChange(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded w-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="" disabled>
-            -- Select a Table --
-          </option>
-          <option value="" disabled>-- Select a Table --</option>
-          <option value="category_log">Category Logs</option>
-          <option value="department_log">Department Logs</option>
-          <option value="invoices_log">Invoices Logs</option>
-          <option value="item_departments_log">Item Departments Logs</option>
-          <option value="item_details_log">Item Details Logs</option>
-          <option value="items_log">Items Logs</option>
-          <option value="purchase_request_log">Purchase Request Logs</option>
-          <option value="purchases_log">Purchases Logs</option>
-          <option value="quotations_log">Quotations Logs</option>
-          <option value="roles_log">Roles Logs</option>
-          <option value="users_log">Users Logs</option>
-          <option value="vendors_log">Vendors Logs</option>
-        </select>
-      </div>
+      <div className="flex justify-between gap-8">
+        {/* Table Selector */}
+        <div className="mb-6 w-full">
+          <label htmlFor="tableSelector" className="block font-medium mb-2 text-gray-700">
+            Select Table:
+          </label>
+          <select
+            id="tableSelector"
+            value={selectedTable}
+            onChange={(e) => handleTableChange(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded w-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="" disabled>
+              Select a Table
+            </option>
+            <option value="" disabled>Select a Table</option>
+            <option value="category_log">Category Logs</option>
+            <option value="department_log">Department Logs</option>
+            <option value="invoices_log">Invoices Logs</option>
+            <option value="item_departments_log">Item Departments Logs</option>
+            <option value="item_details_log">Item Details Logs</option>
+            <option value="items_log">Items Logs</option>
+            <option value="purchase_request_log">Purchase Request Logs</option>
+            <option value="purchases_log">Purchases Logs</option>
+            <option value="quotations_log">Quotations Logs</option>
+            <option value="roles_log">Roles Logs</option>
+            <option value="users_log">Users Logs</option>
+            <option value="vendors_log">Vendors Logs</option>
+          </select>
+        </div>
 
-      {/* User Selector */}
-      <div className="mb-4">
-        <label htmlFor="userDropdown" className="block font-medium mb-1 text-gray-700">
-          Select User:
-        </label>
-        <select
-          id="userDropdown"
-          value={userId || ""}
-          onChange={handleUserChange}
-          className="px-4 py-2 border border-gray-300 rounded w-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="" disabled>
-            -- Select a User --
-          </option>
-          {loading && <option>Loading users...</option>}
-          {error && <option disabled>Error loading users</option>}
-          {!loading &&
-            !error &&
-            users.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.id} - {user.name}
-              </option>
-            ))}
-        </select>
+        {/* User Selector */}
+        <div className="mb-4 w-full">
+          <label htmlFor="userDropdown" className="block font-medium mb-2 text-gray-700">
+            Select User:
+          </label>
+          <select
+            id="userDropdown"
+            value={userId || ""}
+            onChange={handleUserChange}
+            className="px-4 py-2 border border-gray-300 rounded w-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="" disabled>
+              Select a User
+            </option>
+            {loading && <option>Loading users...</option>}
+            {error && <option disabled>Error loading users</option>}
+            {!loading &&
+              !error &&
+              users.map((user: any) => (
+                <option key={user.id} value={user.id}>
+                  {user.id} - {user.username}
+                </option>
+              ))}
+          </select>
+        </div>
       </div>
 
       {/* Logs Table */}
-      <div className="mb-6">
-        <h2 className="text-xl font-medium mb-4 text-gray-800">Logs</h2>
+      <div className="mb-6 mt-4">
         {loading && <p>Loading logs...</p>}
         {error && <p className="text-red-500">Error: {error}</p>}
         {!loading && !error && tableData.length === 0 && (
@@ -155,10 +157,10 @@ const TableAndUserId: React.FC = () => {
         )}
         {!loading && !error && tableData.length > 0 && (
           <>
-            <div className="overflow-x-auto">
-              <table className="table-auto w-full border-collapse border border-gray-300">
+            <div className="overflow-x-auto rounded-lg bg-white">
+              <table className="table-auto w-full border-collapse text-sm text-gray-800">
                 <thead>
-                  <tr className="bg-indigo-100">
+                  <tr className="bg-blue-200">
                     {headers.map((header: any) => (
                       <th
                         key={header}
@@ -199,25 +201,37 @@ const TableAndUserId: React.FC = () => {
                   <option value={20}>20</option>
                 </select>
               </div>
-              <div>
+
+
+
+              <div className="flex justify-center items-center mt-6 space-x-4">
+
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 border border-gray-300 rounded bg-blue-500 text-white disabled:opacity-50"
+                  className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${currentPage === 1
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-gray-300"
+                    } transition`}
                 >
-                  Previous
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
-                <span className="mx-2">
-                  Page {currentPage} of {Math.ceil(total / pageSize)}
+                <span className="mx-2 text-lg">
+                  Page {currentPage}
                 </span>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === Math.ceil(total / pageSize)}
-                  className="px-4 py-2 border border-gray-300 rounded bg-blue-500 text-white disabled:opacity-50"
+                  className={`px-4 py-2 bg-gray-200 rounded-lg shadow 
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-300"
+              } transition`}
+
                 >
-                  Next
+                  <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
+
             </div>
           </>
         )}

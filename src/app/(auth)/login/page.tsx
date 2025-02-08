@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import loginImg from '@/app/images/logini.jpg';
 import Link from 'next/link';

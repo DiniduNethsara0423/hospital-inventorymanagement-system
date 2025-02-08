@@ -59,13 +59,13 @@ const UserId: React.FC = () => {
   };
 
   const renderLogsTable = (logs: any[], logType: string) => (
-    <div className="overflow-x-auto mt-6 ">
-      <h2 className="text-lg font-semibold mb-2 capitalize text-gray-700">{logType}</h2>
-      <table className="table-auto w-full border border-gray-200 rounded-md bg-white text-sm">
-        <thead>
-          <tr className="bg-indigo-100 text-left">
+    <div className="overflow-x-auto rounded-lg bg-white">
+      <h2 className="text-lg font-semibold mb-2 mt-6 capitalize text-gray-800">{logType}</h2>
+      <table className="table-auto w-full border-collapse text-sm text-gray-800">
+      <thead>
+          <tr className="bg-blue-200 text-left">
             {Object.keys(logs[0]).map((key) => (
-              <th key={key} className="border border-gray-200 px-4 py-2 text-gray-600">
+              <th key={key}                         className="border border-gray-300 px-4 py-2 text-left font-semibold ">
                 {key.replace(/_/g, " ").toUpperCase()}
               </th>
             ))}
@@ -91,7 +91,7 @@ const UserId: React.FC = () => {
 
   return (
     <div className="p-8 bg-white min-h-screen">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">User Logs</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">User Logs</h1>
 
       {loading && <p className="text-gray-600">Loading...</p>}
       {error && <p className="text-red-500">Error: {error}</p>}
@@ -108,11 +108,11 @@ const UserId: React.FC = () => {
             className="px-4 py-2 border border-gray-300 rounded-md w-full text-gray-700 bg-white focus:outline-none focus:ring focus:ring-gray-300"
           >
             <option value="" disabled>
-              -- Select a User --
+               Select a User 
             </option>
-            {users.map((user) => (
+            {users.map((user:any) => (
               <option key={user.id} value={user.id}>
-                {user.id} - {user.name}
+                {user.id} - {user.username}
               </option>
             ))}
           </select>

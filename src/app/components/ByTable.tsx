@@ -61,52 +61,53 @@ const Page: React.FC = () => {
   return (
     <div className="min-h-screen ">
       <div className=" py-8">
-        <h1 className="text-3xl font-bold mb-6 text-center">Logs Viewer</h1>
+        <h1 className="text-2xl font-semibold mb-6 text-center">Logs By Category</h1>
 
         {/* Table Selector */}
-        <div className="mb-6  rounded-lg bg-white ">
-          <label htmlFor="tableSelector" className="block font-medium mb-2 text-gray-700">
-            Table Name Selector:
-          </label>
-          <select
-            id="tableSelector"
-            value={selectedTable}
-            onChange={(e) => handleTableChange(e.target.value)}
-            className="px-4 py-2 border-2 rounded w-full focus:outline-none focus:ring-2"
-          >
-            <option value="category_log">Category Log</option>
-            <option value="department_log">Department Log</option>
-            <option value="invoices_log">Invoices Log</option>
-            <option value="item_departments_log">Item Departments Log</option>
-            <option value="item_details_log">Item Details Log</option>
-            <option value="items_log">Items Log</option>
-            <option value="purchase_request_log">Purchase Request Log</option>
-            <option value="purchases_log">Purchases Log</option>
-            <option value="quotations_log">Quotations Log</option>
-            <option value="roles_log">Roles Log</option>
-            <option value="users_log">Users Log</option>
-            <option value="vendors_log">Vendors Log</option>
-          </select>
-        </div>
-
-        {/* Pagination and Page Size */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <label htmlFor="pageSize" className="mr-2 font-medium text-gray-700">
-              Rows per page:
+        <div className='flex justify-between'>
+          <div className="mb-6 w-2/3  rounded-lg bg-white ">
+            <label htmlFor="tableSelector" className="block font-medium mb-2 text-gray-700">
+              Table Name Selector:
             </label>
             <select
-              id="pageSize"
-              value={pageSize}
-              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-              className="px-3 py-2 border rounded text-gray-700 bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              id="tableSelector"
+              value={selectedTable}
+              onChange={(e) => handleTableChange(e.target.value)}
+              className="px-4 py-2 border-2 rounded w-full focus:outline-none focus:ring-2"
             >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
+              <option value="category_log">Category Log</option>
+              <option value="department_log">Department Log</option>
+              <option value="invoices_log">Invoices Log</option>
+              <option value="item_departments_log">Item Departments Log</option>
+              <option value="item_details_log">Item Details Log</option>
+              <option value="items_log">Items Log</option>
+              <option value="purchase_request_log">Purchase Request Log</option>
+              <option value="purchases_log">Purchases Log</option>
+              <option value="quotations_log">Quotations Log</option>
+              <option value="roles_log">Roles Log</option>
+              <option value="users_log">Users Log</option>
+              <option value="vendors_log">Vendors Log</option>
             </select>
           </div>
 
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <label htmlFor="pageSize" className="mr-2 font-medium text-gray-700">
+                Rows per page:
+              </label>
+              <select
+                id="pageSize"
+                value={pageSize}
+                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                className="px-3 py-2 border rounded text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+              </select>
+            </div>
+
+          </div>
         </div>
 
         {/* Table Display */}
@@ -118,7 +119,7 @@ const Page: React.FC = () => {
           <div className="overflow-x-auto rounded-lg bg-white">
             <table className="table-auto w-full border-collapse text-sm text-gray-800">
               <thead>
-                <tr className="bg-indigo-100">
+                <tr className="bg-blue-200">
                   {columns.map((column) => (
                     <th
                       key={column}

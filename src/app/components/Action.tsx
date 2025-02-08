@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getLogsByAction } from "@/app/apis/logs/api"; // Update with the correct path to your API function
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Action: React.FC = () => {
   const [userId, setUserId] = useState<number | null>(null);
@@ -47,13 +48,13 @@ const Action: React.FC = () => {
 
   return (
     <div className="p-6  min-h-screen">
-      <h1 className="text-2xl font-semibold text-gray-800 mb-6">
+      <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
         Action Logs Viewer
       </h1>
 
       {/* Action Selector */}
-      <div className="mb-6 flex flex-col md:flex-row gap-4">
-        <div>
+      <div className="mb-6 flex gap-4 justify-between">
+        <div className="w-2/3">
           <label htmlFor="action" className="font-medium text-gray-700 block mb-1">
             Select Action:
           </label>
@@ -61,9 +62,9 @@ const Action: React.FC = () => {
             id="action"
             value={action}
             onChange={handleActionChange}
-            className="px-4 py-2 border rounded w-full md:w-64 bg-white"
+            className="px-4 py-2 border rounded w-full  bg-white"
           >
-            <option value="">-- Select Action --</option>
+            <option value=""> Select Action </option>
             <option value="INSERT">INSERT</option>
             <option value="UPDATE">UPDATE</option>
             <option value="DELETE">DELETE</option>
@@ -71,20 +72,22 @@ const Action: React.FC = () => {
         </div>
 
         {/* Page Size Selector */}
-        <div>
-          <label htmlFor="pageSize" className="font-medium text-gray-700 block mb-1">
-            Rows Per Page:
-          </label>
-          <select
-            id="pageSize"
-            value={pageSize}
-            onChange={handlePageSizeChange}
-            className="px-4 py-2 border rounded w-full md:w-64 bg-white"
-          >
-            <option value={2}>2</option>
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-          </select>
+        <div className="flex justify-between items-center">
+          <div>
+            <label htmlFor="pageSize" className="mr-2 font-medium text-gray-700">
+              Rows Per Page:
+            </label>
+            <select
+              id="pageSize"
+              value={pageSize}
+              onChange={handlePageSizeChange}
+              className="px-3 py-2 border rounded text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              >
+              <option value={2}>2</option>
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -95,7 +98,7 @@ const Action: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="table-auto w-full border-collapse shadow-md">
             <thead>
-              <tr className="bg-indigo-100 text-gray-700">
+              <tr className="bg-blue-200 text-gray-700">
                 <th className=" px-4 py-2 text-left rounded-tl">ID</th>
                 <th className="border px-4 py-2 text-left">Action</th>
                 <th className=" px-4 py-2 text-left rounded-tr">Timestamp</th>
@@ -106,9 +109,8 @@ const Action: React.FC = () => {
                 logs.map((log, index) => (
                   <tr
                     key={index}
-                    className={`${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                    } hover:bg-blue-50`}
+                    className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                      } hover:bg-blue-50`}
                   >
                     <td className="border border-gray-300 px-4 py-2">{log.id}</td>
                     <td className="border border-gray-300 px-4 py-2">{log.action}</td>
@@ -131,23 +133,30 @@ const Action: React.FC = () => {
       )}
 
       {/* Pagination */}
-      <div className="mt-6 flex justify-between items-center">
+      <div className="flex justify-center items-center mt-6 space-x-4">
+
         <button
           onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1 || loading}
-          className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+          disabled={currentPage === 1}
+          className={`px-4 py-2 bg-gray-200 rounded-lg shadow ${currentPage === 1
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:bg-gray-300"
+            } transition`}
         >
-          Previous
+          <ChevronLeft className="w-5 h-5" />
         </button>
-        <span className="font-medium text-gray-700">
+        <span className="mx-2 text-lg">
           Page {currentPage}
         </span>
         <button
           onClick={() => handlePageChange(currentPage + 1)}
-          disabled={logs.length < pageSize || loading}
-          className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+          className={`px-4 py-2 bg-gray-200 rounded-lg shadow 
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-gray-300"
+              } transition`}
+
         >
-          Next
+          <ChevronRight className="w-5 h-5" />
         </button>
       </div>
     </div>
