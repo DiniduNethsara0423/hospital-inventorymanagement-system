@@ -84,7 +84,7 @@ export const QuotationForm: React.FC<QuotationFormProps> = ({ setQuotations }) =
         }`}
         disabled={isLoading}
       >
-        {isLoading ? "Adding..." : "Add Quotation"}
+        {isLoading ? "Adding..." : "Add Purchase Request"}
       </button>
     </div>
   );

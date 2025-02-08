@@ -11,8 +11,8 @@ import { useRouter } from "next/navigation";
 const OrdersPage = () => {
   const [newInvoice, setNewInvoice]: any = useState({
     dateRange: null,
-    quotationId: "QUOT001",
-    purchaseId: 1,
+    quotationId: "",
+    purchaseId: "",
     invoiceId: "",
     invoicePdf: null,
   });
@@ -227,7 +227,7 @@ const OrdersPage = () => {
               </div>
             )}
           </div>
-  
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Purchase ID</label>
             <div
@@ -235,22 +235,21 @@ const OrdersPage = () => {
               onScroll={handlePurchasesScroll}
             >
               <select
-  className="w-full"
-  value={newInvoice.purchaseId || ""}  
-  onChange={handlePurchaseChange}
->
-  <option value="" disabled>Select Purchase</option> 
-  {purchases.map((purchase: any) => (
-    <option key={purchase.id} value={purchase.id}>
-      {purchase.id}
-    </option>
-  ))}
-</select>
+                className="w-full"
+                value={newInvoice.purchaseId || ""}
+                onChange={handlePurchaseChange}
+              >
+                <option value="" disabled>Select Purchase</option>
+                {purchases.map((purchase: any) => (
+                  <option key={purchase.id} value={purchase.id}>
+                    {purchase.id}
+                  </option>
+                ))}
+              </select>
 
             </div>
           </div>
 
-          {/* Move Quotation ID selector here and disable it */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Quotation ID</label>
             <input

@@ -83,13 +83,13 @@ export const QuotationList: React.FC<QuotationListProps> = ({
 
   return (
     <div className="col-span-2 bg-white p-6 rounded-lg border">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Quotations</h2>
+      <h2 className="text-xl font-bold text-gray-900 mb-4">Purchase Requests</h2>
 
       {error && <p className="text-red-500">{error}</p>}
       {isLoading ? (
         <p className="text-gray-500 text-center">Loading...</p>
       ) : filteredQuotations.length === 0 ? (
-        <p className="text-gray-500 text-center">No quotations found.</p>
+        <p className="text-gray-500 text-center">Purchase Requests Not found</p>
       ) : (
         filteredQuotations.map((quotation) => (
           <div
