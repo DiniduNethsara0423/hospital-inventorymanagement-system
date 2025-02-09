@@ -125,3 +125,14 @@ export const updateQuotationStatus = async (quotationId: string, data: any) => {
     throw new Error(`Failed to update quotation status: ${error}`);
   }
 };
+
+export const getQuotationId = async (): Promise<string> => {
+  const url:any = process.env.NEXT_PUBLIC_GENERATE_QUOTATION_ID
+  try {
+    const response = await api.get(`${url}`);
+    return response.data; // Adjust if the API response has a different structure
+  } catch (error) {
+    console.error("Error fetching quotation ID:", error);
+    throw error;
+  }
+};

@@ -28,7 +28,7 @@ const PurchaseOrders: React.FC = () => {
   return (
     <div className="p-4 min-h-screen">
       <h1 className="text-4xl font-extrabold text-center text-blue-900 mb-6 mt-4">
-        Purchase Orders
+        Purchase Requests
       </h1>
 
       {/* Search Bar */}

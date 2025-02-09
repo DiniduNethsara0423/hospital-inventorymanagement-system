@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { X, FileText, CheckCircle, Upload } from "lucide-react";
-import { addQuotation, uploadQuotationPDF, updateQuotationStatus, fetchSuppliers, fetchQuotationPDFs, fetchQuotationsByPurchaseRequestId, addPurchase } from "@/app/apis/purchase/api"; // Adjust the path as necessary
+import { addQuotation, uploadQuotationPDF, updateQuotationStatus, fetchSuppliers, fetchQuotationPDFs, fetchQuotationsByPurchaseRequestId, addPurchase, getQuotationId } from "@/app/apis/purchase/api"; // Adjust the path as necessary
 
 interface Quotation {
   id: string;
@@ -36,12 +36,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
 
 
   // Generate Purchase Request ID
-  const generatePurchaseRequestId = () => {
-    const now = new Date();
-    const id = now.toISOString().replace(/[-:T.]/g, "").slice(0, 14);
-    setPurchaseRequestId(id);
-  };
-
+ 
   // Fetch suppliers using the API service
   const loadSuppliers = useCallback(async () => {
     if (!hasMore || loading) return;
@@ -82,7 +77,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
     }
 
     setLoading(true);
-    const quotationId = new Date().toISOString().replace(/[-:T.]/g, "").slice(0, 14);
+    const quotationId = purchaseRequestId;
 
     // Prepare the quotation object
     const quotationData = {
@@ -189,15 +184,34 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
     }
   };
 
-
-
-  // Trigger supplier and PDF fetch on mount
   useEffect(() => {
-    generatePurchaseRequestId();
+    
     loadSuppliers();
     loadQuotationPDFs();
     loadQuotationsByPurchaseRequestId();
   }, [loadSuppliers, loadQuotationPDFs, loadQuotationsByPurchaseRequestId]);
+  
+  useEffect(() => {
+    const fetchQuotationId = async () => {
+      try {
+        const id = await getQuotationId();
+        setPurchaseRequestId(id); // Store fetched ID
+      } catch (error) {
+        alert("Failed to fetch quotation ID.");
+      }
+    };
+  
+    fetchQuotationId();
+  }, []);
+  
+
+  // Trigger supplier and PDF fetch on mount
+  // useEffect(() => {
+  //   generatePurchaseRequestId();
+  //   loadSuppliers();
+  //   loadQuotationPDFs();
+  //   loadQuotationsByPurchaseRequestId();
+  // }, [loadSuppliers, loadQuotationPDFs, loadQuotationsByPurchaseRequestId]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

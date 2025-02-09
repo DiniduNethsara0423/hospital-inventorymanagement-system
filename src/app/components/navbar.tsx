@@ -16,7 +16,8 @@ import {
   CirclePlus,
   UserRound,
   Layers2,
-  Album
+  Album,
+  StretchVertical
   
 } from 'lucide-react';
 import Link from 'next/link';
@@ -46,6 +47,7 @@ const SidebarNavbar = () => {
     { href: '/inventory', Icon: LucideBox, label: 'Inventory' },
     ...(roleId !== 3 ? [{ href: '/reports', Icon: LucideClipboardList, label: 'Reports' }] : []),
     { href: '/purchase', Icon: LucideShoppingCart, label: 'Quatations' },
+    { href: '/purchase-orders', Icon: StretchVertical, label: 'Orders' },
     { href: '/suppliers', Icon: LucideTruck, label: 'Suppliers' },
     { href: '/orders', Icon: Album, label: 'Invoice' },
     { href: '/department', Icon: LucideBuilding, label: 'Department' },
