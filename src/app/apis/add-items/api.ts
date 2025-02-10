@@ -2,9 +2,11 @@
 import axios from 'axios';
 
 export const fetchItemByBarcode = async (barcode: string) => {
+  const baseUrl:any = process.env.NEXT_PUBLIC_BASE_URL
+
   try {
     const response = await axios.get(
-      `http://localhost:3100/items/get/item/by/barcode/${barcode}`
+      `${baseUrl}/items/get/item/by/barcode/${barcode}`
     );
     return response.data;
   } catch (error) {

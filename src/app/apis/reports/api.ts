@@ -1,6 +1,5 @@
 import api from "../api";
 
-const API_BASE_URL = "http://localhost:3100";
 
 // Function to fetch and download the report based on the date range
 export const downloadReport = async (startDate: string, endDate: string) => {

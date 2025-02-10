@@ -31,6 +31,7 @@ const OrdersPage = () => {
   const [purchases, setPurchases]: any = useState([]); // Store loaded purchases
   const [purchasePage, setPurchasePage]: any = useState(1); // Current page
   const [hasMorePurchases, setHasMorePurchases]: any = useState(true); // Tracks if more data exists
+  const baseUrl:any = process.env.NEXT_PUBLIC_BASE_URL
 
   const router = useRouter();
 
@@ -201,6 +202,7 @@ const OrdersPage = () => {
   };
 
 
+
   return (
     <div className="p-6 w-full mx-auto mt-10">
       {/* Add New Invoice */}
@@ -338,7 +340,7 @@ const OrdersPage = () => {
                 <td className="px-6 py-3">{invoice.total_value || "0"}</td>
                 <td className="px-6 py-3">
                   <a
-                    href={`http://localhost:3100/${invoice.pdf_path}`}
+                    href={`${baseUrl}/${invoice.pdf_path}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline"

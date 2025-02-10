@@ -32,6 +32,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
   const [quotationList, setQuotationList] = useState<any[]>([]);
   const [isPurchaseCompleted, setIsPurchaseCompleted] = useState(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+  const baseUrl:any = process.env.NEXT_PUBLIC_BASE_URL
 
 
 
@@ -392,7 +393,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
                   <X />
                 </button>
                 <iframe
-                  src={`http://localhost:3100/${pdfPreviewUrl}`}
+                  src={`${baseUrl}/${pdfPreviewUrl}`}
                   className="w-full h-[600px] border rounded"
                   title="PDF Preview"
                 ></iframe>

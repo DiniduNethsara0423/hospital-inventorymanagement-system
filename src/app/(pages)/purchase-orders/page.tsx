@@ -20,6 +20,7 @@ const PurchasesPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10); // Adjust as needed
   const [totalCount, setTotalCount] = useState(0);
+  const baseUrl:any = process.env.NEXT_PUBLIC_BASE_URL
 
   const fetchPurchases = async () => {
     setLoading(true);
@@ -89,7 +90,7 @@ const PurchasesPage: React.FC = () => {
                     </select>
                   </td>
                   <td className="p-2 border">
-                    <a href={`http://localhost:3100/${purchase.pdf_path}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                    <a href={`${baseUrl}/${purchase.pdf_path}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
                       View PDF
                     </a>
                   </td>
