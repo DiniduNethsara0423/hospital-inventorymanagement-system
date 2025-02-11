@@ -33,7 +33,10 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
   const [isPurchaseCompleted, setIsPurchaseCompleted] = useState(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const baseUrl:any = process.env.NEXT_PUBLIC_BASE_URL
-
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  
 
 
   // Generate Purchase Request ID
@@ -73,7 +76,8 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
 
   const handleSubmit = async () => {
     if (!selectedSupplier || !totalValue || !pdfFile) {
-      alert("Please fill all required fields and upload a PDF.");
+      setModalMessage("Please fill all required fields and upload a PDF.");
+      setIsErrorModalOpen(true);
       return;
     }
 
@@ -98,10 +102,12 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
       // Upload the PDF
       await uploadQuotationPDF(quotationId, pdfFile);
 
-      alert("Quotation and PDF uploaded successfully.");
-      setSelectedQuotation(null);
+      setModalMessage("Quotation and PDF uploaded successfully.");
+  setIsSuccessModalOpen(true);
+  setSelectedQuotation(null);
     } catch (error) {
-      alert("Failed to submit the quotation. Please try again.");
+      setModalMessage("Failed to submit the quotation. Please try again.");
+  setIsErrorModalOpen(true);
     } finally {
       setLoading(false);
     }
@@ -132,12 +138,14 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
 
   const handlePurchase = async () => {
     if (isPurchaseCompleted) {
-      alert("Purchase has already been completed for this request.");
+      setModalMessage("Purchase has already been completed for this request.");
+      setIsErrorModalOpen(true);
       return;
     }
 
     if (!selectedPDF) {
-      alert("Please select a quotation before proceeding.");
+      setModalMessage("Please select a quotation before proceeding.");
+      setIsErrorModalOpen(true);
       return;
     }
 
@@ -176,13 +184,15 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
 
       await addPurchase(purchaseData);
 
-      alert("Purchase created successfully.");
-      setSelectedQuotation(null); // Close the modal
-    } catch (error) {
-      alert("Failed to complete the purchase. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+      setModalMessage("Purchase created successfully.");
+  setIsSuccessModalOpen(true);
+  setSelectedQuotation(null);
+} catch (error) {
+  setModalMessage("Failed to complete the purchase. Please try again.");
+  setIsErrorModalOpen(true);
+} finally {
+  setLoading(false);
+}
   };
 
   useEffect(() => {
@@ -404,6 +414,39 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
 
         </div>
       </div>
+
+      {/* Success Modal */}
+{isSuccessModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg transition-transform transform scale-100 animate-scaleIn">
+      <h2 className="text-2xl font-bold text-green-600 mb-4">Success!</h2>
+      <p className="text-gray-700">{modalMessage}</p>
+      <button
+        className="mt-6 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-bold shadow-md transition-colors duration-200"
+        onClick={() => setIsSuccessModalOpen(false)}
+      >
+        OK
+      </button>
+    </div>
+  </div>
+)}
+
+{/* Error Modal */}
+{isErrorModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg transition-transform transform scale-100 animate-scaleIn">
+      <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
+      <p className="text-gray-700">{modalMessage}</p>
+      <button
+        className="mt-6 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg font-bold shadow-md transition-colors duration-200"
+        onClick={() => setIsErrorModalOpen(false)}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

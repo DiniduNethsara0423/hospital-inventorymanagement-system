@@ -13,6 +13,7 @@ const RegisterUserPopUp: React.FC = () => {
     const [otp, setOtp] = useState(Array(6).fill(''));
     const [message, setMessage] = useState('');
     const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+    const [isRegistrationComplete, setIsRegistrationComplete] = useState(false);
 
     const handleInitiateRegistration = async () => {
         try {
@@ -21,10 +22,17 @@ const RegisterUserPopUp: React.FC = () => {
                 setMessage('OTP sent to your email');
                 setStep(2);
             }
-        } catch {
-            setMessage('Error initiating registration');
+        } catch (error: any) {
+            if (error.response?.status === 400 && error.response?.data?.message) {
+                setMessage(error.response.data.message); 
+                console.log(error)
+            } else {
+                setMessage('Error initiating registration');
+                console.log(error)
+            }
         }
     };
+    
 
     const handleVerifyOtp = async () => {
         try {
@@ -33,24 +41,32 @@ const RegisterUserPopUp: React.FC = () => {
             if (response.success) {
                 setMessage('OTP verified');
                 setStep(3);
+            } else {
+                setMessage('Invalid OTP. Please try again.');
             }
         } catch {
-            setMessage('Error verifying OTP');
+            setMessage('Invalid OTP. Please try again.');
         }
     };
+    
 
     const handleCompleteRegistration = async () => {
         try {
             const response = await completeRegistration(email);
             if (response.success) {
                 setMessage('Registration complete');
-                
+                setTimeout(() => {
+                    setIsRegistrationComplete(true); // Hide the component
+                }, 1500); // Delay to let the user see the message
+            } else {
+                setMessage('Error completing registration');
             }
         } catch {
             setMessage('Error completing registration');
         }
     };
-
+    
+    
     const handleOtpChange = (value: string, index: number) => {
         const newOtp = [...otp];
         newOtp[index] = value;

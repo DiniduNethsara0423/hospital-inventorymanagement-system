@@ -37,23 +37,26 @@ export default function SuppliersPage() {
     fetchSuppliers(currentPage, pageSize);
   }, [currentPage]);
 
-  const fetchSuppliers = async (page: number, pageSize: number) => {
-    try {
-      const { data } = await getVendors(page, pageSize);
-      const formattedSuppliers = data.map((vendor: any) => ({
-        id: vendor.vendor_id,
-        vendorName: vendor.vendor_name,
-        email: vendor.email,
-        shopName: vendor.shop_name,
-        shopAddress: vendor.shop_address,
-        telephoneNumber: vendor.telephone_number,
-      }));
-      setSuppliers(formattedSuppliers);
-    } catch (error) {
-      console.error("Error fetching suppliers:", error);
-      alert("Failed to fetch suppliers.");
-    }
-  };
+  const [fetchError, setFetchError] = useState<string | null>(null); // Add this line
+
+const fetchSuppliers = async (page: number, pageSize: number) => {
+  try {
+    const { data } = await getVendors(page, pageSize);
+    const formattedSuppliers = data.map((vendor: any) => ({
+      id: vendor.vendor_id,
+      vendorName: vendor.vendor_name,
+      email: vendor.email,
+      shopName: vendor.shop_name,
+      shopAddress: vendor.shop_address,
+      telephoneNumber: vendor.telephone_number,
+    }));
+    setSuppliers(formattedSuppliers);
+  } catch (error) {
+    console.error("Error fetching suppliers:", error);
+    setFetchError("Failed to fetch suppliers.");
+  }
+};
+
 
   const openModal = async (supplier?: Supplier) => {
     if (supplier) {
@@ -122,19 +125,35 @@ export default function SuppliersPage() {
   
   
 
-  const handleDelete = async (id: string) => {
-    try {
-      // Call the delete API function
-      await deleteVendor(id);
-  
-      // Remove supplier from state if the deletion was successful
-      setSuppliers(suppliers.filter((supplier:any) => supplier.id !== id));
-      alert("Supplier deleted successfully");
-    } catch (error) {
-      alert("Failed to delete supplier.");
-      console.error("Error deleting supplier:", error);
-    }
-  };
+  const [deleteConfirmation, setDeleteConfirmation] = useState<string | null>(null); // Add this line
+
+const handleDelete = (id: string) => {
+  setDeleteConfirmation(id); // Instead of directly deleting, ask for confirmation
+};
+
+const confirmDelete = async () => {
+  if (!deleteConfirmation) return;
+
+  try {
+    await deleteVendor(deleteConfirmation);
+    setSuppliers(suppliers.filter((supplier: any) => supplier.id !== deleteConfirmation));
+  } catch (error) {
+    console.error("Error deleting supplier:", error);
+  } finally {
+    setDeleteConfirmation(null);
+  }
+};
+// Filter the suppliers based on the searchQuery before rendering
+const filteredSuppliers = suppliers.filter((supplier: any) => {
+  const query = searchQuery.toLowerCase();
+  return (
+    supplier.vendorName.toLowerCase().includes(query) ||
+    supplier.email?.toLowerCase().includes(query) ||
+    supplier.shopName.toLowerCase().includes(query) ||
+    supplier.telephoneNumber?.toLowerCase().includes(query)
+  );
+});
+
 
   return (
     <div className="mt-12 mx-3">
@@ -185,42 +204,34 @@ export default function SuppliersPage() {
             </tr>
           </thead>
           <tbody>
-            {suppliers.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="text-center py-6 text-gray-500 text-sm bg-gray-50"
-                >
-                  No suppliers added yet.
-                </td>
-              </tr>
-            ) : (
-              suppliers.map((supplier:any) => (
-                <tr key={supplier.id} className="hover:bg-blue-50">
-                  <td className="border px-4 py-3 text-gray-700">{supplier.id}</td>
-                  <td className="border px-4 py-3 text-gray-700">{supplier.vendorName}</td>
-                  <td className="border px-4 py-3 text-gray-700">{supplier.email || "-"}</td>
-                  <td className="border px-4 py-3 text-gray-700">{supplier.shopName}</td>
-                  <td className="border px-4 py-3 text-gray-700">{supplier.shopAddress || "-"}</td>
-                  <td className="border px-4 py-3 text-gray-700">{supplier.telephoneNumber || "-"}</td>
-                  <td className="border px-4 py-3 text-center">
-                    <button
-                      onClick={() => openModal(supplier)}
-                      className="text-blue-600 mr-4 hover:text-blue-800"
-                    >
-                      <Edit size={20} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(supplier.id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
+  {filteredSuppliers.length === 0 ? (
+    <tr>
+      <td colSpan={6} className="text-center py-6 text-gray-500 text-sm bg-gray-50">
+        No suppliers match your search.
+      </td>
+    </tr>
+  ) : (
+    filteredSuppliers.map((supplier: any) => (
+      <tr key={supplier.id} className="hover:bg-blue-50">
+        <td className="border px-4 py-3 text-gray-700">{supplier.id}</td>
+        <td className="border px-4 py-3 text-gray-700">{supplier.vendorName}</td>
+        <td className="border px-4 py-3 text-gray-700">{supplier.email || "-"}</td>
+        <td className="border px-4 py-3 text-gray-700">{supplier.shopName}</td>
+        <td className="border px-4 py-3 text-gray-700">{supplier.shopAddress || "-"}</td>
+        <td className="border px-4 py-3 text-gray-700">{supplier.telephoneNumber || "-"}</td>
+        <td className="border px-4 py-3 text-center">
+          <button onClick={() => openModal(supplier)} className="text-blue-600 mr-4 hover:text-blue-800">
+            <Edit size={20} />
+          </button>
+          <button onClick={() => handleDelete(supplier.id)} className="text-red-600 hover:text-red-800">
+            <Trash2 size={20} />
+          </button>
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
+
         </table>
       </div>
 
@@ -357,6 +368,44 @@ export default function SuppliersPage() {
           </div>
         </div>
       )}
+
+{fetchError && (
+  <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-md flex justify-center items-center z-50">
+    <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md relative">
+      <h2 className="text-2xl font-semibold text-red-600 mb-4">Error</h2>
+      <p className="text-gray-700 mb-6">{fetchError}</p>
+      <button
+        onClick={() => setFetchError(null)}
+        className="bg-red-500 text-white py-2 px-6 rounded-lg hover:bg-red-600"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+{deleteConfirmation && (
+  <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-md flex justify-center items-center z-50">
+    <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md relative">
+      <h2 className="text-2xl font-semibold text-red-600 mb-4">Confirm Deletion</h2>
+      <p className="text-gray-700 mb-6">Are you sure you want to delete this supplier?</p>
+      <div className="flex justify-end gap-4">
+        <button
+          onClick={() => setDeleteConfirmation(null)}
+          className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-lg"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={confirmDelete}
+          className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

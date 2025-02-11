@@ -36,7 +36,7 @@ const PurchaseOrders: React.FC = () => {
         <FaSearch className="text-gray-400 mr-3" />
         <input
           type="text"
-          placeholder="Search quotations by name"
+          placeholder="Search requests by name"
           value={searchQuery}
           onChange={handleSearchChange}
           className="w-full outline-none text-gray-600"

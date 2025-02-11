@@ -17,47 +17,47 @@ export const QuotationForm: React.FC<QuotationFormProps> = ({ setQuotations }) =
   const [newFullPrice, setNewFullPrice] = useState<number | "">("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAddQuotation = async () => {
-    if (newDescription.trim() === "" || newFullPrice === "") {
-      alert("Please fill out all fields.");
-      return;
-    }
+  // Add states for modals
+const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
 
-    const purchaseRequestPayload = {
-      purchase_request_id: String(Date.now()), // Assuming backend expects a unique ID
+// Update handleAddQuotation method
+const handleAddQuotation = async () => {
+  if (newDescription.trim() === "" || newFullPrice === "") {
+    setIsErrorModalOpen(true); // Trigger error modal for validation
+    return;
+  }
+
+  const purchaseRequestPayload = {
+    purchase_request_id: String(Date.now()),
+    description: newDescription,
+    total_value: Number(newFullPrice),
+    pdf_path: "example-string",
+  };
+
+  try {
+    setIsLoading(true);
+    const response = await addPurchaseRequest(purchaseRequestPayload);
+
+    const newQuotation: Quotation = {
+      id: Date.now(),
       description: newDescription,
-      total_value: Number(newFullPrice),
-      pdf_path: "example-string", // Adjust as per backend expectations
+      fullPrice: Number(newFullPrice),
+      approved: false,
     };
 
-    try {
-      setIsLoading(true);
+    setQuotations((prev) => [...prev, newQuotation]);
+    setIsSuccessModalOpen(true); // Trigger success modal
+    setNewDescription("");
+    setNewFullPrice("");
+  } catch (error: any) {
+    console.error("Failed to add quotation:", error.message);
+    setIsErrorModalOpen(true); // Trigger error modal
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-      // Make the API call
-      const response = await addPurchaseRequest(purchaseRequestPayload);
-     
-      // Update state
-      const newQuotation: Quotation = {
-        id: Date.now(),
-        description: newDescription,
-        fullPrice: Number(newFullPrice),
-        approved: false,
-      };
-
-      setQuotations((prev) => [...prev, newQuotation]);
-      alert("Quotation added successfully!");
-      window.location.reload();
-
-      // Clear form inputs
-      setNewDescription("");
-      setNewFullPrice("");
-    } catch (error: any) {
-      console.error("Failed to add quotation:", error.message);
-      alert("Failed to add quotation. Please check the console for details.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="bg-white p-6 rounded-lg border">
@@ -86,6 +86,42 @@ export const QuotationForm: React.FC<QuotationFormProps> = ({ setQuotations }) =
       >
         {isLoading ? "Adding..." : "Add Purchase Request"}
       </button>
+
+      {/* Success Modal */}
+{isSuccessModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg transition-transform transform scale-100 animate-scaleIn">
+      <h2 className="text-2xl font-bold text-green-600 mb-4">Success!</h2>
+      <p className="text-gray-700">Quotation added successfully!</p>
+      <button
+        className="mt-6 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-bold shadow-md transition-colors duration-200"
+        onClick={() => {
+          setIsSuccessModalOpen(false);
+          window.location.reload(); // Optional: reload the page
+        }}
+      >
+        OK
+      </button>
+    </div>
+  </div>
+)}
+
+{/* Error Modal */}
+{isErrorModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg transition-transform transform scale-100 animate-scaleIn">
+      <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
+      <p className="text-gray-700">Failed to add quotation. Please try again.</p>
+      <button
+        className="mt-6 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg font-bold shadow-md transition-colors duration-200"
+        onClick={() => setIsErrorModalOpen(false)}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

@@ -6,7 +6,7 @@ import RegistrationSteps from "@/app/components/RegisterUserPopUp";
 import { fetchAllUsers, assignPermission, revokePermission, getAllPermissionDetails } from "@/app/apis/auth/api"; // Importing APIs
 import { useRouter } from "next/navigation";
 import { deleteUser } from "@/app/apis/inventory/api";
-
+ 
 const UserManagement: React.FC = () => {
   const [users, setUsers]: any = useState([]);
   const [search, setSearch] = useState("");
@@ -23,6 +23,9 @@ const UserManagement: React.FC = () => {
   const [permissionDetails, setPermissionDetails] = useState([]);
   const [deleteUserId, setDeleteUserId] = useState<number | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState<string | null>(null);
+const [showModal, setShowModal] = useState<boolean>(false);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -65,12 +68,6 @@ const UserManagement: React.FC = () => {
     }
     setShowDeleteModal(false);
   };
-  
-  const filteredUsers = users.filter(
-    (user: any) =>
-      user.username.toLowerCase().includes(search.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.toLowerCase())
-  );
 
   const handleAddUser = () => {
     setShowPopup(true);
@@ -99,24 +96,27 @@ const UserManagement: React.FC = () => {
         permissionId,
         validUntil,
       };
-
+  
       const response = await assignPermission(payload);
-
+  
       if (response.status === 200 || response.status === 201) {
-        alert("Permission assigned successfully!");
-        // Clear form
+        setModalMessage("Permission assigned successfully!");
+        setShowModal(true);
         setRoleId(null);
         setPermissionId(null);
         setValidUntil(null);
-        fetchPermissions()
+        fetchPermissions();
       } else {
-        alert("Failed to assign permission. Please try again.");
+        setModalMessage("Failed to assign permission. Please try again.");
+        setShowModal(true);
       }
     } catch (error) {
       console.error("Error assigning permission:", error);
-      alert("Error assigning permission. Please try again.");
+      setModalMessage("Error assigning permission. Please try again.");
+      setShowModal(true);
     }
   };
+  
 
   const handleRevokePermission = async () => {
     try {
@@ -124,20 +124,21 @@ const UserManagement: React.FC = () => {
         roleId,
         permissionId,
       };
-
+  
       await revokePermission(payload);
-      alert("Permission revoked successfully!");
-
+      setModalMessage("Permission revoked successfully!");
+      setShowModal(true);
       fetchPermissions();
-
-      // Clear form
+  
       setRoleId(null);
       setPermissionId(null);
     } catch (error) {
       console.error("Error revoking permission:", error);
-      alert("Failed to revoke permission. Please try again.");
+      setModalMessage("Failed to revoke permission. Please try again.");
+      setShowModal(true);
     }
   };
+  
 
   const fetchPermissions = async () => {
     try {
@@ -154,7 +155,12 @@ const UserManagement: React.FC = () => {
     fetchUsers();
   }, []);
 
-
+  const filteredUsers = users.filter(
+    (user: any) =>
+      user.username.toLowerCase().includes(search.toLowerCase()) ||
+      user.email.toLowerCase().includes(search.toLowerCase())
+  );
+  
   return (
     <div className="p-8 w-full min-h-screen">
       {/* Tabs */}
@@ -240,39 +246,27 @@ const UserManagement: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.length > 0 ? (
-                    filteredUsers.map((user: any) => (
-                      <tr key={user.id} className="hover:bg-blue-50">
-                        <td className="border px-4 py-3 text-gray-700">
-                          {user.id}
-                        </td>
-                        <td className="border px-4 py-3 text-gray-700">
-                          {user.username}
-                        </td>
-                        <td className="border px-4 py-3 text-gray-700">
-                          {user.email}
-                        </td>
-                        <td className="border px-4 py-3 text-gray-700">
-                          {user.role_id}
-                        </td>
-                        <td className="border px-4 py-3 text-gray-700">
-                          <button onClick={() => handleDeleteClick(user.id)} className="text-red-600 hover:text-red-800">
-                            <Trash2/>
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan={4}
-                        className="text-center py-6 text-gray-700"
-                      >
-                        No users found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
+  {filteredUsers.length > 0 ? (
+    filteredUsers.map((user: any) => (
+      <tr key={user.id} className="hover:bg-blue-50">
+        <td className="border px-4 py-3 text-gray-700">{user.id}</td>
+        <td className="border px-4 py-3 text-gray-700">{user.username}</td>
+        <td className="border px-4 py-3 text-gray-700">{user.email}</td>
+        <td className="border px-4 py-3 text-gray-700">{user.role_id}</td>
+        <td className="border px-4 py-3 text-gray-700">
+          <button onClick={() => handleDeleteClick(user.id)} className="text-red-600 hover:text-red-800">
+            <Trash2 />
+          </button>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan={5} className="text-center py-6 text-gray-700">No users found.</td>
+    </tr>
+  )}
+</tbody>
+
               </table>
             )}
           </div>
@@ -445,6 +439,17 @@ const UserManagement: React.FC = () => {
     </div>
   </div>
 )}
+
+{showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <p className="mb-4 text-gray-700">{modalMessage}</p>
+            <button onClick={() => setShowModal(false)} className="hover:bg-gray-200 text-gray-700 px-4 py-2 rounded">
+        OK
+      </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );

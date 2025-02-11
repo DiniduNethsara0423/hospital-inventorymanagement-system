@@ -64,7 +64,7 @@ export const initiateRegistration = async (email: string, password: string, user
             data: response.data,
         };
     } catch (error) {
-        return handleApiError(error);
+      throw error;
     }
 };
 

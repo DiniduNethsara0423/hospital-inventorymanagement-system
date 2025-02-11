@@ -19,7 +19,9 @@ const AddItemForm = () => {
   });
   const [suggestions, setSuggestions] = useState([]);
   const [isExistingItem, setIsExistingItem] = useState(false);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  
   const router = useRouter();
 
   const [invoiceSuggestions, setInvoiceSuggestions] = useState<string[]>([]);
@@ -117,7 +119,8 @@ const AddItemForm = () => {
     const { category_id, name, barcode, total_qty, lower_quantity, price, invoice_id } = formData;
 
     if (!category_id || !name || !barcode || !total_qty || !lower_quantity || !price || !invoice_id) {
-      alert("Please fill in all required fields.");
+      setModalMessage("Please fill in all required fields.");
+      setIsModalOpen(true);
       return;
     }
 
@@ -129,7 +132,8 @@ const AddItemForm = () => {
         lower_quantity: Number(lower_quantity),
         price: parseFloat(price),
       });
-      alert("Item added successfully!");
+      setModalMessage("Item added successfully!");
+  setIsModalOpen(true);
       setFormData({
         category_id: "",
         name: "",
@@ -143,7 +147,8 @@ const AddItemForm = () => {
       setSuggestions([]);
       setIsExistingItem(false);
     } catch (error) {
-      alert("Failed to add item. Please try again.");
+      setModalMessage("Failed to add item. Please try again.");
+  setIsModalOpen(true);
     }
   };
 
@@ -188,7 +193,7 @@ const AddItemForm = () => {
           />
           {suggestions.length > 0 && (
             <ul className="bg-white border border-gray-300 rounded-lg mt-2 max-h-40 overflow-y-auto shadow-md">
-              {suggestions.map((suggestion: any, index: number) => (
+              {suggestions?.map((suggestion: any, index: number) => (
                 <li
                   key={index}
                   onClick={() => handleSuggestionSelect(suggestion)}
@@ -286,6 +291,22 @@ const AddItemForm = () => {
           Add Item
         </button>
       </form>
+
+      {isModalOpen && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white p-6 rounded-md shadow-lg">
+      <h2 className="text-xl font-semibold mb-4">Message</h2>
+      <p>{modalMessage}</p>
+      <button
+        className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg"
+        onClick={() => setIsModalOpen(false)}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

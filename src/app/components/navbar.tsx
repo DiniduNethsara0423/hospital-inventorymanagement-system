@@ -46,7 +46,7 @@ const SidebarNavbar = () => {
     { href: '/dashboard', Icon: LucideHome, label: 'Dashboard' },
     { href: '/inventory', Icon: LucideBox, label: 'Inventory' },
     ...(roleId !== 3 ? [{ href: '/reports', Icon: LucideClipboardList, label: 'Reports' }] : []),
-    { href: '/purchase', Icon: LucideShoppingCart, label: 'Quatations' },
+    { href: '/purchase', Icon: LucideShoppingCart, label: 'Quotations' },
     { href: '/purchase-orders', Icon: StretchVertical, label: 'Orders' },
     { href: '/suppliers', Icon: LucideTruck, label: 'Suppliers' },
     { href: '/orders', Icon: Album, label: 'Invoice' },

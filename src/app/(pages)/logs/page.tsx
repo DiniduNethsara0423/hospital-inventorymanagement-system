@@ -5,24 +5,23 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
 // Dynamically import components
-const ByTable = dynamic(() => import("../../components/ByTable")); // done
-const TableAndUserId = dynamic(() => import("../../components/TableAndUserId")); // done
-const Action = dynamic(() => import("../../components/Action")); // done
-const UserId = dynamic(() => import("../../components/UserId")); // done
-const TableAndDate = dynamic(() => import("../../components/TableAndDate")); // done
-const DateComponent = dynamic(() => import("../../components/Date")); // Renamed to avoid conflict with `Date`
+const ByTable = dynamic(() => import("../../components/ByTable"));
+const TableAndUserId = dynamic(() => import("../../components/TableAndUserId"));
+const Action = dynamic(() => import("../../components/Action"));
+const UserId = dynamic(() => import("../../components/UserId"));
+const TableAndDate = dynamic(() => import("../../components/TableAndDate"));
+const DateComponent = dynamic(() => import("../../components/Date"));
 
 const Page: React.FC = () => {
   const [currentComponent, setCurrentComponent] = useState<string>("ByTable");
-
   const router = useRouter();
-  
-    useEffect(() => {
-      const token = localStorage.getItem('jwtToken');
-      if (!token) {
-        router.push('/login');
-      }
-    }, [router]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("jwtToken");
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
 
   const navigationItems = [
     { name: "By Table", key: "ByTable" },
@@ -30,7 +29,6 @@ const Page: React.FC = () => {
     { name: "By Action", key: "Action" },
     { name: "By User ID", key: "UserId" },
     { name: "By Table And Date", key: "TableAndDate" },
-    { name: "By Date", key: "DateComponent" },
   ];
 
   const renderComponent = () => {
@@ -53,27 +51,31 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div className="p-6 min-h-screen bg-white">
+    <div className="p-6 min-h-screen text-gray-900">
       {/* Navigation */}
-      <ul className="flex flex-wrap gap-4 mb-6 justify-center">
-        {navigationItems.map((item) => (
-          <li key={item.key}>
-            <button
-              onClick={() => setCurrentComponent(item.key)}
-              className={`px-5 py-3 text-lg rounded-lg transition-all duration-200 ${
-                currentComponent === item.key
-                  ? " decoration-4"
-                  : "text-gray-900 hover:bg-gray-100"
-              }`}
-            >
-              {item.name}
-            </button>
-          </li>
-        ))}
-      </ul>
+      <nav className="flex justify-center mb-6">
+        <ul className="flex flex-wrap gap-4 p-2 bg-white rounded-lg">
+          {navigationItems.map((item) => (
+            <li key={item.key}>
+              <button
+                onClick={() => setCurrentComponent(item.key)}
+                className={`px-6 py-2 text-base text-gray-700 font-medium rounded-lg transition-all duration-200 border-b-2 ${
+                  currentComponent === item.key
+                    ? "border-gray-900 text-gray-900"
+                    : "border-transparent hover:border-gray-300 hover:bg-gray-100"
+                }`}
+              >
+                {item.name}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
+      {/* Display Current Section */}
+      
       {/* Component Content */}
-      <div className="bg-white">{renderComponent()}</div>
+      <div className="p-4 bg-white shadow-sm rounded-lg">{renderComponent()}</div>
     </div>
   );
 };

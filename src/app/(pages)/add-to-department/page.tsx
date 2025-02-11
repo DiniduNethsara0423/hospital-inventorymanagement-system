@@ -18,7 +18,7 @@ const AddItemToDepartment = () => {
   const [itemDetails, setItemDetails] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestedItems, setSuggestedItems] = useState<any[]>([]);
-  
+
   const [formData, setFormData] = useState({
     barcode: "",
     itemDetailId: "", // Default should be an empty string or a valid single value
@@ -50,7 +50,7 @@ const AddItemToDepartment = () => {
       setSuggestedItems([]);
       return;
     }
-  
+
     try {
       const response = await getItemsForDepartmentAddition(query, query); // Use either iName or barcode
       setSuggestedItems(response || []);
@@ -64,7 +64,7 @@ const AddItemToDepartment = () => {
     setSearchQuery(value);
     fetchSuggestedItems(value); // Call API while typing
   };
-  
+
 
   const fetchAllItemDetails = async () => {
     try {
@@ -145,9 +145,10 @@ const AddItemToDepartment = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
 
     try {
       await addItemToDepartment(
@@ -156,7 +157,7 @@ const AddItemToDepartment = () => {
         Number(formData.departmentId),
         Number(formData.qty)
       );
-      alert("Item successfully added to department!");
+      setIsModalOpen(true); // Open modal on success
       setFormData({
         barcode: "",
         itemDetailId: "",
@@ -221,46 +222,46 @@ const AddItemToDepartment = () => {
                 </div>
               </div>
               <div className="relative">
-  <label htmlFor="searchQuery" className="block text-sm font-medium text-gray-700">
-    Search Item (Name or Barcode)
-  </label>
-  <input
-    type="text"
-    id="searchQuery"
-    name="searchQuery"
-    value={searchQuery}
-    onChange={handleSearchChange}
-    placeholder="Type item name or barcode..."
-    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
-  />
+                <label htmlFor="searchQuery" className="block text-sm font-medium text-gray-700">
+                  Search Item (Name or Barcode)
+                </label>
+                <input
+                  type="text"
+                  id="searchQuery"
+                  name="searchQuery"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  placeholder="Type item name or barcode..."
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+                />
 
-  {/* Suggestions Dropdown */}
-  {suggestedItems.length > 0 && (
-   <ul className="absolute left-0 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-md max-h-48 overflow-y-auto z-10">
-   {suggestedItems.length > 0 ? (
-     suggestedItems.map((item) => (
-       <li
-         key={item.ITEM_DETAIL_ID} // Use correct key from API response
-         className="px-3 py-2 hover:bg-gray-200 cursor-pointer"
-         onClick={() => {
-           setFormData({ 
-             ...formData, 
-             itemDetailId: item.ITEM_DETAIL_ID, 
-           });
-           setSearchQuery(item.ITEM_NAME); // Display item name in input box
-           setSuggestedItems([]); // Hide dropdown
-         }}
-       >
-         {item.ITEM_NAME} - {item.ITEM_BARCODE} {/* Ensure correct property names */}
-       </li>
-     ))
-   ) : (
-     <li className="px-3 py-2 text-gray-500">No items found</li>
-   )}
- </ul>
- 
-  )}
-</div>
+                {/* Suggestions Dropdown */}
+                {suggestedItems.length > 0 && (
+                  <ul className="absolute left-0 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-md max-h-48 overflow-y-auto z-10">
+                    {suggestedItems.length > 0 ? (
+                      suggestedItems.map((item) => (
+                        <li
+                          key={item.ITEM_DETAIL_ID} // Use correct key from API response
+                          className="px-3 py-2 hover:bg-gray-200 cursor-pointer"
+                          onClick={() => {
+                            setFormData({
+                              ...formData,
+                              itemDetailId: item.ITEM_DETAIL_ID,
+                            });
+                            setSearchQuery(item.ITEM_NAME); // Display item name in input box
+                            setSuggestedItems([]); // Hide dropdown
+                          }}
+                        >
+                          {item.ITEM_NAME} - {item.ITEM_BARCODE} {/* Ensure correct property names */}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="px-3 py-2 text-gray-500">No items found</li>
+                    )}
+                  </ul>
+
+                )}
+              </div>
 
             </div>
 
@@ -383,6 +384,22 @@ const AddItemToDepartment = () => {
           Next
         </button>
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold text-gray-700">Success</h2>
+            <p className="mt-2 text-gray-600">Item successfully added to department!</p>
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="mt-4 px-4 py-2 text-gray-800  rounded-md hover:bg-gray-200"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
 
   );

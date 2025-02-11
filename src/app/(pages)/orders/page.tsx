@@ -31,7 +31,9 @@ const OrdersPage = () => {
   const [purchases, setPurchases]: any = useState([]); // Store loaded purchases
   const [purchasePage, setPurchasePage]: any = useState(1); // Current page
   const [hasMorePurchases, setHasMorePurchases]: any = useState(true); // Tracks if more data exists
-  const baseUrl:any = process.env.NEXT_PUBLIC_BASE_URL
+  const baseUrl: any = process.env.NEXT_PUBLIC_BASE_URL
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalContent, setModalContent] = useState({ title: "", message: "" });
 
   const router = useRouter();
 
@@ -118,29 +120,43 @@ const OrdersPage = () => {
         purchase_id: newInvoice.purchaseId,
         pdf_path: "",
       });
-
+  
       if (newInvoice.invoicePdf) {
         await uploadInvoicePDF(invoice_id, newInvoice.invoicePdf);
         const { results, count } = await fetchInvoices(currentPage, 7);
         setFilteredInvoices(results);
         setTotalPages(Math.ceil(count[0]["COUNT(*)"] / 7));
-        alert("Invoice created and PDF uploaded successfully!");
-
+  
+        setModalContent({
+          title: "Success",
+          message: "Invoice created and PDF uploaded successfully!",
+        });
+        setModalVisible(true);
+  
         setNewInvoice({
           dateRange: null,
-          quotationId: "", // Clear quotation ID
-          purchaseId: "", // Clear purchase ID (important)
+          quotationId: "",
+          purchaseId: "",
           invoiceId: "",
           invoicePdf: null,
         });
       } else {
-        alert("Invoice created successfully!");
+        setModalContent({
+          title: "Success",
+          message: "Invoice created successfully!",
+        });
+        setModalVisible(true);
       }
     } catch (error) {
       console.error("Failed to add invoice:", error);
-      alert("Failed to add invoice. Please try again.");
+      setModalContent({
+        title: "Error",
+        message: "Failed to add invoice. Please try again.",
+      });
+      setModalVisible(true);
     }
   };
+  
 
   const handleGenerateInvoiceId = async () => {
     try {
@@ -159,17 +175,25 @@ const OrdersPage = () => {
     if (confirmDelete) {
       try {
         await deleteInvoice(invoiceId);
-        alert("Invoice deleted successfully!");
-
-        // Refresh the invoices list after deletion
+        setModalContent({
+          title: "Success",
+          message: "Invoice deleted successfully!",
+        });
+        setModalVisible(true);
+  
         const { results, count } = await fetchInvoices(currentPage, 7);
         setFilteredInvoices(results);
         setTotalPages(Math.ceil(count[0]["COUNT(*)"] / 7));
       } catch (error) {
-        alert("Failed to delete invoice. Please try again.");
+        setModalContent({
+          title: "Error",
+          message: "Failed to delete invoice. Please try again.",
+        });
+        setModalVisible(true);
       }
     }
   };
+  
 
   const viewPdf = (base64String: string) => {
     // Convert base64 string to a Blob
@@ -376,7 +400,7 @@ const OrdersPage = () => {
           Previous
         </button>
         <span className="text-gray-700 font-medium">
-          Page {currentPage} of {totalPages}
+          Page {currentPage}
         </span>
         <button
           onClick={() => setCurrentPage((prev: any) => (currentPage < totalPages ? prev + 1 : prev))}
@@ -387,6 +411,22 @@ const OrdersPage = () => {
           Next
         </button>
       </div>
+
+      {modalVisible && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">{modalContent.title}</h2>
+            <p className="mb-4">{modalContent.message}</p>
+            <button
+              onClick={() => setModalVisible(false)}
+              className="hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

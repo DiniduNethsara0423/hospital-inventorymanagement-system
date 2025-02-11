@@ -21,7 +21,9 @@ const DepartmentDetailPage = () => {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [removingQty, setRemovingQty] = useState(0);
   const [reason, setReason] = useState("");
-
+  const [modalMessage, setModalMessage] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  
   // Redirect to login if token is missing
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
@@ -76,29 +78,38 @@ const DepartmentDetailPage = () => {
 
   const handleUpdate = async () => {
     if (!name.trim()) {
-      alert("Department name is required.");
+      setModalMessage("Department name is required.");
+      setShowModal(true);
       return;
     }
     try {
       await updateDepartment({ id: departmentId, name });
-      alert("Department updated successfully.");
+      setModalMessage("Department updated successfully.");
+      setShowModal(true);
       setIsEditing(false);
     } catch (error) {
-      alert("Failed to update department.");
+      setModalMessage("Failed to update department.");
+      setShowModal(true);
     }
   };
+  
 
-  const handleDelete = async () => {
-    if (confirm("Are you sure you want to delete this department?")) {
-      try {
-        await deleteDepartment(departmentId);
-        alert("Department deleted successfully.");
+const handleDelete = async () => {
+  if (confirm("Are you sure you want to delete this department?")) {
+    try {
+      await deleteDepartment(departmentId);
+      setModalMessage("Department deleted successfully.");
+      setShowModal(true);
+      setTimeout(() => {
         router.back();
-      } catch (error) {
-        alert("Failed to delete department.");
-      }
+      }, 2000); // Delay for better UX before navigating back
+    } catch (error) {
+      setModalMessage("Failed to delete department.");
+      setShowModal(true);
     }
-  };
+  }
+};
+
 
   const handleDeleteItem = async () => {
     if (!selectedItem) return;
@@ -265,6 +276,18 @@ const DepartmentDetailPage = () => {
           </div>
         </div>
       )}
+
+{showModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="bg-white p-6 rounded-md shadow-lg text-center">
+      <p className="mb-4 text-gray-700">{modalMessage}</p>
+      <button onClick={() => setShowModal(false)} className="hover:bg-gray-200 text-gray-800 px-4 py-2 rounded">
+        OK
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
