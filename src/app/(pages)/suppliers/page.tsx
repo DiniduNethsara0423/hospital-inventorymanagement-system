@@ -143,16 +143,18 @@ const confirmDelete = async () => {
     setDeleteConfirmation(null);
   }
 };
-// Filter the suppliers based on the searchQuery before rendering
+
+// Ensure properties are defined before calling toLowerCase()
 const filteredSuppliers = suppliers?.filter((supplier: any) => {
   const query = (searchQuery || "").toLowerCase();
-  return (  
-    supplier.vendorName.toLowerCase().includes(query) ||
-    supplier.email?.toLowerCase().includes(query) ||
-    supplier.shopName.toLowerCase().includes(query) ||
-    supplier.telephoneNumber?.toLowerCase().includes(query)
+  return (
+    (supplier.vendorName && supplier.vendorName.toLowerCase().includes(query)) ||
+    (supplier.email && supplier.email.toLowerCase().includes(query)) ||
+    (supplier.shopName && supplier.shopName.toLowerCase().includes(query)) ||
+    (supplier.telephoneNumber && supplier.telephoneNumber.toLowerCase().includes(query))
   );
 });
+
 
 
   return (
