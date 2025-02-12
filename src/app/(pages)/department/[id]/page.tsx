@@ -54,7 +54,7 @@ const DepartmentDetailPage = () => {
     setLoading(true);
     const baseUrl:any = process.env.NEXT_PUBLIC_BASE_URL
     try {
-      const res = await fetch(`${baseUrl}/items-department/get-details/${departmentId}`);
+      const res = await fetch(`${baseUrl}/items/items-department/get-details/${departmentId}`);
       const data = await res.json();
       if (data) {
         setItems(Array.isArray(data) ? data : [data]);
