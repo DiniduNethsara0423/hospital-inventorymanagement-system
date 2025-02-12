@@ -32,7 +32,7 @@ const ItemsPage: React.FC = () => {
     <div className="p-8 w-full min-h-screen bg-white">
 
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-4xl font-bold text-gray-800">Hospital Inventory</h1>
+        <h1 className="text-4xl font-bold text-gray-800">Inventory </h1>
         <button
           className="bg-gray-700 hover:bg-gray-800 text-white px-8 py-3 rounded-lg text-base shadow-lg font-semibold"
           onClick={() => router.push("/add-Inventory")}

@@ -76,7 +76,7 @@ const Page: React.FC = () => {
   return (
     <div className="p-6">
       {/* Header */}
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Hospital Reports</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Inventory Reports</h1>
 
       {/* Flexbox Layout for Date Range and Button */}
       <div className="flex items-center gap-4 mb-6">
