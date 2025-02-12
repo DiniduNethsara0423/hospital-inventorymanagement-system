@@ -7,7 +7,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased font-sans">
+      <body className="">
         <div className="flex h-screen">
           <div className="w-[16%] text-white">
             <Navbar />

@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google"; // Import Inter font
 import "./globals.css";
 import { AuthProvider } from "./lib/AuthContext";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Configure the Inter font
+const inter = Inter({
+  variable: "--font-inter", // Correct variable for Inter
   subsets: ["latin"],
 });
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -26,9 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${inter.variable} antialiased`}>
          <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

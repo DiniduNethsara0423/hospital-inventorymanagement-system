@@ -156,7 +156,7 @@ const filteredSuppliers = suppliers.filter((supplier: any) => {
 
 
   return (
-    <div className="mt-12 mx-3">
+    <div className="mt-12 mx-6">
       {/* Page Header */}
       <div className="text-left mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Supplier Management</h1>

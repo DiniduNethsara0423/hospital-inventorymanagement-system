@@ -65,7 +65,7 @@ const SidebarNavbar = () => {
   ]
 
   return (
-    <div className="flex font-sans">
+    <div className="flex">
       {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 z-40 w-64 h-screen py-4 transition-transform bg-gray-900   ${
@@ -86,7 +86,7 @@ const SidebarNavbar = () => {
             <ul className="space-y-2 font-medium">
             {middleNavItems.map(({ href, Icon, label }) => (
               <div>
-                <p className='text-xl'>ACCOUNT</p>
+                <p className='text-lg'>ACCOUNT</p>
               <SidebarItem key={href} href={href} Icon={Icon} label={label} />
               </div>
             ))}

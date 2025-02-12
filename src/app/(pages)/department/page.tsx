@@ -100,7 +100,7 @@ function DepartmentsPage() {
   };
 
   return (
-    <div className="w-full h-screen mt-12 px-3">
+    <div className="w-full h-screen mt-12 px-8">
       {/* Page Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Departments</h1>

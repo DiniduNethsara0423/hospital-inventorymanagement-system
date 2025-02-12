@@ -58,7 +58,7 @@ function InventoryPage() {
   
 
   return (
-    <div className="p-8 bg-white  min-h-screen font-sans">
+    <div className="p-8 bg-white  min-h-screen">
       {/* Header Section */}
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-semibold text-gray-900">Inventory Management KPIs</h1>
