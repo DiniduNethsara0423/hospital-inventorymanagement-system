@@ -61,7 +61,7 @@ function InventoryPage() {
     <div className="p-8 bg-white  min-h-screen font-sans">
       {/* Header Section */}
       <header className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-semibold text-[#002788]">Inventory Management KPIs</h1>
+        <h1 className="text-3xl font-semibold text-gray-900">Inventory Management KPIs</h1>
         <div className="text-gray-700">
           <span className="font-medium">Period:</span>{' '}
           <span className="text-green-600 font-bold cursor-pointer hover:underline">This Week</span>
@@ -80,7 +80,7 @@ function InventoryPage() {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500">{card.label}</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">{card.value}</p>
+              <p className="text-2xl font-bold text-gray-800 mt-1">{card.value}</p>
             </div>
           </div>
         ))}

@@ -32,22 +32,23 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="relative w-1/2 md:w-1/3">
-      <div className="flex items-center">
-        <input
-          type="text"
-          className="w-full px-4 py-2 text-gray-900 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600"
-          placeholder="Search items... name / barcode"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <button
-          onClick={handleSearch}
-          className="ml-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-        >
-          <LucideSearch className="w-5 h-5" />
-        </button>
-      </div>
+    <div className="relative w-1/2 md:w-1/3 ml-64">
+      <div className="flex items-center bg-gray-100 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 shadow-sm">
+  <input
+    type="text"
+    className="w-full px-4 py-2 text-gray-900 bg-transparent focus:outline-none dark:text-white"
+    placeholder="Search items... name / barcode"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+  />
+  <button
+    onClick={handleSearch}
+    className="px-4 py-2  text-gray-900 rounded-r-lg  focus:outline-none"
+  >
+    <LucideSearch className="w-5 h-5" />
+  </button>
+</div>
+
       {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
 
       {isModalOpen && itemDetails && (

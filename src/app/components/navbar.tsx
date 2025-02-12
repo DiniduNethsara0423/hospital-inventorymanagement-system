@@ -51,7 +51,6 @@ const SidebarNavbar = () => {
     { href: '/suppliers', Icon: LucideTruck, label: 'Suppliers' },
     { href: '/orders', Icon: Album, label: 'Invoice' },
     { href: '/department', Icon: LucideBuilding, label: 'Department' },
-    ...(roleId === 1 ? [{ href: '/user-management', Icon: LucideUsers, label: 'User Management' }] : []),
     { href: '/add-to-department', Icon: CirclePlus, label: 'Add Items to Department' },
     { href: '/settings', Icon: Layers2, label: 'Categories' },
   ];
@@ -60,22 +59,39 @@ const SidebarNavbar = () => {
     // { href: '/settings', Icon: LucideSettings, label: 'Categories' },
     ...(roleId !== 3 ? [{ href: '/logs', Icon: LucideBook, label: 'Logs' }] : []),
   ];
+  const middleNavItems = [
+    ...(roleId === 1 ? [{ href: '/user-management', Icon: LucideUsers, label: 'User Management' }] : []),
+
+  ]
 
   return (
-    <div className="flex">
+    <div className="flex font-sans">
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-40 w-64 h-screen pt-16 transition-transform bg-white border-r border-gray-200 ${
+        className={`fixed top-0 left-0 z-40 w-64 h-screen py-4 transition-transform bg-gray-900   ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0`}
       >
+                  <h1 className="text-2xl font-semibold text-white text-center">Inventory System</h1>
+
         <div className="flex flex-col justify-between h-full px-3 pb-4 overflow-y-auto">
           {/* Top Section */}
-          <ul className="space-y-2 font-medium mt-6">
+          <ul className="space-y-2 font-medium mt-6 text-gray-100">
             {navItems.map(({ href, Icon, label }) => (
               <SidebarItem key={href} href={href} Icon={Icon} label={label} />
             ))}
           </ul>
+
+          <div>
+            <ul className="space-y-2 font-medium">
+            {middleNavItems.map(({ href, Icon, label }) => (
+              <div>
+                <p className='text-xl'>ACCOUNT</p>
+              <SidebarItem key={href} href={href} Icon={Icon} label={label} />
+              </div>
+            ))}
+          </ul>
+          </div>
 
           {/* Bottom Section */}
           <ul className="space-y-2 font-medium">
@@ -87,7 +103,7 @@ const SidebarNavbar = () => {
       </aside>
 
       {/* Navbar */}
-      <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200">
+      <nav className="fixed top-0  w-full bg-white border-b border-gray-200">
         <div className="px-4 py-3 lg:px-5 flex justify-between items-center">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -96,7 +112,6 @@ const SidebarNavbar = () => {
             <span className="sr-only">Toggle Sidebar</span>
             <LucideBox className="w-6 h-6" />
           </button>
-          <h1 className="text-xl font-semibold text-gray-900 ">Inventory System</h1>
 
           {/* Search Bar */}
           <SearchBar />
@@ -109,7 +124,10 @@ const SidebarNavbar = () => {
             }}
             className="block px-4 py-2 text-gray-700 hover:text-gray-800 hover:bg-gray-200 rounded-lg font-semibold"
           >
-            Log Out
+            <div className='flex gap-3'>
+            <LucideLogOut/>
+            <p>Logout</p>
+            </div>
           </button>
         </div>
       </nav>
@@ -121,9 +139,9 @@ const SidebarItem = ({ href, Icon, label }: any) => (
   <li>
     <Link
       href={href}
-      className="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100"
+      className="flex items-center p-2 text-gray-50 rounded-lg hover:bg-gray-800"
     >
-      <Icon className="w-5 h-5 text-gray-500" />
+      <Icon className="w-5 h-5 text-gray-50" />
       <span className="ml-3">{label}</span>
     </Link>
   </li>
