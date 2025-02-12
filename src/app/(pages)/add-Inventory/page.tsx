@@ -171,7 +171,7 @@ const AddItemForm = () => {
               Select a category
             </option>
             {Array.isArray(categories) &&
-              categories.map((category: any) => (
+              categories?.map((category: any) => (
                 <option key={category.id} value={category.id}>
                   {category.category_name}
                 </option>
@@ -197,7 +197,7 @@ const AddItemForm = () => {
             <ul className="bg-white border border-gray-300 rounded-lg mt-2 max-h-40 overflow-y-auto shadow-md">
               {Array.isArray(suggestions) && suggestions.length > 0 && (
                 <ul className="bg-white border border-gray-300 rounded-lg mt-2 max-h-40 overflow-y-auto shadow-md">
-                  {suggestions.map((suggestion: any, index: number) => (
+                  {suggestions?.map((suggestion: any, index: number) => (
                     <li key={index} onClick={() => handleSuggestionSelect(suggestion)} className="p-2 hover:bg-blue-50 cursor-pointer flex justify-between">
                       <span>{suggestion.name}</span>
                       <span className="text-gray-500">{suggestion.barcode}</span>
@@ -273,7 +273,7 @@ const AddItemForm = () => {
           />
           {invoiceSuggestions.length > 0 && (
             <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto shadow-lg">
-              {Array.isArray(invoiceSuggestions) &&
+              {Array?.isArray(invoiceSuggestions) &&
                 invoiceSuggestions.map((suggestion, index) => (
                   <li
                     key={index}
