@@ -145,8 +145,8 @@ const confirmDelete = async () => {
 };
 // Filter the suppliers based on the searchQuery before rendering
 const filteredSuppliers = suppliers.filter((supplier: any) => {
-  const query = searchQuery.toLowerCase();
-  return (
+  const query = (searchQuery || "").toLowerCase();
+  return (  
     supplier.vendorName.toLowerCase().includes(query) ||
     supplier.email?.toLowerCase().includes(query) ||
     supplier.shopName.toLowerCase().includes(query) ||

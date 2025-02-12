@@ -21,7 +21,7 @@ const AddItemForm = () => {
   const [isExistingItem, setIsExistingItem] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
-  
+
   const router = useRouter();
 
   const [invoiceSuggestions, setInvoiceSuggestions] = useState<string[]>([]);
@@ -133,7 +133,7 @@ const AddItemForm = () => {
         price: parseFloat(price),
       });
       setModalMessage("Item added successfully!");
-  setIsModalOpen(true);
+      setIsModalOpen(true);
       setFormData({
         category_id: "",
         name: "",
@@ -148,7 +148,7 @@ const AddItemForm = () => {
       setIsExistingItem(false);
     } catch (error) {
       setModalMessage("Failed to add item. Please try again.");
-  setIsModalOpen(true);
+      setIsModalOpen(true);
     }
   };
 
@@ -170,11 +170,13 @@ const AddItemForm = () => {
             <option value="" disabled>
               Select a category
             </option>
-            {categories.map((category: any) => (
-              <option key={category.id} value={category.id}>
-                {category.category_name}
-              </option>
-            ))}
+            {Array.isArray(categories) &&
+              categories.map((category: any) => (
+                <option key={category.id} value={category.id}>
+                  {category.category_name}
+                </option>
+              ))}
+
           </select>
         </div>
 
@@ -193,16 +195,17 @@ const AddItemForm = () => {
           />
           {suggestions.length > 0 && (
             <ul className="bg-white border border-gray-300 rounded-lg mt-2 max-h-40 overflow-y-auto shadow-md">
-              {suggestions?.map((suggestion: any, index: number) => (
-                <li
-                  key={index}
-                  onClick={() => handleSuggestionSelect(suggestion)}
-                  className="p-2 hover:bg-blue-50 cursor-pointer flex justify-between"
-                >
-                  <span>{suggestion.name}</span>
-                  <span className="text-gray-500">{suggestion.barcode}</span>
-                </li>
-              ))}
+              {Array.isArray(suggestions) && suggestions.length > 0 && (
+                <ul className="bg-white border border-gray-300 rounded-lg mt-2 max-h-40 overflow-y-auto shadow-md">
+                  {suggestions.map((suggestion: any, index: number) => (
+                    <li key={index} onClick={() => handleSuggestionSelect(suggestion)} className="p-2 hover:bg-blue-50 cursor-pointer flex justify-between">
+                      <span>{suggestion.name}</span>
+                      <span className="text-gray-500">{suggestion.barcode}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
             </ul>
           )}
         </div>
@@ -260,7 +263,7 @@ const AddItemForm = () => {
         ))}
 
         <div className="relative">
-        <label className="text-md font-medium text-gray-700 mb-1">Invoice ID</label>
+          <label className="text-md font-medium text-gray-700 mb-1">Invoice ID</label>
           <input
             id="invoice_id"
             type="text"
@@ -270,15 +273,17 @@ const AddItemForm = () => {
           />
           {invoiceSuggestions.length > 0 && (
             <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto shadow-lg">
-              {invoiceSuggestions.map((suggestion, index) => (
-                <li
-                  key={index}
-                  onClick={() => handleInvoiceSuggestionSelect(suggestion)}
-                  className="p-2 hover:bg-blue-100 cursor-pointer"
-                >
-                  {suggestion}
-                </li>
-              ))}
+              {Array.isArray(invoiceSuggestions) &&
+                invoiceSuggestions.map((suggestion, index) => (
+                  <li
+                    key={index}
+                    onClick={() => handleInvoiceSuggestionSelect(suggestion)}
+                    className="p-2 hover:bg-blue-100 cursor-pointer"
+                  >
+                    {suggestion}
+                  </li>
+                ))}
+
             </ul>
           )}
         </div>
@@ -293,19 +298,19 @@ const AddItemForm = () => {
       </form>
 
       {isModalOpen && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white p-6 rounded-md shadow-lg">
-      <h2 className="text-xl font-semibold mb-4">Message</h2>
-      <p>{modalMessage}</p>
-      <button
-        className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg"
-        onClick={() => setIsModalOpen(false)}
-      >
-        Close
-      </button>
-    </div>
-  </div>
-)}
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-md shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Message</h2>
+            <p>{modalMessage}</p>
+            <button
+              className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg"
+              onClick={() => setIsModalOpen(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );
