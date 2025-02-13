@@ -225,10 +225,10 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
   // }, [loadSuppliers, loadQuotationPDFs, loadQuotationsByPurchaseRequestId]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 max-lg:px-4">
       <div className="bg-white rounded-lg w-full max-w-3xl p-8 relative max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center border-b pb-4 mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+          <h2 className="text-2xl max-sm:text-xl font-bold text-gray-800 flex items-center">
             <FileText className="mr-2 text-blue-600" /> Quotation Details
           </h2>
           <button
@@ -240,7 +240,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
         </div>
 
         {/* Quotation Details */}
-        <div className="space-y-4 mb-8">
+        <div className="space-y-4 mb-8 max-sm:text-sm">
           <p>
             <strong>Price:</strong> ${selectedQuotation.fullPrice.toFixed(2)}
           </p>
@@ -250,7 +250,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
         </div>
 
         {/* Additional Information */}
-        <div className="space-y-4 mb-8">
+        <div className="space-y-4 mb-8 max-sm:text-sm">
           <h3 className="text-lg font-semibold">Add Additional Information</h3>
           <div>
             <label className="block text-sm font-medium text-gray-700">
@@ -343,13 +343,13 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
 
 
         <div className="space-y-4 mt-8">
-          <h3 className="text-lg font-semibold">Uploaded Quotations</h3>
+          <h3 className="text-lg max-sm:text-sm font-semibold">Uploaded Quotations</h3>
           <ul className="space-y-2">
             <ul className="space-y-2">
               {quotationList.map((quotation) => (
                 <li
                   key={quotation.quotation_id}
-                  className={`flex items-center justify-between p-2 border ${selectedPDF === quotation.quotation_id ? "bg-blue-50" : ""
+                  className={`flex items-center justify-between p-2 max-sm:text-sm border ${selectedPDF === quotation.quotation_id ? "bg-blue-50" : ""
                     }`}
                 >
                   <label className="flex items-center space-x-2 cursor-pointer">
@@ -379,7 +379,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
           <button
             onClick={handlePurchase}
             disabled={isPurchaseCompleted || !selectedPDF || loading}
-            className={`bg-gray-900 text-white px-4 py-2 rounded ${isPurchaseCompleted || !selectedPDF || loading
+            className={`bg-gray-900 text-white px-4 py-2 rounded  max-sm:text-sm ${isPurchaseCompleted || !selectedPDF || loading
               ? "opacity-50 cursor-not-allowed"
               : ""
               }`}
@@ -388,7 +388,7 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
           </button>
 
           {isPurchaseCompleted && (
-            <p className="text-red-500 mt-2">
+            <p className="text-red-500 mt-2 max-sm:text-sm">
               A purchase has already been confirmed for this request.
             </p>
           )}

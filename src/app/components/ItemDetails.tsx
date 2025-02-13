@@ -175,55 +175,96 @@ const [notificationType, setNotificationType] = useState<"success" | "warning" |
       </div>
 
       {isLoading ? (
-        <p className="text-center text-gray-700 font-medium">Loading item details...</p>
-      ) : (
-        <table className="table-auto w-full border-collapse">
-          <thead className="bg-blue-200 text-left">
-            <tr>
-              <th className="px-4 py-3 text-gray-800">ID</th>
-              <th className="px-4 py-3 text-gray-800">Barcode</th>
-              <th className="px-4 py-3 text-gray-800">Price</th>
-              <th className="px-4 py-3 text-gray-800">Invoice ID</th>
-              <th className="px-4 py-3 text-gray-800">Qty</th>
-              <th className="px-4 py-3 text-gray-800">Maintenance Date</th>
-              <th className="px-4 py-3 text-gray-800">Removed Qty</th>
-              <th className="px-4 py-3 text-gray-800">Removed Purpose</th>
-              <th className="px-4 py-3 text-gray-800 text-center">Actions</th>
+  <p className="text-center text-gray-700 font-medium">Loading item details...</p>
+) : (
+  <div>
+    {/* Table for large screens */}
+    <div className="hidden lg:block overflow-x-auto">
+      <table className="table-auto w-full border-collapse">
+        <thead className="bg-blue-200 text-left">
+          <tr>
+            <th className="px-4 py-3 text-gray-800">ID</th>
+            <th className="px-4 py-3 text-gray-800">Barcode</th>
+            <th className="px-4 py-3 text-gray-800">Price</th>
+            <th className="px-4 py-3 text-gray-800">Invoice ID</th>
+            <th className="px-4 py-3 text-gray-800">Qty</th>
+            <th className="px-4 py-3 text-gray-800">Maintenance Date</th>
+            <th className="px-4 py-3 text-gray-800">Removed Qty</th>
+            <th className="px-4 py-3 text-gray-800">Removed Purpose</th>
+            <th className="px-4 py-3 text-gray-800 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {itemDetails.map((detail: any) => (
+            <tr key={detail.id} className="hover:bg-blue-50">
+              <td className="border px-4 py-3 text-gray-700">{detail.id}</td>
+              <td className="border px-4 py-3 text-gray-700">{detail.barcode}</td>
+              <td className="border px-4 py-3 text-gray-700">{detail.price}</td>
+              <td className="border px-4 py-3 text-gray-700">{detail.invoice_id}</td>
+              <td className="border px-4 py-3 text-gray-700">{detail.qty}</td>
+              <td className="border px-4 py-3 text-gray-700">{formatDate(detail.maintance_date) ?? "N/A"}</td>
+              <td className="border px-4 py-3 text-gray-700">{detail.removed_qty}</td>
+              <td className="border px-4 py-3 text-gray-700">{detail.removed_purpose ?? "N/A"}</td>
+              <td className="border px-4 py-3 text-center">
+                <button
+                  className="text-red-600 hover:text-red-800 mr-2"
+                  onClick={() => handleDelete(detail.id, detail.qty)}
+                >
+                  <Trash2 size={20} />
+                </button>
+                <button
+                  className="text-blue-600 hover:text-blue-800"
+                  onClick={() => handleEdit(detail)}
+                >
+                  <Edit size={20} />
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {itemDetails.map((detail:any) => (
-              <tr key={detail.id} className="hover:bg-blue-50">
-                <td className="border px-4 py-3 text-gray-700">{detail.id}</td>
-                <td className="border px-4 py-3 text-gray-700">{detail.barcode}</td>
-                <td className="border px-4 py-3 text-gray-700">{detail.price}</td>
-                <td className="border px-4 py-3 text-gray-700">{detail.invoice_id}</td>
-                <td className="border px-4 py-3 text-gray-700">{detail.qty}</td>
-                <td className="border px-4 py-3 text-gray-700">{formatDate(detail.maintance_date) ?? "N/A"}</td>
-                <td className="border px-4 py-3 text-gray-700">{detail.removed_qty}</td>
-                <td className="border px-4 py-3 text-gray-700">{detail.removed_purpose ?? "N/A"}</td>
-                <td className="border px-4 py-3 text-center">
-                  <button
-                    className="text-red-600 hover:text-red-800 mr-2"
-                    onClick={() => handleDelete(detail.id, detail.qty)}
-                  >
-                    <Trash2 size={20} />
-                  </button>
-                  <button
-                    className="text-blue-600 hover:text-blue-800"
-                    onClick={() => handleEdit(detail)}
-                  >
-                    <Edit size={20} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    {/* Card layout for small screens */}
+    <div className="lg:hidden space-y-4">
+      {itemDetails.map((detail: any) => (
+        <div
+          key={detail.id}
+          className="bg-white shadow-md rounded-lg p-4 border border-gray-300"
+        >
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-gray-800">Barcode: {detail.barcode}</h3>
+            <div className="flex space-x-2">
+              <button
+                className="text-blue-600 hover:text-blue-800"
+                onClick={() => handleEdit(detail)}
+              >
+                <Edit size={20} />
+              </button>
+              <button
+                className="text-red-600 hover:text-red-800"
+                onClick={() => handleDelete(detail.id, detail.qty)}
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
+          </div>
+          <p className="text-gray-600 text-sm">ID: {detail.id}</p>
+          <p className="text-gray-600 text-sm">Price: {detail.price}</p>
+          <p className="text-gray-600 text-sm">Invoice ID: {detail.invoice_id}</p>
+          <p className="text-gray-600 text-sm">Qty: {detail.qty}</p>
+          <p className="text-gray-600 text-sm">Maintenance Date: {formatDate(detail.maintance_date) ?? "N/A"}</p>
+          <p className="text-gray-600 text-sm">Removed Qty: {detail.removed_qty}</p>
+          <p className="text-gray-600 text-sm">Removed Purpose: {detail.removed_purpose ?? "N/A"}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
 
 {isModalOpen && editingItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-md flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-md flex justify-center items-center z-50 max-sm:px-4">
           <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-xl relative">
             <button
               onClick={() => setIsModalOpen(false)}

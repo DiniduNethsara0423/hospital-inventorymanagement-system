@@ -9,7 +9,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="">
         <div className="flex h-screen">
-          <div className="w-[16%] text-white">
+          <div className=" text-white">
             <Navbar />
           </div>
 

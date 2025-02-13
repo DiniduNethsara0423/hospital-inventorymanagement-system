@@ -17,15 +17,16 @@ import {
   UserRound,
   Layers2,
   Album,
-  StretchVertical
-  
+  StretchVertical,
+  Menu,
+  X
 } from 'lucide-react';
 import Link from 'next/link';
 import SearchBar from './SearchBar';
 import { useRouter } from 'next/navigation';
 
 const SidebarNavbar = () => {
-  const router = useRouter()
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [roleId, setRoleId] = useState<number | null>(null);
 
@@ -34,14 +35,13 @@ const SidebarNavbar = () => {
     if (token) {
       const decoded = parseJwt(token);
       if (decoded && decoded.roleId) {
-        setRoleId(decoded.roleId); // Set role ID from decoded token
+        setRoleId(decoded.roleId);
       } else {
         console.error('Failed to extract roleId from token');
       }
     }
   }, []);
 
-  // Define which items to show based on roleId
   const navItems = [
     { href: '/dashboard', Icon: LucideHome, label: 'Dashboard' },
     { href: '/inventory', Icon: LucideBox, label: 'Inventory' },
@@ -56,23 +56,30 @@ const SidebarNavbar = () => {
   ];
 
   const bottomNavItems = [
-    // { href: '/settings', Icon: LucideSettings, label: 'Categories' },
     ...(roleId !== 3 ? [{ href: '/logs', Icon: LucideBook, label: 'Logs' }] : []),
   ];
+
   const middleNavItems = [
     ...(roleId === 1 ? [{ href: '/user-management', Icon: LucideUsers, label: 'User Management' }] : []),
-
-  ]
+  ];
 
   return (
     <div className="flex">
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-40 w-64 h-screen py-4 transition-transform bg-gray-900   ${
+        className={`fixed top-0 left-0 z-40 w-64 h-screen py-4 bg-gray-900 transition-transform ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0`}
+        } md:translate-x-0 md:static`}
       >
-                  <h1 className="text-2xl font-semibold text-white text-center">Inventory System</h1>
+        <div className="flex justify-between items-center px-4">
+          <h1 className="lg:text-xl max-sm:text-xl font-semibold text-nowrap text-white">Inventory System</h1>
+          <button
+            className="text-white md:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          >
+            <X size={24} />
+          </button>
+        </div>
 
         <div className="flex flex-col justify-between h-full px-3 pb-4 overflow-y-auto">
           {/* Top Section */}
@@ -82,16 +89,17 @@ const SidebarNavbar = () => {
             ))}
           </ul>
 
-          <div>
-            <ul className="space-y-2 font-medium">
-            {middleNavItems.map(({ href, Icon, label }) => (
-              <div>
-                <p className='text-lg'>ACCOUNT</p>
-              <SidebarItem key={href} href={href} Icon={Icon} label={label} />
-              </div>
-            ))}
-          </ul>
-          </div>
+          {/* Middle Section */}
+          {middleNavItems.length > 0 && (
+            <div>
+              <p className="text-sm text-gray-400 mt-4 px-2">ACCOUNT</p>
+              <ul className="space-y-2 font-medium">
+                {middleNavItems.map(({ href, Icon, label }) => (
+                  <SidebarItem key={href} href={href} Icon={Icon} label={label} />
+                ))}
+              </ul>
+            </div>
+          )}
 
           {/* Bottom Section */}
           <ul className="space-y-2 font-medium">
@@ -103,31 +111,29 @@ const SidebarNavbar = () => {
       </aside>
 
       {/* Navbar */}
-      <nav className="fixed top-0  w-full bg-white border-b border-gray-200">
-        <div className="px-4 py-3 lg:px-5 flex justify-between items-center">
+      <nav className="fixed top-0 w-full bg-white border-b border-gray-200">
+        <div className="px-4 py-3 flex justify-between items-center">
+          {/* Sidebar Toggle Button */}
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 md:hidden"
+            className="md:hidden text-gray-500" 
           >
-            <span className="sr-only">Toggle Sidebar</span>
-            <LucideBox className="w-6 h-6" />
+            <Menu size={24} />
           </button>
 
           {/* Search Bar */}
           <SearchBar />
 
-          {/* Profile Section */}
+          {/* Logout Button */}
           <button
             onClick={() => {
               localStorage.removeItem('jwtToken');
               router.push('/login');
             }}
-            className="block px-4 py-2 text-gray-700 hover:text-gray-800 hover:bg-gray-200 rounded-lg font-semibold"
+            className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm md:text-base"
           >
-            <div className='flex gap-3'>
-            <LucideLogOut/>
-            <p>Logout</p>
-            </div>
+            <LucideLogOut size={18} />
+            <span className='max-lg:hidden'>Logout</span>
           </button>
         </div>
       </nav>
@@ -139,9 +145,9 @@ const SidebarItem = ({ href, Icon, label }: any) => (
   <li>
     <Link
       href={href}
-      className="flex items-center p-2 text-gray-50 rounded-lg hover:bg-gray-800"
+      className="flex items-center p-2 text-gray-50 rounded-lg hover:bg-gray-800 text-sm lg:text-base"
     >
-      <Icon className="w-5 h-5 text-gray-50" />
+      <Icon className="w-5 h-5  text-gray-50" />
       <span className="ml-3">{label}</span>
     </Link>
   </li>
@@ -151,8 +157,8 @@ export default SidebarNavbar;
 
 function parseJwt(token: string) {
   try {
-    const base64Url = token.split('.')[1]; // Get the payload part
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // Decode Base64
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split('')

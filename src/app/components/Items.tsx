@@ -216,65 +216,109 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
 
 
       {isLoading ? (
-        <p className="text-center text-gray-700 font-medium">Loading items...</p>
-      ) : (
-        <table className="table-auto w-full border-collapse">
-          <thead className="bg-blue-200 text-left">
-            <tr>
-              <th className="px-4 py-3 text-gray-800">Barcode</th>
-              <th className="px-4 py-3 text-gray-800">Name</th>
-              <th className="px-4 py-3 text-gray-800">Category</th>
-              <th className="px-4 py-3 text-gray-800">Available Qty</th>
-              <th className="px-4 py-3 text-gray-800">Currently Using Qty</th>
-              <th className="px-4 py-3 text-gray-800">Lower Qty</th>
-              <th className="px-4 py-3 text-gray-800">Total Qty</th>
-              <th className="px-4 py-3 text-gray-800 text-center">Actions</th>
+  <p className="text-center text-gray-700 font-medium">Loading items...</p>
+) : (
+  <div>
+    {/* Table for large screens */}
+    <div className="hidden lg:block overflow-x-auto">
+      <table className="table-auto w-full border-collapse">
+        <thead className="bg-blue-200 text-left">
+          <tr>
+            <th className="px-4 py-3 text-gray-800 rounded-tl-xl">Barcode</th>
+            <th className="px-4 py-3 text-gray-800">Name</th>
+            <th className="px-4 py-3 text-gray-800">Category</th>
+            <th className="px-4 py-3 text-gray-800">Available Qty</th>
+            <th className="px-4 py-3 text-gray-800">Currently Using Qty</th>
+            <th className="px-4 py-3 text-gray-800">Lower Qty</th>
+            <th className="px-4 py-3 text-gray-800">Total Qty</th>
+            <th className="px-4 py-3 text-gray-800 text-center rounded-tr-xl">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item: any) => (
+            <tr
+              key={item.item_barcode}
+              className={`hover:bg-blue-50 cursor-pointer ${
+                item.available_qty < item.lower_quantity ? "bg-red-100" : ""
+              }`}
+              onClick={() => handleRowClick(item)}
+            >
+              <td className="border px-4 py-3 text-gray-700">{item.item_barcode}</td>
+              <td className="border px-4 py-3 text-gray-700">{item.item_name}</td>
+              <td className="border px-4 py-3 text-gray-700">{item.category_name}</td>
+              <td className="border px-4 py-3 text-gray-700">{item.available_qty}</td>
+              <td className="border px-4 py-3 text-gray-700">{item.currently_using_qty ?? "N/A"}</td>
+              <td className="border px-4 py-3 text-gray-700">{item.lower_quantity}</td>
+              <td className="border px-4 py-3 text-gray-700">{item.qty}</td>
+              <td className="border px-4 py-3 text-center">
+                <button
+                  className="text-blue-600 hover:text-blue-800 mr-2"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent row click
+                    handleEditClick(item);
+                  }}
+                >
+                  <Edit size={20} />
+                </button>
+                <button
+                  className="text-red-600 hover:text-red-800"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent row click
+                    confirmDelete(item.item_barcode);
+                  }}
+                >
+                  <Trash2 size={20} />
+                </button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-  {items.map((item: any) => (
-    <tr
-      key={item.item_barcode}
-      className={`hover:bg-blue-50 cursor-pointer ${item.available_qty < item.lower_quantity ? "bg-red-100" : ""}`}
-      onClick={() => handleRowClick(item)}
-    >
-      <td className="border px-4 py-3 text-gray-700">{item.item_barcode}</td>
-      <td className="border px-4 py-3 text-gray-700">{item.item_name}</td>
-      <td className="border px-4 py-3 text-gray-700">{item.category_name}</td>
-      <td className="border px-4 py-3 text-gray-700">{item.available_qty}</td>
-      <td className="border px-4 py-3 text-gray-700">{item.currently_using_qty ?? "N/A"}</td>
-      <td className="border px-4 py-3 text-gray-700">{item.lower_quantity}</td>
-      <td className="border px-4 py-3 text-gray-700">{item.qty}</td>
-      <td className="border px-4 py-3 text-center">
-        <button
-          className="text-blue-600 hover:text-blue-800 mr-2"
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent row click
-            handleEditClick(item);
-          }}
-        >
-          <Edit size={20} />
-        </button>
-        <button
-          className="text-red-600 hover:text-red-800"
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent row click
-            confirmDelete(item.item_barcode);
-          }}
-        >
-          <Trash2 size={20} />
-        </button>
-      </td>
-    </tr>
-  ))}
-</tbody>
+          ))}
+        </tbody>
+      </table>
+    </div>
 
-        </table>
-      )}
+    {/* Card layout for small screens */}
+    <div className="lg:hidden space-y-4">
+      {items.map((item: any) => (
+        <div
+          key={item.item_barcode}
+          className={`bg-white shadow-md rounded-lg p-4 border ${
+            item.available_qty < item.lower_quantity ? "border-red-500" : "border-gray-300"
+          }`}
+          
+        >
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-gray-800">{item.item_name}</h3>
+            <div className="flex space-x-2">
+              <button
+                className="text-blue-600 hover:text-blue-800"
+                onClick={() => handleEditClick(item)}
+              >
+                <Edit size={20} />
+              </button>
+              <button
+                className="text-red-600 hover:text-red-800"
+                onClick={() => confirmDelete(item.item_barcode)}
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
+          </div>
+          <p className="text-gray-600 text-sm">Barcode: {item.item_barcode}</p>
+          <p className="text-gray-600 text-sm">Category: {item.category_name}</p>
+          <p className="text-gray-600 text-sm">Available Qty: {item.available_qty}</p>
+          <p className="text-gray-600 text-sm">Currently Using Qty: {item.currently_using_qty ?? "N/A"}</p>
+          <p className="text-gray-600 text-sm">Lower Qty: {item.lower_quantity}</p>
+          <p className="text-gray-600 text-sm">Total Qty: {item.qty}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
 
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-          <div className="bg-white p-6 rounded shadow-lg w-1/3">
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center max-md:px-4">
+          <div className="bg-white p-6 rounded shadow-lg w-1/3 max-md:w-full">
             <h3 className="text-xl font-semibold mb-4">Delete Item</h3>
             <p className="mb-6 text-gray-700">
               Are you sure you want to delete this item? This action is permanent and cannot be undone.
@@ -298,8 +342,8 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-          <div className="bg-white p-6 rounded shadow-lg w-1/3">
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center border border-red-500 max-md:px-4">
+          <div className="bg-white p-6 rounded shadow-lg w-1/3 max-md:w-full">
             <h3 className="text-xl font-semibold mb-4">Edit Item</h3>
             <div className="mb-4">
               <label className="block text-gray-700 mb-1">Name</label>

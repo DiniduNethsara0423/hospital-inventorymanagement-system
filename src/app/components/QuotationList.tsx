@@ -137,7 +137,7 @@ export const QuotationList: React.FC<QuotationListProps> = ({
 
       {/* Delete Confirmation Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 max-sm:px-3">
           <div className="bg-white w-full max-w-md p-6 rounded-md shadow-lg relative">
             <h2 className="text-xl font-bold text-gray-800 mb-4">
               Confirm Deletion

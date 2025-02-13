@@ -31,17 +31,17 @@ const ItemsPage: React.FC = () => {
   return (
     <div className="p-8 w-full min-h-screen bg-white">
 
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-4xl font-bold text-gray-800">Inventory </h1>
+      <div className="flex  justify-between items-center mb-6">
+        <h1 className="text-4xl max-sm:text-xl  font-bold text-gray-800">Inventory </h1>
         <button
-          className="bg-gray-700 hover:bg-gray-800 text-white px-8 py-3 rounded-lg text-base shadow-lg font-semibold"
+          className="bg-gray-700 hover:bg-gray-800 text-white px-8 py-3 max-lg:px-4 max-lg:py-2 rounded-lg text-base shadow-lg font-semibold"
           onClick={() => router.push("/add-Inventory")}
         >
           Add New Item
         </button>
       </div>
 
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center mb-4 max-sm:my-10">
         <button
           className={`px-4 py-2 ${activeTab === "items" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
           onClick={() => setActiveTab("items")}
