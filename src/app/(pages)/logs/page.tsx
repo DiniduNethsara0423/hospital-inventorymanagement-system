@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { Menu, X } from "lucide-react"; // Import icons for menu toggle
 
 // Dynamically import components
 const ByTable = dynamic(() => import("../../components/ByTable"));
@@ -14,6 +15,7 @@ const DateComponent = dynamic(() => import("../../components/Date"));
 
 const Page: React.FC = () => {
   const [currentComponent, setCurrentComponent] = useState<string>("ByTable");
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // For mobile menu
   const router = useRouter();
 
   useEffect(() => {
@@ -51,10 +53,42 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div className="p-6 min-h-screen text-gray-900">
+    <div className="p-6 mt-2 min-h-screen text-gray-900">
       {/* Navigation */}
-      <nav className="flex justify-center mb-6">
-        <ul className="flex flex-wrap gap-4 p-2 bg-white rounded-lg">
+      <nav className="mb-6">
+        {/* Mobile Menu Toggle */}
+        <div className="lg:hidden flex justify-between items-center bg-white p-3 rounded-lg shadow">
+          <span className="text-lg font-semibold text-gray-800">Menu</span>
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="focus:outline-none">
+            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
+
+        {/* Mobile Dropdown Menu */}
+        {isMenuOpen && (
+          <ul className="lg:hidden flex flex-col gap-2 p-2 mt-2 bg-white rounded-lg shadow">
+            {navigationItems.map((item) => (
+              <li key={item.key}>
+                <button
+                  onClick={() => {
+                    setCurrentComponent(item.key);
+                    setIsMenuOpen(false); // Close menu after selection
+                  }}
+                  className={`block w-full px-4 py-2 text-base text-gray-700 font-medium rounded-lg transition-all duration-200 ${
+                    currentComponent === item.key
+                      ? "bg-gray-200 text-gray-900"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  {item.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {/* Desktop Navigation (Hidden on Small Screens) */}
+        <ul className="hidden lg:flex justify-center gap-4 p-2 bg-white rounded-lg">
           {navigationItems.map((item) => (
             <li key={item.key}>
               <button
@@ -72,8 +106,6 @@ const Page: React.FC = () => {
         </ul>
       </nav>
 
-      {/* Display Current Section */}
-      
       {/* Component Content */}
       <div className="p-4 bg-white shadow-sm rounded-lg">{renderComponent()}</div>
     </div>

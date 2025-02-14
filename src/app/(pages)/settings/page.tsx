@@ -105,9 +105,9 @@ const CategoriesPage = () => {
       </h1>
 
       {/* Search and Add New Category */}
-      <div className="flex flex-wrap justify-between items-center mb-6">
+      <div className="flex max-lg:flex-col gap-4 xl:flex-wrap justify-between items-center mb-6">
         {/* Search Bar */}
-        <div className="flex items-center w-full md:w-2/3 bg-white border border-gray-300 rounded-full shadow-sm px-4 py-2">
+        <div className="flex items-center w-full lg:w-2/3 bg-white border border-gray-300 rounded-full shadow-sm px-4 py-2">
           <Search className="text-gray-500 w-5 h-5 mr-2" />
           <input
             type="text"
@@ -119,7 +119,7 @@ const CategoriesPage = () => {
         </div>
 
         {/* Add New Category */}
-        <div className="flex items-center space-x-2 mt-4 md:mt-0">
+        <div className="flex items-center max-lg:w-full space-x-2 mt-4 md:mt-0">
           <input
             type="text"
             placeholder="Category Name"
@@ -127,7 +127,7 @@ const CategoriesPage = () => {
             onChange={(e) =>
               setNewCategory({ ...newCategory, category_name: e.target.value })
             }
-            className="w-full md:w-auto border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full lg:w-auto max-lg:w-full border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             onClick={handleAddCategory}

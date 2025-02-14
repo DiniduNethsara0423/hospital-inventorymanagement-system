@@ -191,9 +191,9 @@ const [showModal, setShowModal] = useState<boolean>(false);
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-4xl font-bold text-gray-800">User Management</h1>
           </div>
-          <div className="flex flex-wrap justify-between items-center mb-6">
+          <div className="flex max-lg:flex-col gap-3 flex-wrap justify-between items-center mb-6">
 
-            <div className="flex items-center w-full md:w-2/3 bg-white border border-gray-300 rounded-full shadow-sm px-4 py-2">
+            <div className="flex items-center w-full lg:w-2/3 bg-white border border-gray-300 rounded-full shadow-sm px-4 py-2">
 
               <Search className="text-gray-500 w-5 h-5 mr-2" />
               <input
@@ -204,10 +204,10 @@ const [showModal, setShowModal] = useState<boolean>(false);
                 className="w-full focus:outline-none"
               />
             </div>
-            <div className="flex items-center space-x-2 mt-4 md:mt-0">
+            <div className="flex text-center max-lg:w-full items-center space-x-2 mt-4 md:mt-0">
               <button
                 onClick={handleAddUser}
-                className="flex items-center space-x-2 bg-gray-700 text-white px-6 py-3 rounded-full shadow-lg hover:bg-gray-800 transition"
+                className="flex items-center text-center space-x-2 max-lg:w-full bg-gray-700 text-white px-6 py-3 rounded-full shadow-lg hover:bg-gray-800 transition"
               >
                 <Plus className="w-5 h-5" />
                 <span>Add Users</span>

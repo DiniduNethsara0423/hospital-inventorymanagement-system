@@ -48,15 +48,15 @@ const TableAndDate: React.FC = () => {
   };
 
   return (
-    <div className="p-6 bg-white">
+    <div className="p- bg-white">
       <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
         Table and Date Selector
       </h1>
 
-      <div className=" bg-white p-6">
+      <div className=" bg-white p-">
         {/* Dropdown for selecting table */}
-        <div className="flex  justify-between gap-10">
-        <div className="mb-6 w-2/3">
+        <div className="flex max-lg:flex-col  justify-between lg:gap-10">
+        <div className="mb-6 lg:w-2/3 w-full">
           <label htmlFor="tableSelector" className="block font-semibold text-gray-700 mb-2">
             Select Table:
           </label>
@@ -82,11 +82,11 @@ const TableAndDate: React.FC = () => {
         </div>
 
         {/* Date input and search button */}
-        <div className="mb-4 w-1/2">
+        <div className="mb-4 lg:w-1/2 w-full">
           <label htmlFor="date" className="block font-semibold text-gray-700 mb-2">
             Enter Date (yyyy-mm-dd):
           </label>
-          <div className="flex items-center space-x-5 w-full">
+          <div className="flex max-sm:flex-col max-sm:gap-4 items-center lg:space-x-5 w-full">
            <div className="w-full">
            <input
               type="date"
@@ -98,7 +98,7 @@ const TableAndDate: React.FC = () => {
            </div>
             <button
               onClick={fetchLogs}
-              className="px-6 py-2 bg-gray-700 text-white font-medium rounded-md hover:bg-gray-800 transition-colors"
+              className="px-6 py-2 max-sm:w-full bg-gray-700 text-white font-medium rounded-md hover:bg-gray-800 transition-colors"
               >
               Search
             </button>

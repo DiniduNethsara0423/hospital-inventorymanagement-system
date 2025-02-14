@@ -340,54 +340,95 @@ const OrdersPage = () => {
       </div>
 
       {/* Invoice Table */}
-      <div className="overflow-x-auto rounded-lg border border-gray-300">
-        <table className="table-auto w-full text-left bg-white">
-          <thead className="bg-blue-100 text-gray-800 text-sm font-medium">
-            <tr>
-              <th className="px-6 py-3">Quotation ID</th>
-              <th className="px-6 py-3">Invoice ID</th>
-              <th className="px-6 py-3">Purchase ID</th>
-              <th className="px-6 py-3">Vendor ID</th>
-              <th className="px-6 py-3">Total Value</th>
-              <th className="px-6 py-3">Invoice PDF</th>
-              <th className="px-6 py-3 text-center">Actions</th>
+      <div className="rounded-lg border border-gray-300">
+  {/* Table for lg & xl screens */}
+  <div className="hidden lg:block overflow-x-auto">
+    <table className="table-auto w-full text-left bg-white min-w-[600px]">
+      <thead className="bg-blue-100 text-gray-800 text-sm font-medium">
+        <tr>
+          <th className="px-6 py-3">Quotation ID</th>
+          <th className="px-6 py-3">Invoice ID</th>
+          <th className="px-6 py-3">Purchase ID</th>
+          <th className="px-6 py-3">Vendor ID</th>
+          <th className="px-6 py-3">Total Value</th>
+          <th className="px-6 py-3 whitespace-nowrap">Invoice PDF</th>
+          <th className="px-6 py-3 text-center whitespace-nowrap">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filteredInvoices.map((invoice: any) => (
+          <tr key={invoice.invoice_id} className="border-t hover:bg-gray-100">
+            <td className="px-6 py-3">{invoice.quotation_id}</td>
+            <td className="px-6 py-3">{invoice.invoice_id || "N/A"}</td>
+            <td className="px-6 py-3">{invoice.purchase_id}</td>
+            <td className="px-6 py-3">{invoice.vendors_id}</td>
+            <td className="px-6 py-3">{invoice.total_value || "0"}</td>
+            <td className="px-6 py-3 whitespace-nowrap">
+              <a
+                href={`${baseUrl}/${invoice.pdf_path}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                View PDF
+              </a>
+            </td>
+            <td className="text-center px-6 py-3">
+              <button
+                onClick={() => handleDeleteInvoice(invoice.invoice_id)}
+                className="text-red-600 hover:text-red-800"
+              >
+                <Trash2 size={20} />
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
 
-            </tr>
-          </thead>
-          <tbody>
-            {filteredInvoices.map((invoice: any) => (
-              <tr key={invoice.invoice_id} className="border-t hover:bg-gray-100">
-                <td className="px-6 py-3">{invoice.quotation_id}</td>
-                <td className="px-6 py-3">{invoice.invoice_id || "N/A"}</td>
-                <td className="px-6 py-3">{invoice.purchase_id}</td>
-                <td className="px-6 py-3">{invoice.vendors_id}</td>
-                <td className="px-6 py-3">{invoice.total_value || "0"}</td>
-                <td className="px-6 py-3">
-                  <a
-                    href={`${baseUrl}/${invoice.pdf_path}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    View PDF
-                  </a>
-
-
-                </td>
-
-                <td className="text-center">
-                  <button
-                    onClick={() => handleDeleteInvoice(invoice.invoice_id)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    <Trash2 size={20} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+  {/* Cards for sm & md screens */}
+  <div className="lg:hidden space-y-4 p-4">
+    {filteredInvoices.map((invoice: any) => (
+      <div key={invoice.invoice_id} className="bg-white shadow rounded-lg p-4 border border-gray-200">
+        <p className="text-gray-700">
+          <strong>Quotation ID:</strong> {invoice.quotation_id}
+        </p>
+        <p className="text-gray-700">
+          <strong>Invoice ID:</strong> {invoice.invoice_id || "N/A"}
+        </p>
+        <p className="text-gray-700">
+          <strong>Purchase ID:</strong> {invoice.purchase_id}
+        </p>
+        <p className="text-gray-700">
+          <strong>Vendor ID:</strong> {invoice.vendors_id}
+        </p>
+        <p className="text-gray-700">
+          <strong>Total Value:</strong> {invoice.total_value || "0"}
+        </p>
+        <p>
+          <a
+            href={`${baseUrl}/${invoice.pdf_path}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            View PDF
+          </a>
+        </p>
+        <div className="mt-3 flex justify-end">
+          <button
+            onClick={() => handleDeleteInvoice(invoice.invoice_id)}
+            className="text-red-600 hover:text-red-800"
+          >
+            <Trash2 size={20} />
+          </button>
+        </div>
       </div>
+    ))}
+  </div>
+</div>
+
 
       {/* Pagination */}
       <div className="flex justify-center items-center mt-6 space-x-4">

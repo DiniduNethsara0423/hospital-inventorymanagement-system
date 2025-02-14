@@ -64,8 +64,8 @@ const Page: React.FC = () => {
         <h1 className="text-2xl font-semibold mb-6 text-center">Logs By Category</h1>
 
         {/* Table Selector */}
-        <div className='flex justify-between'>
-          <div className="mb-6 w-2/3  rounded-lg bg-white ">
+        <div className='flex max-lg:flex-col justify-between'>
+          <div className="mb-6 w-full lg:w-2/3  rounded-lg bg-white ">
             <label htmlFor="tableSelector" className="block font-medium mb-2 text-gray-700">
               Table Name Selector:
             </label>

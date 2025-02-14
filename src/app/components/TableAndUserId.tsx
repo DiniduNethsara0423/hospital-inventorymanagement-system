@@ -90,7 +90,7 @@ const TableAndUserId: React.FC = () => {
     <div className="bg-white min-h-screen">
       <h1 className="text-2xl font-semibold mb-8 text-center">Dynamic Logs Table</h1>
 
-      <div className="flex justify-between gap-8">
+      <div className="flex max-lg:flex-col justify-between gap-2 lg:gap-8">
         {/* Table Selector */}
         <div className="mb-6 w-full">
           <label htmlFor="tableSelector" className="block font-medium mb-2 text-gray-700">
@@ -185,7 +185,7 @@ const TableAndUserId: React.FC = () => {
               </table>
             </div>
             {/* Pagination */}
-            <div className="flex justify-between items-center mt-6">
+            <div className="flex max-md:flex-col justify-between items-center mt-6">
               <div>
                 <label htmlFor="pageSize" className="mr-2 font-medium text-gray-700">
                   Rows per page:

@@ -194,12 +194,12 @@ const AddItemToDepartment = () => {
       </div>
 
       {/* Form Section */}
-      <main className="flex-1 flex justify-center">
-        <div className="w-full p-8 bg-white rounded-lg border">
+      <main className="flex-1 flex justify-center ">
+        <div className="w-full max-w-3xl p-3 bg-white rounded-lg border shadow-md">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Barcode and Item Detail ID */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className=" relative">
                 <label htmlFor="barcode" className="block text-sm font-medium text-gray-700">
                   Barcode
                 </label>
@@ -210,7 +210,7 @@ const AddItemToDepartment = () => {
                     type="text"
                     value={formData.barcode}
                     readOnly
-                    className="flex-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm focus:outline-none"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
                   />
                   <button
                     type="button"
@@ -234,39 +234,36 @@ const AddItemToDepartment = () => {
                   placeholder="Type item name or barcode..."
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none"
                 />
-
                 {/* Suggestions Dropdown */}
                 {suggestedItems.length > 0 && (
                   <ul className="absolute left-0 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-md max-h-48 overflow-y-auto z-10">
                     {suggestedItems.length > 0 ? (
                       suggestedItems.map((item) => (
                         <li
-                          key={item.ITEM_DETAIL_ID} // Use correct key from API response
+                          key={item.ITEM_DETAIL_ID}
                           className="px-3 py-2 hover:bg-gray-200 cursor-pointer"
                           onClick={() => {
                             setFormData({
                               ...formData,
                               itemDetailId: item.ITEM_DETAIL_ID,
                             });
-                            setSearchQuery(item.ITEM_NAME); // Display item name in input box
-                            setSuggestedItems([]); // Hide dropdown
+                            setSearchQuery(item.ITEM_NAME);
+                            setSuggestedItems([]);
                           }}
                         >
-                          {item.ITEM_NAME} - {item.ITEM_BARCODE} {/* Ensure correct property names */}
+                          {item.ITEM_NAME} - {item.ITEM_BARCODE}
                         </li>
                       ))
                     ) : (
                       <li className="px-3 py-2 text-gray-500">No items found</li>
                     )}
                   </ul>
-
                 )}
               </div>
-
             </div>
 
             {/* Department and Quantity */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="departmentId" className="block text-sm font-medium text-gray-700">
                   Department
@@ -285,7 +282,6 @@ const AddItemToDepartment = () => {
                     </option>
                   ))}
                 </select>
-
               </div>
               <div>
                 <label htmlFor="qty" className="block text-sm font-medium text-gray-700">
@@ -314,55 +310,82 @@ const AddItemToDepartment = () => {
         </div>
       </main>
 
+
       {/* Table Section */}
       <div className="py-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-700">Assigned Items</h2>
-          {/* Page Size Selector */}
-          <div className="overflow-x-auto rounded-lg border-gray-300">
-            <label htmlFor="pageSize" className="mr-2 text-sm font-medium text-gray-700">
-              Items per page:
-            </label>
-            <select
-              id="pageSize"
-              value={pageSize}
-              onChange={handlePageSizeChange}
-              className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <table className="table-auto w-full text-left bg-white">
-            <thead className="bg-blue-100 text-gray-800 text-sm font-medium">
-              <tr>
-                <th className="px-6 py-3 rounded-tl-lg">Barcode</th>
-                <th className="px-6 py-3">Generated Barcode</th>
-                <th className="px-6 py-3">Item</th>
-                <th className="px-6 py-3">Department</th>
-                <th className="px-6 py-3 rounded-tr-lg">Quantity</th>
-              </tr>
-            </thead>
-            <tbody>
-              {assignedItems.map((item: any) => (
-                <tr key={item.ITEM_DEPARTMENT_BARCODE} className="border-t hover:bg-gray-100">
-                  <td className="px-6 py-3">{item.ITEM_DEPARTMENT_BARCODE}</td>
-                  <td className="px-6 py-3">
-                    <Barcode barcode={item.ITEM_DEPARTMENT_BARCODE} />
-                  </td>
-                  <td className="px-6 py-3">{item.ITEM_NAME}</td>
-                  <td className="px-6 py-3">{item.DEPARTMENT_NAME}</td>
-                  <td className="px-6 py-3">{item.QTY}</td>
-                </tr>
-              ))}
-            </tbody>
+  {/* Header & Page Size Selector */}
+  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+    <h2 className="text-xl font-bold text-gray-700">Assigned Items</h2>
+    <div className="flex items-center">
+      <label htmlFor="pageSize" className="mr-2 text-sm font-medium text-gray-700">
+        Items per page:
+      </label>
+      <select
+        id="pageSize"
+        value={pageSize}
+        onChange={handlePageSizeChange}
+        className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-300"
+      >
+        <option value={5}>5</option>
+        <option value={10}>10</option>
+        <option value={20}>20</option>
+      </select>
+    </div>
+  </div>
 
-          </table>
-        </div>
+  {/* Table Layout for Large Screens */}
+  <div className="hidden md:block overflow-x-auto bg-white rounded-lg shadow-md border">
+    <table className="min-w-full table-auto text-left">
+      <thead className="bg-blue-100 text-gray-800 text-sm font-medium">
+        <tr>
+          <th className="px-4 py-3 rounded-tl-lg">Barcode</th>
+          <th className="px-4 py-3">Generated Barcode</th>
+          <th className="px-4 py-3">Item</th>
+          <th className="px-4 py-3">Department</th>
+          <th className="px-4 py-3 rounded-tr-lg">Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        {assignedItems.map((item: any) => (
+          <tr key={item.ITEM_DEPARTMENT_BARCODE} className="border-t hover:bg-gray-100">
+            <td className="px-4 py-3">{item.ITEM_DEPARTMENT_BARCODE}</td>
+            <td className="px-4 py-3">
+              <Barcode barcode={item.ITEM_DEPARTMENT_BARCODE} />
+            </td>
+            <td className="px-4 py-3">{item.ITEM_NAME}</td>
+            <td className="px-4 py-3">{item.DEPARTMENT_NAME}</td>
+            <td className="px-4 py-3">{item.QTY}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  {/* Card Layout for Small Screens */}
+  <div className="md:hidden space-y-4">
+    {assignedItems.map((item: any) => (
+      <div key={item.ITEM_DEPARTMENT_BARCODE} className="bg-white p-4 rounded-lg shadow-md border">
+        <p className="text-sm font-medium text-gray-700">
+          <span className="font-semibold">Barcode:</span> {item.ITEM_DEPARTMENT_BARCODE}
+        </p>
+        <p className="text-sm font-medium text-gray-700 flex items-center gap-2">
+          <span className="font-semibold">Generated Barcode:</span> <Barcode barcode={item.ITEM_DEPARTMENT_BARCODE} />
+        </p>
+        <p className="text-sm font-medium text-gray-700">
+          <span className="font-semibold">Item:</span> {item.ITEM_NAME}
+        </p>
+        <p className="text-sm font-medium text-gray-700">
+          <span className="font-semibold">Department:</span> {item.DEPARTMENT_NAME}
+        </p>
+        <p className="text-sm font-medium text-gray-700">
+          <span className="font-semibold">Quantity:</span> {item.QTY}
+        </p>
       </div>
+    ))}
+  </div>
+</div>
+
+
 
       {/* Pagination */}
       <div className="flex justify-center items-center mt-4 space-x-4">
