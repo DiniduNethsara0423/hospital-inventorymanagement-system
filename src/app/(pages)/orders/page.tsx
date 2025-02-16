@@ -112,7 +112,33 @@ const OrdersPage = () => {
     setShowDatePicker(false);
   };
 
+  const [errors, setErrors] = useState({
+    quotationId: false,
+    purchaseId: false,
+    invoiceId: false,
+    invoicePdf: false,
+  });
+  
   const handleAddInvoice = async () => {
+    const newErrors = {
+      quotationId: !newInvoice.quotationId,
+      purchaseId: !newInvoice.purchaseId,
+      invoiceId: !newInvoice.invoiceId,
+      invoicePdf: !newInvoice.invoicePdf,
+    };
+  
+    setErrors(newErrors);
+  
+    // If any error exists, stop form submission
+    if (Object.values(newErrors).some((error) => error)) {
+      setModalContent({
+        title: "Error",
+        message: "Please fill all required fields before submitting.",
+      });
+      setModalVisible(true);
+      return;
+    }
+  
     try {
       const { invoice_id } = await createInvoice({
         invoice_id: newInvoice.invoiceId,
@@ -121,32 +147,29 @@ const OrdersPage = () => {
         pdf_path: "",
       });
   
-      if (newInvoice.invoicePdf) {
-        await uploadInvoicePDF(invoice_id, newInvoice.invoicePdf);
-        const { results, count } = await fetchInvoices(currentPage, 7);
-        setFilteredInvoices(results);
-        setTotalPages(Math.ceil(count[0]["COUNT(*)"] / 7));
+      await uploadInvoicePDF(invoice_id, newInvoice.invoicePdf);
+      const { results, count } = await fetchInvoices(currentPage, 7);
+      setFilteredInvoices(results);
+      setTotalPages(Math.ceil(count[0]["COUNT(*)"] / 7));
   
-        setModalContent({
-          title: "Success",
-          message: "Invoice created and PDF uploaded successfully!",
-        });
-        setModalVisible(true);
+      setModalContent({
+        title: "Success",
+        message: "Invoice created and PDF uploaded successfully!",
+      });
+      setModalVisible(true);
   
-        setNewInvoice({
-          dateRange: null,
-          quotationId: "",
-          purchaseId: "",
-          invoiceId: "",
-          invoicePdf: null,
-        });
-      } else {
-        setModalContent({
-          title: "Success",
-          message: "Invoice created successfully!",
-        });
-        setModalVisible(true);
-      }
+      setNewInvoice({
+        quotationId: "",
+        purchaseId: "",
+        invoiceId: "",
+        invoicePdf: null,
+      });
+      setErrors({
+        quotationId: false,
+        purchaseId: false,
+        invoiceId: false,
+        invoicePdf: false,
+      });
     } catch (error) {
       console.error("Failed to add invoice:", error);
       setModalContent({
@@ -255,78 +278,79 @@ const OrdersPage = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Purchase ID</label>
-            <div
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm overflow-auto max-h-40"
-              onScroll={handlePurchasesScroll}
-            >
-              <select
-                className="w-full"
-                value={newInvoice.purchaseId || ""}
-                onChange={handlePurchaseChange}
-              >
-                <option value="" disabled>Select Purchase</option>
-                {purchases.map((purchase: any) => (
-                  <option key={purchase.id} value={purchase.id}>
-                    {purchase.id}
-                  </option>
-                ))}
-              </select>
+  <label className="block text-sm font-medium text-gray-700 mb-1">Purchase ID</label>
+  <select
+    className={`w-full border rounded-lg px-4 py-2 text-sm ${
+      errors.purchaseId ? "border-red-500" : "border-gray-300"
+    }`}
+    value={newInvoice.purchaseId || ""}
+    onChange={handlePurchaseChange}
+  >
+    <option value="" disabled>Select Purchase</option>
+    {purchases.map((purchase: any) => (
+      <option key={purchase.id} value={purchase.id}>{purchase.id}</option>
+    ))}
+  </select>
+</div>
 
-            </div>
-          </div>
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">Quotation ID</label>
+  <input
+    required
+    type="text"
+    className={`w-full border rounded-lg px-4 py-2 text-sm bg-gray-100 ${
+      errors.quotationId ? "border-red-500" : "border-gray-300"
+    }`}
+    value={newInvoice.quotationId}
+    readOnly
+  />
+</div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Quotation ID</label>
-            <input
-              type="text"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm bg-gray-100"
-              value={newInvoice.quotationId}
-              readOnly // Make it non-editable
-            />
-          </div>
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">Invoice ID</label>
+  <div className="flex items-center">
+    <input
+      required
+      type="text"
+      className={`w-full border rounded-lg px-4 py-2 text-sm bg-gray-100 ${
+        errors.invoiceId ? "border-red-500" : "border-gray-300"
+      }`}
+      value={newInvoice.invoiceId}
+      readOnly
+    />
+    <button
+      onClick={handleGenerateInvoiceId}
+      className="ml-2 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800"
+    >
+      Generate
+    </button>
+  </div>
+</div>
 
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Invoice ID</label>
-            <div className="flex items-center">
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm bg-gray-100"
-                value={newInvoice.invoiceId}
-                readOnly // Disable the text field
-              />
-              <button
-                onClick={handleGenerateInvoiceId}
-                className="ml-2 bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800"
-              >
-                Generate
-              </button>
-            </div>
-          </div>
-
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Select Invoice PDF</label>
-            <div className="relative">
-              <label
-                htmlFor="invoice-upload"
-                className="block text-sm border border-gray-300 px-4 py-2 rounded-lg text-gray-700 cursor-pointer bg-white hover:border-2"
-              >
-                Choose PDF File
-              </label>
-              <input
-                id="invoice-upload"
-                type="file"
-                accept="application/pdf"
-                className="sr-only"
-                onChange={(e) =>
-                  setNewInvoice({ ...newInvoice, invoicePdf: e.target.files ? e.target.files[0] : null })
-                }
-              />
-              {newInvoice.invoicePdf && <p className="mt-2 text-sm text-gray-600">{newInvoice.invoicePdf.name}</p>}
-            </div>
-          </div>
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">Select Invoice PDF</label>
+  <div className="relative">
+    <label
+      htmlFor="invoice-upload"
+      className={`block text-sm border px-4 py-2 rounded-lg cursor-pointer bg-white ${
+        errors.invoicePdf ? "border-red-500" : "border-gray-300"
+      }`}
+    >
+      Choose PDF File
+    </label>
+    <input
+      required
+      id="invoice-upload"
+      type="file"
+      accept="application/pdf"
+      className="sr-only"
+      onChange={(e) =>
+        setNewInvoice({ ...newInvoice, invoicePdf: e.target.files ? e.target.files[0] : null })
+      }
+    />
+    {newInvoice.invoicePdf && <p className="mt-2 text-sm text-gray-600">{newInvoice.invoicePdf.name}</p>}
+  </div>
+</div>
 
           <div className="flex items-end">
             <button
