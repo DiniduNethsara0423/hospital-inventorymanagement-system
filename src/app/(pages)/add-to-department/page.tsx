@@ -171,6 +171,11 @@ const closeModal = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (Number(formData.qty) <= 0) {
+      showModal("Quantity must be greater than 0.");
+      setModalType("error");
+      return;
+    }
 
     try {
       await addItemToDepartment(
@@ -189,6 +194,7 @@ const closeModal = () => {
       fetchAssignedItems(); // Refresh table data
     } catch (error) {
       showModal("Failed to add item to department. Please try again.");
+      setModalType("error");
     }
   };
 

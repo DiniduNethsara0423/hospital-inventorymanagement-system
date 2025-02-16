@@ -24,6 +24,12 @@ function DepartmentsPage() {
 
   const router = useRouter();
   
+  const [modalOpen, setModalOpen] = useState(false);
+const [modalTitle, setModalTitle] = useState("");
+const [modalMessage, setModalMessage] = useState("");
+const [modalAction, setModalAction] = useState<(() => void) | null>(null);
+
+
     useEffect(() => {
       const token = localStorage.getItem('jwtToken');
       if (!token) {
@@ -69,30 +75,38 @@ function DepartmentsPage() {
         await postDepartment({ name });
       }
       setOpenPopup(false);
-      setEditingDepartment(null); // Reset editing state after saving
-      fetchDepartments(); // Refresh the list
+    setEditingDepartment(null);
+    fetchDepartments();
+  } catch (error) {
+    setModalTitle("Error");
+    setModalMessage("Failed to save department. Please try again.");
+    setModalOpen(true);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+const handleDeleteDepartment = async (id: number) => {
+  setModalTitle("Confirm Deletion");
+  setModalMessage("Are you sure you want to delete this department?");
+  setModalAction(() => async () => {
+    setModalOpen(false);
+    setLoading(true);
+    try {
+      await deleteDepartment(id);
+      fetchDepartments();
     } catch (error) {
-      console.error("Failed to save department:", error);
-      alert("Error saving department. Please try again.");
+      setModalTitle("Error");
+      setModalMessage("Failed to delete department. Please try again.");
+      setModalOpen(true);
     } finally {
       setLoading(false);
     }
-  };
+  });
+  setModalOpen(true);
+};
 
-
-  const handleDeleteDepartment = async (id: number) => {
-    if (confirm("Are you sure you want to delete this department?")) {
-      setLoading(true);
-      try {
-        await deleteDepartment(id);
-        fetchDepartments(); // Refresh the list after deletion
-      } catch (error) {
-        alert("Error deleting department. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
 
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
@@ -213,11 +227,14 @@ function DepartmentsPage() {
             onClick={() => {
               const departmentName = editingDepartment?.name || "";
               if (!departmentName.trim()) {
-                alert("Department name is required.");
+                setModalTitle("Validation Error");
+                setModalMessage("Department name is required.");
+                setModalOpen(true);
                 return;
               }
               handleAddOrUpdateDepartment(departmentName);
             }}
+            
           >
             Save
           </button>

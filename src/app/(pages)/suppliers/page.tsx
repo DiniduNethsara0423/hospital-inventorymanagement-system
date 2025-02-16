@@ -110,8 +110,14 @@ const validateEmail = (email: string) => {
       }
     }
   };
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async () => {
+    if (!form.vendorName || !form.shopName || !form.email || !form.shopName || !form.telephoneNumber) {
+      setErrorMessage("Please fill in all required fields");
+      return;
+    }
+
     try {
       const supplierData: any = {
         vendor_id: form.id, // Use the ID
@@ -140,7 +146,7 @@ const validateEmail = (email: string) => {
       fetchSuppliers(currentPage, pageSize)
     } catch (error: any) {
       console.error("Error saving supplier:", error);
-      alert(error.message || "Failed to save supplier.");
+      setErrorMessage("Failed to save supplier.");
     }
   };
 
@@ -459,6 +465,22 @@ const validateEmail = (email: string) => {
           </div>
         </div>
       )}
+
+{/* Error Modal */}
+{errorMessage && (
+  <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-md flex justify-center items-center z-50">
+    <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-md text-center">
+      <h2 className="text-2xl font-semibold text-red-600">Error</h2>
+      <p className="text-gray-700 mt-4">{errorMessage}</p>
+      <button
+        onClick={() => setErrorMessage(null)}
+        className="mt-6 bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition"
+      >
+        OK
+      </button>
+    </div>
+  </div>
+)}
 
     </div>
   );
