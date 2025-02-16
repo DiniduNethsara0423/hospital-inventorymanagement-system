@@ -4,6 +4,7 @@ import { FiEdit, FiTrash } from "react-icons/fi";
 import { getCategory, postCategory, updateCategory, deleteCategory } from "@/app/apis/add-category/api";
 import { Search, Edit, Trash2, Plus, ChevronLeft, ChevronRight } from "lucide-react"; // Lucide React icons
 import { useRouter } from "next/navigation";
+import Modal from "@/app/components/Modal";
 interface Category {
   id: number;
   category_name: string;
@@ -18,7 +19,10 @@ const CategoriesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [totalCategories, setTotalCategories] = useState<number>(0);
   const [newCategory, setNewCategory] = useState({ category_name: "" });
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalType, setModalType] = useState<"success" | "error">("success");
+  
   const router = useRouter();
   
     useEffect(() => {
@@ -39,7 +43,9 @@ const CategoriesPage = () => {
         console.error(response.message);
       }
     } catch (error:any) {
-      alert(error.message);
+      setModalMessage(error.message);
+      setModalType("error");
+      setIsModalOpen(true);
     }
   };
 
@@ -60,15 +66,21 @@ const CategoriesPage = () => {
 
   const handleAddCategory = async () => {
     if (!newCategory.category_name.trim()) {
-      alert("Category name cannot be empty.");
-      return;
+      setModalMessage("Category name cannot be empty.");
+      setModalType("error");
+      setIsModalOpen(true);
     }
     try {
       await postCategory(newCategory);
       setNewCategory({ category_name: "" });
+      setModalMessage("Category added successfully!");
+    setModalType("success");
+    setIsModalOpen(true);
       fetchCategories();
     } catch (error: any) {
-      alert(error.message);
+      setModalMessage(error.message);
+    setModalType("error");
+    setIsModalOpen(true);
     }
   };
 
@@ -80,20 +92,29 @@ const CategoriesPage = () => {
           category_name: selectedCategory.category_name,
         });
         setSelectedCategory(null);
+        setModalMessage("Category updated successfully!");
+      setModalType("success");
+      setIsModalOpen(true);
         fetchCategories();
       } catch (error: any) {
-        alert(error.message);
+        setModalMessage(error.message);
+      setModalType("error");
+      setIsModalOpen(true);
       }
     }
   };
   const handleDeleteCategory = async (id: number) => {
     try {
       await deleteCategory(id);
-      alert("Category deleted successfully");
-      fetchCategories();
-    } catch (error: any) {
-      alert(error.message);
-    }
+      setModalMessage("Category deleted successfully!");
+    setModalType("success");
+    setIsModalOpen(true);
+    fetchCategories();
+  } catch (error: any) {
+    setModalMessage(error.message);
+    setModalType("error");
+    setIsModalOpen(true);
+  }
   };
 
 
@@ -240,6 +261,13 @@ const CategoriesPage = () => {
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
+      <Modal 
+  isOpen={isModalOpen} 
+  onClose={() => setIsModalOpen(false)} 
+  message={modalMessage} 
+  type={modalType} 
+/>
+
     </div>
   );
 }

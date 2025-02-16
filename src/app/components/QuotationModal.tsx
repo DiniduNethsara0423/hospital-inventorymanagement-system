@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { X, FileText, CheckCircle, Upload } from "lucide-react";
 import { addQuotation, uploadQuotationPDF, updateQuotationStatus, fetchSuppliers, fetchQuotationPDFs, fetchQuotationsByPurchaseRequestId, addPurchase, getQuotationId } from "@/app/apis/purchase/api"; // Adjust the path as necessary
+import Modal from "./Modal";
 
 interface Quotation {
   id: string;
@@ -37,7 +38,10 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   
-
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
+  const [modalMessage2, setModalMessage2] = useState("");
+  const [modalType2, setModalType2] = useState<"success" | "error">("success");
+  
 
   // Generate Purchase Request ID
  
@@ -154,7 +158,9 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
     );
 
     if (!selectedQuotationData) {
-      alert("Selected quotation data not found.");
+      setModalMessage2("Selected quotation data not found.");
+    setModalType2("error");
+    setIsModalOpen2(true);
       return;
     }
 
@@ -208,7 +214,9 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
         const id = await getQuotationId();
         setPurchaseRequestId(id); // Store fetched ID
       } catch (error) {
-        alert("Failed to fetch quotation ID.");
+        setModalMessage2("Failed to fetch quotation ID.");
+    setModalType2("error");
+    setIsModalOpen2(true);
       }
     };
   
@@ -446,6 +454,13 @@ export const QuotationModal: React.FC<QuotationModalProps> = ({
     </div>
   </div>
 )}
+<Modal 
+  isOpen={isModalOpen2} 
+  onClose={() => setIsModalOpen2(false)} 
+  message={modalMessage2} 
+  type={modalType2} 
+/>
+
 
     </div>
   );

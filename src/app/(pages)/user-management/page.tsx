@@ -6,6 +6,7 @@ import RegistrationSteps from "@/app/components/RegisterUserPopUp";
 import { fetchAllUsers, assignPermission, revokePermission, getAllPermissionDetails } from "@/app/apis/auth/api"; // Importing APIs
 import { useRouter } from "next/navigation";
 import { deleteUser } from "@/app/apis/inventory/api";
+import Modal from "@/app/components/Modal";
  
 const UserManagement: React.FC = () => {
   const [users, setUsers]: any = useState([]);
@@ -25,6 +26,10 @@ const UserManagement: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [modalMessage, setModalMessage] = useState<string | null>(null);
 const [showModal, setShowModal] = useState<boolean>(false);
+
+const [isModalOpen, setIsModalOpen] = useState(false);
+const [modalType, setModalType] = useState<"success" | "error">("success");
+const [modalMessage2, setModalMessage2] = useState("");
 
   const router = useRouter();
 
@@ -61,9 +66,13 @@ const [showModal, setShowModal] = useState<boolean>(false);
       try {
         await deleteUser(deleteUserId);
         setUsers(users.filter((user: any) => user.id !== deleteUserId));
-        alert("User deleted successfully!");
+        setModalMessage2("User deleted successfully!");
+    setModalType("success");
+    setIsModalOpen(true);
       } catch (error) {
-        alert("Failed to delete user.");
+        setModalMessage2("Faild to delete user!");
+    setModalType("error");
+    setIsModalOpen(true);
       }
     }
     setShowDeleteModal(false);
@@ -450,6 +459,13 @@ const [showModal, setShowModal] = useState<boolean>(false);
           </div>
         </div>
       )}
+
+<Modal 
+  isOpen={isModalOpen} 
+  onClose={() => setIsModalOpen(false)} 
+  message={modalMessage2} 
+  type={modalType} 
+/>
 
     </div>
   );

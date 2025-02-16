@@ -199,42 +199,47 @@ const DepartmentDetailPage = () => {
         </tr>
       </thead>
       <tbody>
-        {items.length === 0 ? (
+        {items.filter(item => item.QTY > 0).length === 0 ? ( // Check if filtered array is empty
           <tr>
             <td colSpan={4} className="text-center py-4 text-gray-500 italic">
               No data to show
             </td>
           </tr>
         ) : (
-          items.map((item, index) => (
-            <tr key={index} className="border-t hover:bg-gray-100">
-              <td className="border px-4 py-2">{item.ITEM_DEPARTMENT_BARCODE}</td>
-              <td className="border px-4 py-2">{item.ITEM_NAME}</td>
-              <td className="border px-4 py-2">{item.QTY}</td>
-              <td className="border px-4 py-2 flex space-x-4">
-                <button
-                  className="text-red-500 hover:text-red-700"
-                  onClick={() => {
-                    setSelectedItem(item);
-                    setIsModalOpen(true);
-                  }}
-                >
-                  <Trash2 size={20} />
-                </button>
-              </td>
-            </tr>
-          ))
+          items
+            .filter(item => item.QTY > 0) // Filter items with QTY > 0
+            .map((item, index) => (
+              <tr key={index} className="border-t hover:bg-gray-100">
+                <td className="border px-4 py-2">{item.ITEM_DEPARTMENT_BARCODE}</td>
+                <td className="border px-4 py-2">{item.ITEM_NAME}</td>
+                <td className="border px-4 py-2">{item.QTY}</td>
+                <td className="border px-4 py-2 flex space-x-4">
+                  <button
+                    className="text-red-500 hover:text-red-700"
+                    onClick={() => {
+                      setSelectedItem(item);
+                      setIsModalOpen(true);
+                    }}
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </td>
+              </tr>
+            ))
         )}
       </tbody>
     </table>
   </div>
 
+
   {/* Show Cards for sm and below */}
   <div className="md:hidden flex flex-col gap-4">
-    {items.length === 0 ? (
+    {items.filter(item => item.QTY > 0).length === 0 ? (
       <p className="text-center py-4 text-gray-500 italic">No data to show</p>
     ) : (
-      items.map((item, index) => (
+      items
+      .filter(item => item.QTY > 0)
+      .map((item, index) => (
         <div key={index} className="border rounded-lg p-4 shadow-sm bg-gray-50">
           <div className="flex justify-between">
             <span className="text-gray-600 font-medium">Barcode:</span>

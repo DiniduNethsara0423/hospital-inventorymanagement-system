@@ -6,6 +6,7 @@ import { addItemToDepartment, getAssignedItems, getDepartments, getItemsForDepar
 import { getAllItemDetails, getBarcode } from "@/app/apis/inventory/api"; // Update the path as needed
 import Barcode from "@/app/components/Barcode";
 import { useRouter } from "next/navigation";
+import Modal from "@/app/components/Modal";
 
 
 const AddItemToDepartment = () => {
@@ -36,12 +37,27 @@ const AddItemToDepartment = () => {
     }
   }, [router]);
 
+  const [modalOpen, setModalOpen] = useState(false);
+const [modalMessage, setModalMessage] = useState("");
+
+const [modalType, setModalType] = useState<"success" | "error">("success");
+
+const showModal = (message: string) => {
+  setModalMessage(message);
+  setModalOpen(true);
+};
+
+const closeModal = () => {
+  setModalOpen(false);
+};
   const fetchAssignedItems = async () => {
     try {
       const response = await getAssignedItems(currentPage, pageSize);
       setAssignedItems(response.result);
     } catch (error) {
-      alert("Failed to fetch assigned items.");
+      showModal("Failed to fetch assigned items.");
+      setModalType("error");
+
     }
   };
 
@@ -81,7 +97,9 @@ const AddItemToDepartment = () => {
 
       setItemDetails(allItemDetails);
     } catch (error) {
-      alert("Failed to fetch item details.");
+      showModal("Failed to fetch item details.");
+      setModalType("error");
+
     }
   };
 
@@ -100,7 +118,9 @@ const AddItemToDepartment = () => {
 
       setDepartments(allDepartments);
     } catch (error) {
-      alert("Failed to fetch departments.");
+      showModal("Failed to fetch departments.");
+      setModalType("error");
+
     }
   };
 
@@ -110,7 +130,9 @@ const AddItemToDepartment = () => {
       const response = await getBarcode();
       setFormData({ ...formData, barcode: String(response.data) });
     } catch (error) {
-      alert("Failed to fetch barcode.");
+      showModal("Failed to fetch barcode.");
+      setModalType("error");
+
     }
   };
 
@@ -166,7 +188,7 @@ const AddItemToDepartment = () => {
       });
       fetchAssignedItems(); // Refresh table data
     } catch (error) {
-      alert("Failed to add item to department. Please try again.");
+      showModal("Failed to add item to department. Please try again.");
     }
   };
 
@@ -422,6 +444,7 @@ const AddItemToDepartment = () => {
           </div>
         </div>
       )}
+<Modal isOpen={modalOpen} onClose={closeModal} message={modalMessage}   type={modalType} />
 
     </div>
 

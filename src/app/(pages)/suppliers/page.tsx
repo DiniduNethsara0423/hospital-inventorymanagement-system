@@ -24,6 +24,13 @@ export default function SuppliersPage() {
 
   const router = useRouter();
 
+  const [emailError, setEmailError] = useState<string | null>(null);
+
+const validateEmail = (email: string) => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(email);
+};
+
   useEffect(() => {
     const token = localStorage.getItem('jwtToken');
     if (!token) {
@@ -86,8 +93,22 @@ export default function SuppliersPage() {
     setEditingId(null);
   };
 
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setForm({ ...form, [e.target.name]: e.target.value });
+    
+  // };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+  
+    if (name === "email") {
+      if (value && !validateEmail(value)) {
+        setEmailError("Invalid email format");
+      } else {
+        setEmailError(null);
+      }
+    }
   };
 
   const handleSubmit = async () => {
@@ -331,17 +352,19 @@ export default function SuppliersPage() {
                 />
               </div>
               <div>
-                <label className="block text-lg font-medium text-gray-700 mb-1">
-                  Email (Optional)
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-lg"
-                />
-              </div>
+  <label className="block text-lg font-medium text-gray-700 mb-1">
+    Email (Optional)
+  </label>
+  <input
+    type="email"
+    name="email"
+    value={form.email || ""}
+    onChange={handleChange}
+    className={`w-full px-4 py-2 border ${emailError ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-blue-500 focus:border-blue-500 text-lg`}
+  />
+  {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+</div>
+
               <div>
                 <label className="block text-lg font-medium text-gray-700 mb-1">
                   Shop Name

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { getLogsByTableAndDate } from "@/app/apis/logs/api";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Modal from "./Modal";
 
 const TableAndDate: React.FC = () => {
   const [selectedTable, setSelectedTable] = useState("category_log");
@@ -11,14 +12,19 @@ const TableAndDate: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [total, setTotal] = useState(0);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalType, setModalType] = useState<"success" | "error">("success");
+  
   const handleTableChange = (table: string) => {
     setSelectedTable(table);
   };
 
   const fetchLogs = async () => {
     if (!selectedDate) {
-      alert("Please select a date.");
+      setModalMessage("Please select a date.");
+    setModalType("error");
+    setIsModalOpen(true);
       return;
     }
 
@@ -180,6 +186,13 @@ const TableAndDate: React.FC = () => {
         </div> */}
         </div>
       </div>
+      <Modal 
+  isOpen={isModalOpen} 
+  onClose={() => setIsModalOpen(false)} 
+  message={modalMessage} 
+  type={modalType} 
+/>
+
     </div>
   );
 };
