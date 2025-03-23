@@ -67,7 +67,7 @@ const SidebarNavbar = () => {
     <div className="flex">
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-40 w-64 h-screen py-4 bg-gray-900 transition-transform ${
+        className={`fixed top-0 left-0 z-40 w-64 h-screen py-4 bg-gray-900 transition-transform  ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0 md:static`}
       >

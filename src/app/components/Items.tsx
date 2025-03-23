@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import JsBarcode from "jsbarcode";
 import { getAllItems, deleteItem, updateItem, getAllCategories } from "@/app/apis/inventory/api";
 import { Edit, Trash2, X } from "lucide-react";
+import Link from "next/link";
 
 interface InventoryItem {
   item_barcode: string;
@@ -211,7 +212,7 @@ const Items: React.FC<ItemsProps> = ({ currentPage, itemsPerPage, onTotalItemsCh
             <option value={50}>50</option>
           </select>
         </div>
-        <p className="text-gray-700">Total Items: {totalItems}</p>
+        <p className="text-blue-600"><Link href={"/all-items"}>All Items</Link></p>
       </div>
 
 
